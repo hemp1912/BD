@@ -1,3 +1,5 @@
+import os
+import json
 import uuid
 from typing import Optional
 from fastapi import APIRouter, HTTPException, Request, status
@@ -9,8 +11,44 @@ from backend.db_client import db_client
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
+class PersistentSessionsDict(dict):
+    def __init__(self, filepath):
+        self.filepath = filepath
+        super().__init__()
+        self.load()
+        
+    def load(self):
+        if os.path.exists(self.filepath):
+            try:
+                with open(self.filepath, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    self.update(data)
+            except Exception as e:
+                print(f"[!] Warning: Could not load persistent sessions: {e}")
+                
+    def save(self):
+        try:
+            with open(self.filepath, "w", encoding="utf-8") as f:
+                json.dump(self, f, indent=4)
+        except Exception as e:
+            print(f"[!] Warning: Could not save persistent sessions: {e}")
+            
+    def __setitem__(self, key, value):
+        super().__setitem__(key, value)
+        self.save()
+        
+    def pop(self, key, default=None):
+        res = super().pop(key, default)
+        self.save()
+        return res
+        
+    def __delitem__(self, key):
+        super().__delitem__(key)
+        self.save()
+
 # Session cache for token verification
-MOCK_SESSIONS = {}
+SESSIONS_FILE = os.path.join(os.path.dirname(__file__), "sessions_cache.json")
+MOCK_SESSIONS = PersistentSessionsDict(SESSIONS_FILE)
 
 class LoginRequest(BaseModel):
     email: str
@@ -31,6 +69,19 @@ def extract_request_token(request: Request, token: Optional[str] = None) -> Opti
         return auth_header.split(" ", 1)[1].strip()
     return request.query_params.get("token")
 
+def is_appwrite_session_expired(expire_str: Optional[str]) -> bool:
+    if not expire_str:
+        return False
+    try:
+        from datetime import datetime, timezone
+        iso_str = expire_str.replace("Z", "+00:00")
+        expire_dt = datetime.fromisoformat(iso_str)
+        now_dt = datetime.now(timezone.utc)
+        return now_dt >= expire_dt
+    except Exception as e:
+        print(f"[!] Error parsing Appwrite session expiration: {e}")
+        return False
+
 async def get_current_session(request: Request, token: Optional[str] = None):
     session_token = extract_request_token(request, token)
     if not session_token:
@@ -40,11 +91,52 @@ async def get_current_session(request: Request, token: Optional[str] = None):
         )
         
     if config.DB_TYPE == "APPWRITE":
+        import time
+        is_fallback_session = session_token.startswith("sess_")
+        
         if session_token in MOCK_SESSIONS:
             session_data = MOCK_SESSIONS[session_token]
-            if session_data["role"] != "admin":
-                raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin privileges required.")
-            return session_data
+            
+            # Check natural Appwrite expiration if not a mock/fallback session
+            if not is_fallback_session:
+                expire_str = session_data.get("expire")
+                if is_appwrite_session_expired(expire_str):
+                    print(f"[*] Session {session_token[:8]}... has naturally expired. Evicting from cache.")
+                    MOCK_SESSIONS.pop(session_token, None)
+                    raise HTTPException(
+                        status_code=status.HTTP_401_UNAUTHORIZED,
+                        detail="Session expired. Please log in again."
+                    )
+                
+                # Check if cache TTL (e.g. 5 minutes) has elapsed to re-verify session status with Appwrite
+                now = time.time()
+                last_verified = session_data.get("verified_at", 0)
+                if now - last_verified > 300:
+                    print(f"[*] Session cache TTL elapsed for {session_token[:8]}... Re-verifying with Appwrite.")
+                    try:
+                        client = Client()
+                        client.set_endpoint(config.APPWRITE_ENDPOINT)
+                        client.set_project(config.APPWRITE_PROJECT_ID)
+                        client.set_session(session_token)
+                        
+                        account = Account(client)
+                        session_info = account.get_session("current")
+                        
+                        session_data["verified_at"] = now
+                        session_data["expire"] = session_info.get("expire", "")
+                        MOCK_SESSIONS[session_token] = session_data
+                    except Exception as e:
+                        print(f"[*] Session verification failed: {e}. Removing from cache.")
+                        MOCK_SESSIONS.pop(session_token, None)
+                        raise HTTPException(
+                            status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail="Session invalid or revoked. Please log in again."
+                        )
+            
+            if session_token in MOCK_SESSIONS:
+                if session_data["role"] != "admin":
+                    raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin privileges required.")
+                return session_data
             
         try:
             client = Client()
@@ -55,6 +147,14 @@ async def get_current_session(request: Request, token: Optional[str] = None):
             account = Account(client)
             user_details = account.get()
             
+            expire_time = ""
+            if not is_fallback_session:
+                try:
+                    session_info = account.get_session("current")
+                    expire_time = session_info.get("expire", "")
+                except Exception:
+                    pass
+            
             email = user_details.get("email", "")
             user_id = user_details.get("$id", user_details.get("id", ""))
             
@@ -64,13 +164,16 @@ async def get_current_session(request: Request, token: Optional[str] = None):
                 
             role = "admin"
             name = db_user.get("full_name", user_details.get("name", "Admin"))
-                 
+            
+            import time
             session_data = {
                 "email": email,
                 "role": role,
                 "name": name,
                 "id": user_id,
-                "token": session_token
+                "token": session_token,
+                "expire": expire_time,
+                "verified_at": time.time()
             }
             MOCK_SESSIONS[session_token] = session_data
             return session_data
@@ -135,12 +238,16 @@ async def login(req: LoginRequest):
             name = db_user.get("full_name", user_details.get("name", "Admin"))
                 
             session_token = session_secret
+            session_expire = session.get("expire", "")
+            import time
             session_data = {
                 "email": email,
                 "role": role,
                 "name": name,
                 "id": user_id,
-                "token": session_token
+                "token": session_token,
+                "expire": session_expire,
+                "verified_at": time.time()
             }
             MOCK_SESSIONS[session_token] = session_data
             return session_data
@@ -151,12 +258,15 @@ async def login(req: LoginRequest):
             if email in fallback_users and fallback_users[email]["role"] == "admin" and fallback_users[email]["password"] == password:
                 user_info = fallback_users[email]
                 session_token = "sess_" + str(uuid.uuid4())[:12]
+                import time
                 session_data = {
                     "email": email,
                     "role": user_info["role"],
                     "name": user_info.get("full_name", user_info.get("name", "Unknown")),
                     "id": user_info.get("id", "usr_admin"),
-                    "token": session_token
+                    "token": session_token,
+                    "expire": "",
+                    "verified_at": time.time()
                 }
                 MOCK_SESSIONS[session_token] = session_data
                 return session_data
@@ -171,12 +281,15 @@ async def login(req: LoginRequest):
         
     if user_info:
         session_token = "sess_" + str(uuid.uuid4())[:12]
+        import time
         session_data = {
             "email": email,
             "role": user_info["role"],
             "name": user_info.get("full_name", user_info.get("name", "Unknown")),
             "id": user_info.get("id", "usr_admin"),
-            "token": session_token
+            "token": session_token,
+            "expire": "",
+            "verified_at": time.time()
         }
         MOCK_SESSIONS[session_token] = session_data
         return session_data

@@ -202,9 +202,24 @@ class AppwriteDB(BaseDB):
                     {"type": "string", "key": "contact", "size": 100, "required": False, "default": ""},
                     {"type": "float", "key": "base_rate", "required": False, "default": 0.0},
                     {"type": "float", "key": "amount_owed", "required": False, "default": 0.0},
-                    {"type": "string", "key": "payment_history", "size": 10000, "required": False, "default": "[]"}
+                    {"type": "string", "key": "payment_history", "size": 10000, "required": False, "default": "[]"},
+                    {"type": "float", "key": "half_day_rate", "required": False, "default": 0.0},
+                    {"type": "float", "key": "night_rate", "required": False, "default": 0.0}
                 ],
                 "indexes": []
+            },
+            config.APPWRITE_ATTENDANCE_COLLECTION_ID: {
+                "name": "Attendance",
+                "attributes": [
+                    {"type": "string", "key": "crew_id", "size": 100, "required": True},
+                    {"type": "string", "key": "crew_name", "size": 255, "required": True},
+                    {"type": "string", "key": "date", "size": 50, "required": True},
+                    {"type": "string", "key": "status", "size": 50, "required": True},
+                    {"type": "float", "key": "calculated_pay", "required": True}
+                ],
+                "indexes": [
+                    {"key": "date_index", "type": "key", "attributes": ["date"]}
+                ]
             }
         }
 
@@ -409,6 +424,9 @@ class AppwriteDB(BaseDB):
             ("base_daily_rate", 0.0),
             ("base_rate", 0.0),
             ("amount_owed", 0.0),
+            ("calculated_pay", 0.0),
+            ("half_day_rate", 0.0),
+            ("night_rate", 0.0),
         ]:
             if num_field in cleaned and cleaned.get(num_field) is None:
                 cleaned[num_field] = default_val
@@ -651,4 +669,56 @@ class AppwriteDB(BaseDB):
             return True
         except Exception:
             return False
+
+    # Attendance CRUD
+    async def get_attendance(self, date_str: str):
+        res = self.databases.list_documents(
+            self.db_id,
+            config.APPWRITE_ATTENDANCE_COLLECTION_ID,
+            queries=[Query.equal("date", date_str), Query.limit(100)]
+        )
+        return [self._clean_doc(d) for d in self._get_documents_list(res)]
+
+    async def get_attendance_record(self, date_str: str, crew_id: str):
+        try:
+            res = self.databases.list_documents(
+                self.db_id,
+                config.APPWRITE_ATTENDANCE_COLLECTION_ID,
+                queries=[Query.equal("date", date_str), Query.equal("crew_id", crew_id)]
+            )
+            docs = self._get_documents_list(res)
+            return self._clean_doc(docs[0]) if docs else None
+        except Exception:
+            return None
+
+    async def save_attendance_record(self, date_str: str, crew_id: str, record: dict):
+        existing = await self.get_attendance_record(date_str, crew_id)
+        data = {k: v for k, v in record.items() if k != "id"}
+        data["date"] = date_str
+        data["crew_id"] = crew_id
+        
+        if existing:
+            doc = self.databases.update_document(
+                self.db_id,
+                config.APPWRITE_ATTENDANCE_COLLECTION_ID,
+                existing["id"],
+                data
+            )
+        else:
+            doc_id = "att_" + str(uuid.uuid4())[:8]
+            doc = self.databases.create_document(
+                self.db_id,
+                config.APPWRITE_ATTENDANCE_COLLECTION_ID,
+                doc_id,
+                data
+            )
+        return self._clean_doc(doc)
+
+    async def get_all_attendance(self):
+        res = self.databases.list_documents(
+            self.db_id,
+            config.APPWRITE_ATTENDANCE_COLLECTION_ID,
+            queries=[Query.limit(1000)]
+        )
+        return [self._clean_doc(d) for d in self._get_documents_list(res)]
 

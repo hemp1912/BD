@@ -1368,7 +1368,7 @@ async function loadCrewData(page) {
         }
 
         if (filtered.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="7" style="text-align: center;">No crew profiles found.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="8" style="text-align: center;">No crew profiles found.</td></tr>`;
             renderPaginationControls("crew-pagination", 0, crewPage, "loadCrewData");
             return;
         }
@@ -1384,10 +1384,12 @@ async function loadCrewData(page) {
                 <td>${c.role}</td>
                 <td>${c.contact || ''}</td>
                 <td>₹${c.base_rate.toFixed(2)}</td>
+                <td><span class="badge badge-confirmed">${c.days_worked || 0} days</span></td>
                 <td><strong class="${c.amount_owed > 0 ? 'text-danger' : 'text-success'}">₹${c.amount_owed.toFixed(2)}</strong></td>
                 <td>
                     <div style="display: flex; gap: 0.4rem;">
                         <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.8rem;" onclick="openCrewPaymentModal('${c.id}')">Payout</button>
+                        <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.8rem;" onclick="openCrewHistoryModal('${c.id}')">History</button>
                         <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.8rem;" onclick="editCrewMember('${c.id}')">Edit</button>
                         <button class="btn-danger" style="padding: 0.35rem 0.5rem; font-size: 0.8rem; border-radius: 8px;" onclick="deleteCrewMember('${c.id}')">✕</button>
                     </div>
@@ -1406,8 +1408,10 @@ async function handleCrewSubmit(e) {
     const role = document.getElementById("crew-role").value;
     const contact = document.getElementById("crew-contact").value;
     const base_rate = parseFloat(document.getElementById("crew-rate").value) || 0.0;
+    const half_day_rate = parseFloat(document.getElementById("crew-half-day-rate").value) || 0.0;
+    const night_rate = parseFloat(document.getElementById("crew-night-rate").value) || 0.0;
     
-    const payload = { name, role, contact, base_rate };
+    const payload = { name, role, contact, base_rate, half_day_rate, night_rate };
     const method = id ? "PUT" : "POST";
     const endpoint = id ? `/api/crew/${id}` : "/api/crew";
     
@@ -1433,6 +1437,8 @@ function editCrewMember(crewId) {
     document.getElementById("crew-role").value = member.role;
     document.getElementById("crew-contact").value = member.contact || "";
     document.getElementById("crew-rate").value = member.base_rate;
+    document.getElementById("crew-half-day-rate").value = member.half_day_rate && member.half_day_rate > 0 ? member.half_day_rate : "";
+    document.getElementById("crew-night-rate").value = member.night_rate && member.night_rate > 0 ? member.night_rate : "";
     
     openModal("modal-crew");
 }
@@ -1477,13 +1483,125 @@ async function handleCrewPaymentSubmit(e) {
         });
         showToast("Payout to crew member logged.");
         closeModal("modal-crew-payment");
+        
+        // Refresh crewList to include the new payment history
+        crewList = await apiFetch("/api/crew");
+        
+        // Ask if they want to download the receipt
+        showConfirmation("Payout Logged", "Would you like to download the PDF payout receipt?", () => {
+            exportCrewPayoutPDF(id, 0); // 0 is index of newest payment
+        });
+        
         loadCrewData();
     } catch (err) {}
+}
+
+function openCrewHistoryModal(crewId) {
+    const member = crewList.find(c => c.id === crewId);
+    if (!member) return;
+    
+    document.getElementById("crew-history-name").innerText = member.name;
+    const tbody = document.getElementById("crew-history-table-body");
+    tbody.innerHTML = "";
+    
+    let history = [];
+    try {
+        history = JSON.parse(member.payment_history || "[]");
+    } catch (e) {}
+    
+    if (history.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">No past payouts logged.</td></tr>`;
+        openModal("modal-crew-history");
+        return;
+    }
+    
+    // Sort descending by date (newest first)
+    history.sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    history.forEach((pay, index) => {
+        const tr = document.createElement("tr");
+        const dateStr = new Date(pay.date).toLocaleDateString('en-IN', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        
+        tr.innerHTML = `
+            <td>${dateStr}</td>
+            <td style="font-weight: 600;">₹${pay.amount.toFixed(2)}</td>
+            <td style="text-align: right;">
+                <button class="btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" onclick="exportCrewPayoutPDF('${member.id}', ${index})">PDF</button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+    
+    openModal("modal-crew-history");
+}
+
+function exportCrewPayoutPDF(crewId, paymentIndex) {
+    const member = crewList.find(c => c.id === crewId);
+    if (!member) return;
+    
+    let history = [];
+    try {
+        history = JSON.parse(member.payment_history || "[]");
+    } catch (e) {}
+    
+    // Sort descending by date to match list indexes
+    history.sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    const pay = history[paymentIndex];
+    if (!pay) return;
+    
+    const template = document.getElementById("crew-payout-pdf-template");
+    if (!template) {
+        showToast("Payout template not found", "error");
+        return;
+    }
+    
+    const printArea = template.cloneNode(true);
+    printArea.style.display = "block";
+    
+    const dateStr = new Date(pay.date).toLocaleDateString('en-IN', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+    
+    printArea.querySelector("#pdf-payout-date").innerText = dateStr;
+    printArea.querySelector("#pdf-crew-name").innerText = member.name;
+    printArea.querySelector("#pdf-crew-role").innerText = member.role;
+    printArea.querySelector("#pdf-crew-contact").innerText = member.contact || "N/A";
+    printArea.querySelector("#pdf-payout-amount").innerText = `₹${pay.amount.toFixed(2)}`;
+    printArea.querySelector("#pdf-payout-remaining").innerText = `₹${member.amount_owed.toFixed(2)}`;
+    
+    const opt = {
+        margin:       [10, 10, 10, 10],
+        filename:     `Bhoomi_Payout_${member.name.replace(/\s+/g, '_')}_${pay.date.split('T')[0]}.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true, letterRendering: true, scrollY: 0 },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    
+    showToast("Generating Payout PDF Receipt...");
+    html2pdf().from(printArea).set(opt).save().then(() => {
+        showToast("Payout receipt exported successfully.");
+    }).catch(err => {
+        console.error("PDF generation failed:", err);
+        showToast("Failed to generate payout PDF.", "error");
+    });
 }
 
 // ─── 4. Finance Hub ──────────────────────────────────────────────────────────
 let currentFinanceFilter = "All";
 async function loadFinanceData(filterType = "All", page) {
+    if (typeof filterType === "number") {
+        page = filterType;
+        filterType = currentFinanceFilter;
+    }
     currentFinanceFilter = filterType;
     if (page !== undefined) financePage = page;
 
@@ -1765,7 +1883,7 @@ async function exportInvoiceToPDF(eventId) {
             margin:       [10, 10, 10, 10],
             filename:     `Bhoomi_Invoice_${evt.id}.pdf`,
             image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
+            html2canvas:  { scale: 2, useCORS: true, letterRendering: true, scrollY: 0 },
             jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
         
@@ -2008,7 +2126,7 @@ async function exportManualInvoiceToPDF(eventId, data) {
         margin: [10, 10, 10, 10],
         filename: `Bhoomi_ManualInvoice_${eventId}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+        html2canvas: { scale: 2, useCORS: true, letterRendering: true, scrollY: 0 },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
@@ -2043,6 +2161,22 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("crew-form").addEventListener("submit", handleCrewSubmit);
     document.getElementById("crew-payment-form").addEventListener("submit", handleCrewPaymentSubmit);
     document.getElementById("manual-invoice-form").addEventListener("submit", handleManualInvoiceSubmit);
+
+    // 4. Attendance system listeners
+    const btnManageAttendance = document.getElementById("btn-manage-attendance");
+    if (btnManageAttendance) {
+        btnManageAttendance.addEventListener("click", openAttendanceModal);
+    }
+    const attendanceDateInput = document.getElementById("attendance-date");
+    if (attendanceDateInput) {
+        attendanceDateInput.addEventListener("change", (e) => {
+            loadAttendanceRegister(e.target.value);
+        });
+    }
+    const attendanceForm = document.getElementById("attendance-form");
+    if (attendanceForm) {
+        attendanceForm.addEventListener("submit", handleAttendanceSubmit);
+    }
 
     // 3. Modals open triggers
     document.getElementById("btn-add-inventory").addEventListener("click", () => {
@@ -2257,6 +2391,118 @@ document.addEventListener("DOMContentLoaded", () => {
     initializeSession();
 });
 
+// ─── Attendance Controller ──────────────────────────────────────────────────
+function openAttendanceModal() {
+    const today = new Date().toISOString().split('T')[0];
+    const dateInput = document.getElementById("attendance-date");
+    if (dateInput) {
+        dateInput.value = today;
+    }
+    openModal("modal-attendance");
+    loadAttendanceRegister(today);
+}
+
+async function loadAttendanceRegister(date) {
+    const tbody = document.getElementById("attendance-table-body");
+    if (!tbody) return;
+    
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align: center;">Loading attendance data...</td></tr>`;
+    
+    try {
+        const data = await apiFetch(`/api/attendance?date=${date}`);
+        tbody.innerHTML = "";
+        
+        if (data.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align: center;">No crew members onboarded yet.</td></tr>`;
+            return;
+        }
+        
+        data.forEach(item => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td><strong>${item.crew_name}</strong></td>
+                <td>₹${item.base_rate.toFixed(2)}</td>
+                <td style="text-align: center;">
+                    <select class="attendance-status-select form-input" 
+                            style="margin-bottom: 0; padding: 0.25rem 0.5rem; height: 32px; width: auto;"
+                            data-crew-id="${item.crew_id}" 
+                            data-base-rate="${item.base_rate}" 
+                            data-half-day-rate="${item.half_day_rate || 0.0}" 
+                            data-night-rate="${item.night_rate || 0.0}" 
+                            onchange="updateRowCalculatedPay(this)">
+                        <option value="Absent" ${item.status === 'Absent' ? 'selected' : ''}>Absent</option>
+                        <option value="Half Day" ${item.status === 'Half Day' ? 'selected' : ''}>Half Day</option>
+                        <option value="Full Day" ${item.status === 'Full Day' ? 'selected' : ''}>Full Day</option>
+                        <option value="Night Work" ${item.status === 'Night Work' ? 'selected' : ''}>Night Work</option>
+                    </select>
+                </td>
+                <td style="text-align: right; font-weight: 600; color: var(--maroon);" class="calculated-pay-cell">
+                    ₹${item.calculated_pay.toFixed(2)}
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--status-danger);">Failed to load attendance data.</td></tr>`;
+    }
+}
+
+function updateRowCalculatedPay(select) {
+    const baseRate = parseFloat(select.getAttribute("data-base-rate")) || 0.0;
+    const halfDayRate = parseFloat(select.getAttribute("data-half-day-rate")) || 0.0;
+    const nightRate = parseFloat(select.getAttribute("data-night-rate")) || 0.0;
+    const status = select.value;
+    
+    let pay = 0.0;
+    if (status === "Full Day") {
+        pay = baseRate;
+    } else if (status === "Half Day") {
+        pay = halfDayRate > 0 ? halfDayRate : baseRate * 0.5;
+    } else if (status === "Night Work") {
+        pay = nightRate > 0 ? nightRate : baseRate * 1.5;
+    }
+    
+    const payCell = select.closest("tr").querySelector(".calculated-pay-cell");
+    if (payCell) {
+        payCell.innerText = `₹${pay.toFixed(2)}`;
+    }
+}
+
+async function handleAttendanceSubmit(e) {
+    e.preventDefault();
+    const date = document.getElementById("attendance-date").value;
+    if (!date) return;
+    
+    const saveBtn = document.querySelector("#attendance-form button[type='submit']");
+    saveBtn.disabled = true;
+    saveBtn.innerText = "Saving Register...";
+    
+    const records = [];
+    document.querySelectorAll(".attendance-status-select").forEach(select => {
+        records.push({
+            crew_id: select.getAttribute("data-crew-id"),
+            status: select.value
+        });
+    });
+    
+    try {
+        await apiFetch("/api/attendance", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ date, records })
+        });
+        showToast("Attendance register logged and crew wages updated.");
+        closeModal("modal-attendance");
+        loadCrewData();
+        loadDashboardData();
+    } catch (err) {
+        console.error("Attendance save error:", err);
+    } finally {
+        saveBtn.disabled = false;
+        saveBtn.innerText = "Save Attendance Register";
+    }
+}
+
 // ─── Global Window Exports ──────────────────────────────────────────────────
 window.editInventoryItem = editInventoryItem;
 window.deleteInventoryItem = deleteInventoryItem;
@@ -2278,3 +2524,6 @@ window.loadFinanceData = loadFinanceData;
 window.loadDashboardData = loadDashboardData;
 window.loadEventsData = loadEventsData;
 window.loadInvoicesData = loadInvoicesData;
+window.openAttendanceModal = openAttendanceModal;
+window.updateRowCalculatedPay = updateRowCalculatedPay;
+

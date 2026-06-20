@@ -374,9 +374,14 @@
                             Track internal crew profiles, base rates, payment logs, and amounts owed.
                         </p>
                     </div>
-                    <button class="btn btn-primary" id="btn-add-crew-member">
-                        <span>Add Team Profile</span>
-                    </button>
+                    <div style="display: flex; gap: 0.75rem;">
+                        <button class="btn btn-secondary" id="btn-manage-attendance" style="border: 2px solid var(--gold); border-radius: 4px; padding: 10px 20px;">
+                            <span>Daily Attendance Register</span>
+                        </button>
+                        <button class="btn btn-primary" id="btn-add-crew-member">
+                            <span>Add Team Profile</span>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="glass-panel" style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
@@ -393,13 +398,14 @@
                                     <th>Role</th>
                                     <th>Contact</th>
                                     <th>Base Rate (₹)</th>
+                                    <th>Days Worked</th>
                                     <th>Owed Wages (₹)</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="crew-table-body">
                                 <tr>
-                                    <td colspan="7" style="text-align: center;">Loading crew profiles...</td>
+                                    <td colspan="8" style="text-align: center;">Loading crew profiles...</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -1154,8 +1160,18 @@
                     <input type="text" id="crew-contact" required placeholder="E.g., +91 98765 43210">
                 </div>
                 <div class="form-group">
-                    <label for="crew-rate">Base Daily Rate (₹)</label>
+                    <label for="crew-rate">Base Daily Rate (Full Day) (₹)</label>
                     <input type="number" id="crew-rate" required min="0" value="150">
+                </div>
+                <div class="row2">
+                    <div class="form-group">
+                        <label for="crew-half-day-rate">Half Day Rate (₹ - Optional)</label>
+                        <input type="number" id="crew-half-day-rate" min="0" placeholder="Auto-calculate (50%)" step="any">
+                    </div>
+                    <div class="form-group">
+                        <label for="crew-night-rate">Night Work Rate (₹ - Optional)</label>
+                        <input type="number" id="crew-night-rate" min="0" placeholder="Auto-calculate (150%)" step="any">
+                    </div>
                 </div>
                 <div class="form-group" style="flex-direction: row; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('modal-crew')">Cancel</button>
@@ -1191,6 +1207,135 @@
                     <button type="submit" class="btn btn-primary">Record Payout</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Crew Daily Attendance Modal -->
+    <div class="modal-overlay" id="modal-attendance">
+        <div class="modal-card glass-panel" style="max-width: 650px; max-height: 90vh; overflow-y: auto;">
+            <div class="modal-header">
+                <h3>Daily Attendance Register</h3>
+                <button class="btn btn-secondary" onclick="closeModal('modal-attendance')" style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
+            </div>
+
+            <form id="attendance-form">
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label for="attendance-date">Attendance Date</label>
+                    <input type="date" id="attendance-date" required style="max-width: 200px;">
+                </div>
+
+                <div class="table-wrapper" style="margin-bottom: 1.5rem; max-height: 350px; overflow-y: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Crew Member</th>
+                                <th>Base Rate</th>
+                                <th style="text-align: center;">Status</th>
+                                <th style="text-align: right;">Calculated Pay</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendance-table-body">
+                            <!-- Dynamic rows loaded via JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="form-group" style="flex-direction: row; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-attendance')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Attendance Register</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Crew Payout History Modal -->
+    <div class="modal-overlay" id="modal-crew-history">
+        <div class="modal-card glass-panel" style="max-width: 500px; max-height: 80vh; overflow-y: auto;">
+            <div class="modal-header">
+                <h3>Payout History</h3>
+                <button class="btn btn-secondary" onclick="closeModal('modal-crew-history')" style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
+            </div>
+            <div style="margin-bottom: 1rem;">
+                <label>Crew Member:</label>
+                <span id="crew-history-name" style="font-weight: 600; font-size: 1.1rem; margin-left: 0.5rem;">-</span>
+            </div>
+            <div class="table-wrapper" style="margin-bottom: 1.5rem;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th style="text-align: right;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="crew-history-table-body">
+                        <!-- Loaded dynamically -->
+                    </tbody>
+                </table>
+            </div>
+            <div style="display: flex; justify-content: flex-end;">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modal-crew-history')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden Crew Payout PDF Template -->
+    <div id="crew-payout-pdf-template" style="display: none;">
+        <div class="pdf-container" style="padding: 40px; font-family: 'Poppins', sans-serif; color: #333; background: #fff; max-width: 800px; margin: 0 auto; box-sizing: border-box; border: 1px solid #eee; border-radius: 8px;">
+            <!-- Brand Header -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #6b1623; padding-bottom: 20px; margin-bottom: 30px;">
+                <div>
+                    <h1 style="font-family: 'Marcellus', serif; color: #6b1623; margin: 0 0 5px 0; font-size: 2.2rem; letter-spacing: 2px;">BHOOMI DECORATION</h1>
+                    <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #c9941f; margin: 0 0 10px 0; font-weight: 500;">Luxury Event & Wedding Decorators</p>
+                    <p style="margin: 0; font-size: 0.8rem; color: #666; line-height: 1.4;">Mumbai, Maharashtra, India<br>Email: hello@bhoomidecoration.com | Web: www.bhoomidecoration.com</p>
+                </div>
+                <div style="text-align: right;">
+                    <h2 style="font-family: 'Marcellus', serif; color: #333; margin: 0 0 10px 0; font-size: 1.8rem; letter-spacing: 1px;">PAYOUT RECEIPT</h2>
+                    <p style="margin: 0; font-size: 0.85rem; color: #666;">Date: <span id="pdf-payout-date">DD/MM/YYYY</span></p>
+                </div>
+            </div>
+
+            <!-- Receipt Info Grid -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 35px;">
+                <div style="background: #fdfaf7; border-left: 3px solid #c9941f; padding: 15px; border-radius: 4px;">
+                    <h3 style="font-family: 'Marcellus', serif; color: #6b1623; font-size: 1rem; margin: 0 0 10px 0; letter-spacing: 0.5px;">PAID TO:</h3>
+                    <p style="margin: 0 0 5px 0; font-size: 1rem; font-weight: 600;" id="pdf-crew-name">Rajesh Sharma</p>
+                    <p style="margin: 0 0 5px 0; font-size: 0.85rem; color: #555;"><strong>Role:</strong> <span id="pdf-crew-role">Lead Florist</span></p>
+                    <p style="margin: 0; font-size: 0.85rem; color: #555;"><strong>Contact:</strong> <span id="pdf-crew-contact">+91 99999 99999</span></p>
+                </div>
+                <div style="background: #fdfaf7; border-left: 3px solid #6b1623; padding: 15px; border-radius: 4px; display: flex; flex-direction: column; justify-content: center;">
+                    <h3 style="font-family: 'Marcellus', serif; color: #6b1623; font-size: 1rem; margin: 0 0 10px 0; letter-spacing: 0.5px;">PAYMENT SUMMARY:</h3>
+                    <p style="margin: 0 0 5px 0; font-size: 0.9rem;"><strong>Payment Amount:</strong> <span id="pdf-payout-amount" style="font-weight: 600; color: #1f4b43; font-size: 1.1rem;">₹0.00</span></p>
+                    <p style="margin: 0; font-size: 0.9rem;"><strong>Remaining Owed:</strong> <span id="pdf-payout-remaining" style="font-weight: 600; color: #6b1623;">₹0.00</span></p>
+                </div>
+            </div>
+
+            <!-- Notes Section -->
+            <div style="background: #fafafa; border: 1px solid #eee; padding: 15px; border-radius: 4px; margin-bottom: 40px;">
+                <h4 style="font-family: 'Marcellus', serif; color: #6b1623; font-size: 0.9rem; margin: 0 0 8px 0;">PAYMENT NOTE</h4>
+                <p style="margin: 0; font-size: 0.8rem; color: #555; line-height: 1.4;">
+                    This document serves as formal acknowledgement of wages/payout received from Bhoomi Decoration. The recipient confirms that the payment amount listed above is correct and has been successfully received.
+                </p>
+            </div>
+
+            <!-- Signature Lines -->
+            <div style="margin-top: 60px; display: flex; justify-content: space-between; align-items: flex-end; padding-top: 20px; border-top: 1px dashed #ddd;">
+                <div style="text-align: center;">
+                    <div style="width: 180px; border-bottom: 1px solid #888; margin-bottom: 5px;"></div>
+                    <p style="margin: 0; font-size: 0.75rem; color: #666; font-weight: 600;">Authorized Signatory</p>
+                    <p style="margin: 2px 0 0 0; font-size: 0.65rem; color: #999;">Bhoomi Decoration</p>
+                </div>
+                <div style="text-align: center;">
+                    <div style="width: 180px; border-bottom: 1px solid #888; margin-bottom: 5px;"></div>
+                    <p style="margin: 0; font-size: 0.75rem; color: #666; font-weight: 600;">Recipient Signature</p>
+                    <p style="margin: 2px 0 0 0; font-size: 0.65rem; color: #999;">Acknowledgment of Receipt</p>
+                </div>
+            </div>
+
+            <!-- Footer Message -->
+            <div style="text-align: center; margin-top: 50px; font-size: 0.75rem; color: #999; font-style: italic; border-top: 1px solid #eee; padding-top: 15px;">
+                Thank you for your hard work and dedication to Bhoomi Decoration events!
+            </div>
         </div>
     </div>
 

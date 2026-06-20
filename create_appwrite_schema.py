@@ -137,6 +137,43 @@ def bootstrap_collections():
             "indexes": [
                 {"key": "email_index", "type": "key", "attributes": ["email"]}
             ]
+        },
+        "gallery": {
+            "name": "Gallery",
+            "attributes": [
+                {"type": "string", "key": "title", "size": 255, "required": True},
+                {"type": "string", "key": "category", "size": 100, "required": True},
+                {"type": "string", "key": "description", "size": 1000, "required": False, "default": ""},
+                {"type": "string", "key": "image_url", "size": 2048, "required": True}
+            ],
+            "indexes": []
+        },
+        "crew": {
+            "name": "Crew",
+            "attributes": [
+                {"type": "string", "key": "name", "size": 255, "required": True},
+                {"type": "string", "key": "role", "size": 255, "required": True},
+                {"type": "string", "key": "contact", "size": 100, "required": False, "default": ""},
+                {"type": "float", "key": "base_rate", "required": False, "default": 0.0},
+                {"type": "float", "key": "amount_owed", "required": False, "default": 0.0},
+                {"type": "string", "key": "payment_history", "size": 10000, "required": False, "default": "[]"},
+                {"type": "float", "key": "half_day_rate", "required": False, "default": 0.0},
+                {"type": "float", "key": "night_rate", "required": False, "default": 0.0}
+            ],
+            "indexes": []
+        },
+        "attendance": {
+            "name": "Attendance",
+            "attributes": [
+                {"type": "string", "key": "crew_id", "size": 100, "required": True},
+                {"type": "string", "key": "crew_name", "size": 255, "required": True},
+                {"type": "string", "key": "date", "size": 50, "required": True},
+                {"type": "string", "key": "status", "size": 50, "required": True},
+                {"type": "float", "key": "calculated_pay", "required": True}
+            ],
+            "indexes": [
+                {"key": "date_index", "type": "key", "attributes": ["date"]}
+            ]
         }
     }
 

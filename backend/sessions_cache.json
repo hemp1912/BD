@@ -1,0 +1,45 @@
+{
+    "sess_697cfab4-7d0": {
+        "email": "hello@bhoomidecoration.com",
+        "role": "admin",
+        "name": "Admin Manager",
+        "id": "usr_admin",
+        "token": "sess_697cfab4-7d0"
+    },
+    "sess_29362e49-46b": {
+        "email": "hello@bhoomidecoration.com",
+        "role": "admin",
+        "name": "Admin Manager",
+        "id": "usr_admin",
+        "token": "sess_29362e49-46b",
+        "expire": "",
+        "verified_at": 1781943924.6386971
+    },
+    "sess_2b7a0023-e6d": {
+        "email": "hello@bhoomidecoration.com",
+        "role": "admin",
+        "name": "Admin Manager",
+        "id": "usr_admin",
+        "token": "sess_2b7a0023-e6d",
+        "expire": "",
+        "verified_at": 1781944369.364935
+    },
+    "sess_3255a49a-f13": {
+        "email": "hello@bhoomidecoration.com",
+        "role": "admin",
+        "name": "Admin Manager",
+        "id": "usr_admin",
+        "token": "sess_3255a49a-f13",
+        "expire": "",
+        "verified_at": 1781944449.0919187
+    },
+    "sess_76f4656c-cc4": {
+        "email": "hello@bhoomidecoration.com",
+        "role": "admin",
+        "name": "Admin Manager",
+        "id": "usr_admin",
+        "token": "sess_76f4656c-cc4",
+        "expire": "",
+        "verified_at": 1781944623.6576054
+    }
+}

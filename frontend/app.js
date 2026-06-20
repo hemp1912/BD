@@ -4,6 +4,7 @@ let inventoryList = [];
 let clientsList = [];
 let eventsList = [];
 let activeCrewAssignments = []; // Temporary cache during booking editing
+let sessionExpiredToastShown = false;
 
 // State Management for Notifications
 let notificationsList = [];
@@ -26,7 +27,10 @@ async function apiFetch(endpoint, options = {}) {
         const response = await fetch(endpoint, options);
         if (response.status === 401) {
             // Un-authenticated / Session expired
-            showToast("Session expired. Please log in again.", "danger");
+            if (!sessionExpiredToastShown) {
+                sessionExpiredToastShown = true;
+                showToast("Session expired. Please log in again.", "danger");
+            }
             logout();
             return Promise.reject(new Error("Unauthorized"));
         }

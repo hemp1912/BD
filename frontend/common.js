@@ -2,6 +2,7 @@
 
 // State Management for Notifications
 let confirmCallback = null;
+let sessionExpiredToastShown = false;
 
 // API Helpers
 async function apiFetch(endpoint, options = {}) {
@@ -18,7 +19,10 @@ async function apiFetch(endpoint, options = {}) {
     try {
         const response = await fetch(endpoint, options);
         if (response.status === 401) {
-            showToast("Session expired. Please log in again.", "danger");
+            if (!sessionExpiredToastShown) {
+                sessionExpiredToastShown = true;
+                showToast("Session expired. Please log in again.", "danger");
+            }
             logout();
             return Promise.reject(new Error("Unauthorized"));
         }

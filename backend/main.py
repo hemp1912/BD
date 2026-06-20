@@ -109,7 +109,11 @@ async def get_surprise():
             return f.read()
     return "<h3>Error: surprise.html not found.</h3>"
 
-@app.get("/crew.html")
-@app.get("/crew")
+@app.get("/crew.html", response_class=HTMLResponse)
+@app.get("/crew", response_class=HTMLResponse)
 async def get_crew():
-    return RedirectResponse(url="/")
+    crew_path = os.path.join(FRONTEND_DIR, "crew.html")
+    if os.path.exists(crew_path):
+        with open(crew_path, "r", encoding="utf-8") as f:
+            return f.read()
+    return "<h3>Error: crew.html not found.</h3>"

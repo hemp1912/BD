@@ -15,8 +15,13 @@
     <script>
         (function() {
             const token = localStorage.getItem("eventflow_token");
+            const role = localStorage.getItem("eventflow_role");
             if (token) {
-                window.location.href = "/admin";
+                if (role === "admin") {
+                    window.location.href = "/admin";
+                } else {
+                    window.location.href = "/crew";
+                }
             }
         })();
     </script>

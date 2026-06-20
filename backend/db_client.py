@@ -46,17 +46,12 @@ class BaseDB:
     async def get_user_by_email(self, email: str): raise NotImplementedError
     async def create_user(self, user: dict): raise NotImplementedError
 
-# Factory to get database client
-db_client = None
+    # Attendance
+    async def get_attendance(self, date_str: str): raise NotImplementedError
+    async def get_attendance_record(self, date_str: str, crew_id: str): raise NotImplementedError
+    async def save_attendance_record(self, date_str: str, crew_id: str, record: dict): raise NotImplementedError
+    async def get_all_attendance(self): raise NotImplementedError
 
-if config.DB_TYPE == "APPWRITE":
-    try:
-        from backend.db.appwrite_db import AppwriteDB
-        db_client = AppwriteDB()
-    except Exception as e:
-        print(f"[!] Failed to load Appwrite client, falling back to MOCK mode. Error: {e}")
-        from backend.db.mock_db import MockDB
-        db_client = MockDB()
-else:
-    from backend.db.mock_db import MockDB
-    db_client = MockDB()
+# Factory to get database client
+from backend.db.appwrite_db import AppwriteDB
+db_client = AppwriteDB()
