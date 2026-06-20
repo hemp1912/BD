@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bhoomi Decoration - Crew Portal</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- CSS Link -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Instant Redirect Protection (Role Isolation) -->
+    <script>
+        (function() {
+            const token = localStorage.getItem("eventflow_token");
+            const role = localStorage.getItem("eventflow_role");
+            if (!token || role !== "labor") {
+                window.location.href = "/";
+            }
+        })();
+    </script>
+</head>
+
+<body>
+
+    <!-- Pulsing Geometric Loading Skeleton -->
+    <div id="loading-skeleton">
+        <div class="skeleton-container">
+            <svg class="skeleton-logo" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 100 V50 C20 20 50 10 60 10 C70 10 100 20 100 50 V100" fill="none" stroke="#C9941F" stroke-width="4" />
+                <path d="M35 100 V55 C35 30 50 20 60 20 C70 20 85 30 85 55 V100" fill="none" stroke="#6B1623" stroke-width="3" />
+                <circle cx="60" cy="20" r="4" fill="#C9941F" />
+            </svg>
+            <div class="skeleton-title">Bhoomi Decoration</div>
+            <p class="skeleton-subtitle">Loading crew checklist console...</p>
+            <div class="skeleton-geometric-blocks">
+                <div class="skeleton-block sq1"></div>
+                <div class="skeleton-block sq2"></div>
+                <div class="skeleton-block sq3"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN LOGISTICS WORKSPACE -->
+    <div id="app-view" class="app-container">
+
+        <!-- Mobile Header Bar -->
+        <div class="mobile-header">
+            <button id="sidebar-toggle" class="btn btn-ghost" aria-label="Toggle Sidebar" style="padding: 0.5rem; border: none; font-size: 1.5rem; background: transparent; color: var(--maroon);">
+                <span class="hamburger-icon">☰</span>
+            </button>
+            <div class="mobile-logo">Bhoomi <span>✦</span></div>
+            <div style="width: 40px;"></div>
+        </div>
+
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="app-sidebar">
+            <button id="sidebar-close" class="mobile-only-btn" aria-label="Close Sidebar" style="position: absolute; top: 1rem; right: 1rem; background: transparent; border: none; font-size: 1.25rem; color: var(--maroon); cursor: pointer;">✕</button>
+            <div class="sidebar-logo" style="font-family: 'Marcellus', serif; font-size: 1.5rem; text-align: center; color: var(--maroon);">
+                Bhoomi <span>✦</span>
+            </div>
+
+            <nav style="flex: 1;">
+                <ul class="nav-list" id="sidebar-nav-links">
+                    <li>
+                        <a class="nav-item active" data-target="crew-view">
+                            <span>Assigned Job Shift</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="user-profile-panel" style="border-top: 1px solid rgba(107,22,35,0.15); padding-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                <div style="font-size: 0.9rem; font-weight: 600; color: var(--maroon);" id="user-display-name">Loading...</div>
+                <div style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gold); font-weight: 600;" id="user-display-role">Logistics Field Crew</div>
+                <button id="logout-btn" class="btn btn-ghost" style="margin-top: 0.5rem; padding: 0.5rem 1rem; font-size: 0.8rem; border-color: var(--maroon);">
+                    <span>Secure Sign Out</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Workspace Area -->
+        <main class="main-content">
+
+            <!-- Field Worker Screen -->
+            <section id="crew-subview" class="app-subview">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+                    <div>
+                        <h2 id="crew-worker-title" style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.6rem;">Crew Setup Screen</h2>
+                        <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #5a4a3d;">
+                            Field checklist and active design blueprint coordinates.
+                        </p>
+                    </div>
+                    <div style="display: flex; gap: 0.75rem;">
+                        <button class="btn btn-ghost" id="btn-upload-layout-trigger">
+                            <span>Upload Layout Photo</span>
+                        </button>
+                        <button class="btn btn-secondary" id="btn-crew-highcontrast" style="border: 2px solid var(--gold); border-radius: 4px; padding: 10px 20px;">
+                            <span>Toggle High-Contrast View</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="crew-grid">
+                    <!-- Left Column: Tasks Checklist -->
+                    <div class="glass-panel" style="grid-column: span 1;">
+                        <h3 style="font-family: 'Marcellus', serif; margin-bottom: 1.25rem;">Assigned Tasks Checklist</h3>
+                        <div class="crew-task-list" id="crew-tasks-container">
+                            <p style="text-align: center;">No active field tasks assigned for your shift today.</p>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Design Blueprints -->
+                    <div class="glass-panel">
+                        <h3 style="font-family: 'Marcellus', serif; margin-bottom: 0.5rem;">Design Layout Reference Map</h3>
+                        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">Follow stage lighting and decor guidelines below.</p>
+
+                        <div class="layout-preview-box" id="crew-layout-preview" style="cursor: pointer; min-height: 250px; display: flex; align-items: center; justify-content: center; border: 2.5px dashed var(--border-glass); border-radius: 4px; background: rgba(255,255,255,0.02); transition: var(--transition-smooth);">
+                            <span style="color: var(--text-muted);">No design layout attached yet.</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Modals Workspace -->
+
+    <!-- Upload Layout Modal -->
+    <div class="modal-overlay" id="modal-upload-layout">
+        <div class="modal-card glass-panel" style="max-width: 450px;">
+            <div class="modal-header">
+                <h3>Upload Layout Blueprints / Sketch</h3>
+                <button class="btn btn-secondary" onclick="closeModal('modal-upload-layout')" style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
+            </div>
+
+            <form id="upload-layout-form">
+                <input type="hidden" id="upload-layout-event-id">
+                <div class="form-group">
+                    <label for="upload-layout-file">Select Venue Blueprint Photo / Drawing</label>
+                    <input type="file" id="upload-layout-file" required accept="image/*">
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">
+                        Image will be compressed locally below 1MB to preserve cloud bandwidth.
+                    </p>
+                </div>
+
+                <div class="form-group" style="flex-direction: row; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-upload-layout')">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btn-upload-submit">Upload Layout</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Sidebar Backdrop Overlay -->
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+    <!-- Shared Utilities Scripts -->
+    <script src="common.js"></script>
+    <script src="crew.js"></script>
+</body>
+
+</html>

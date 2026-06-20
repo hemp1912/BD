@@ -1,0 +1,35 @@
+import os
+from dotenv import load_dotenv
+
+# Load .env file if it exists
+load_dotenv(override=True)
+
+# App Database Mode: 'MOCK' or 'APPWRITE'
+# Defaults to MOCK unless all Appwrite credentials are supplied.
+APPWRITE_ENDPOINT = os.getenv("APPWRITE_ENDPOINT", "")
+APPWRITE_PROJECT_ID = os.getenv("APPWRITE_PROJECT_ID", "")
+APPWRITE_API_KEY = os.getenv("APPWRITE_API_KEY", "")
+
+DB_TYPE = os.getenv("DB_TYPE", "MOCK").upper()
+if DB_TYPE != "APPWRITE" or not (APPWRITE_ENDPOINT and APPWRITE_PROJECT_ID and APPWRITE_API_KEY):
+    DB_TYPE = "MOCK"
+
+APPWRITE_DATABASE_ID = os.getenv("APPWRITE_DATABASE_ID", "default_db")
+APPWRITE_INVENTORY_COLLECTION_ID = os.getenv("APPWRITE_INVENTORY_COLLECTION_ID", "inventory")
+APPWRITE_CLIENTS_COLLECTION_ID = os.getenv("APPWRITE_CLIENTS_COLLECTION_ID", "clients")
+APPWRITE_EVENTS_COLLECTION_ID = os.getenv("APPWRITE_EVENTS_COLLECTION_ID", "events")
+APPWRITE_TASKS_COLLECTION_ID = os.getenv("APPWRITE_TASKS_COLLECTION_ID", "tasks")
+APPWRITE_USERS_COLLECTION_ID = os.getenv("APPWRITE_USERS_COLLECTION_ID", "users")
+APPWRITE_STORAGE_BUCKET_ID = os.getenv("APPWRITE_STORAGE_BUCKET_ID", "blueprints")
+APPWRITE_GALLERY_COLLECTION_ID = os.getenv("APPWRITE_GALLERY_COLLECTION_ID", "gallery")
+APPWRITE_CREW_COLLECTION_ID = os.getenv("APPWRITE_CREW_COLLECTION_ID", "crew")
+
+# Telegram Bot Alert Settings
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+
+# Server Config
+HOST = os.getenv("HOST", "127.0.0.1")
+PORT = int(os.getenv("PORT", "8000"))
+
+print(f"[*] Starting Application in [{DB_TYPE}] Database Mode")

@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bhoomi Decoration - Admin Panel</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- CSS Link -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Instant Redirect Protection (Role Isolation) -->
+    <script>
+        (function() {
+            const token = localStorage.getItem("eventflow_token");
+            const role = localStorage.getItem("eventflow_role");
+            if (!token || role !== "admin") {
+                window.location.href = "/";
+            }
+        })();
+    </script>
+    
+    <!-- Print Stylesheet Rules -->
+    <style>
+        @media print {
+            body * {
+                visibility: hidden !important;
+            }
+            #print-receipt-section, #print-receipt-section * {
+                visibility: visible !important;
+            }
+            #print-receipt-section {
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 1.5cm !important;
+                background: #ffffff !important;
+                color: #000000 !important;
+                display: block !important;
+            }
+            .modal-overlay {
+                background: none !important;
+                position: absolute !important;
+                inset: 0 !important;
+                display: block !important;
+                overflow: visible !important;
+            }
+            .modal-card {
+                border: none !important;
+                box-shadow: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                background: none !important;
+            }
+            #payment-form, .modal-header, .btn, aside, header {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Pulsing Geometric Loading Skeleton -->
+    <div id="loading-skeleton">
+        <div class="skeleton-container">
+            <svg class="skeleton-logo" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 100 V50 C20 20 50 10 60 10 C70 10 100 20 100 50 V100" fill="none" stroke="#C9941F" stroke-width="4" />
+                <path d="M35 100 V55 C35 30 50 20 60 20 C70 20 85 30 85 55 V100" fill="none" stroke="#6B1623" stroke-width="3" />
+                <circle cx="60" cy="20" r="4" fill="#C9941F" />
+            </svg>
+            <div class="skeleton-title">Bhoomi Decoration</div>
+            <p class="skeleton-subtitle">Loading admin console datasets...</p>
+            <div class="skeleton-geometric-blocks">
+                <div class="skeleton-block sq1"></div>
+                <div class="skeleton-block sq2"></div>
+                <div class="skeleton-block sq3"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN LOGISTICS WORKSPACE -->
+    <div id="app-view" class="app-container">
+
+        <!-- Mobile Header Bar -->
+        <div class="mobile-header">
+            <button id="sidebar-toggle" class="btn btn-ghost" aria-label="Toggle Sidebar" style="padding: 0.5rem; border: none; font-size: 1.5rem; background: transparent; color: var(--maroon);">
+                <span class="hamburger-icon">☰</span>
+            </button>
+            <div class="mobile-logo">Bhoomi <span>✦</span></div>
+            <div style="width: 40px;"></div>
+        </div>
+
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="app-sidebar">
+            <button id="sidebar-close" class="mobile-only-btn" aria-label="Close Sidebar" style="position: absolute; top: 1rem; right: 1rem; background: transparent; border: none; font-size: 1.25rem; color: var(--maroon); cursor: pointer;">✕</button>
+            <div class="sidebar-logo" style="font-family: 'Marcellus', serif; font-size: 1.5rem; text-align: center; color: var(--maroon);">
+                Bhoomi <span>✦</span>
+            </div>
+
+            <nav style="flex: 1;">
+                <ul class="nav-list" id="sidebar-nav-links">
+                    <li>
+                        <a class="nav-item active" data-target="dashboard-view" id="nav-btn-dashboard">
+                            <span>Operations Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-item" data-target="events-view" id="nav-btn-events">
+                            <span>Events Projects</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-item" data-target="warehouse-view" id="nav-btn-warehouse">
+                            <span>Warehouse Catalog</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-item" data-target="clients-view" id="nav-btn-clients">
+                            <span>Clients CRM</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-item" data-target="gallery-view" id="nav-btn-gallery">
+                            <span>Portfolio Gallery</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-item" data-target="crew-view" id="nav-btn-crew">
+                            <span>Crew Ledger</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-item" data-target="finance-view" id="nav-btn-finance">
+                            <span>Finance Hub</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-item" data-target="invoice-view" id="nav-btn-invoice">
+                            <span>Invoices Hub</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="user-profile-panel" style="border-top: 1px solid rgba(107,22,35,0.15); padding-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                <div style="font-size: 0.9rem; font-weight: 600; color: var(--maroon);" id="user-display-name">Loading...</div>
+                <div style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gold); font-weight: 600;" id="user-display-role">Business Administrator</div>
+                <button id="logout-btn" class="btn btn-ghost" style="margin-top: 0.5rem; padding: 0.5rem 1rem; font-size: 0.8rem; border-color: var(--maroon);">
+                    <span>Secure Sign Out</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Workspace Area -->
+        <main class="main-content">
+
+            <!-- Operations Dashboard View -->
+            <section id="dashboard-subview" class="app-subview">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+                    <div>
+                        <h2 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.8rem;">Operations Dashboard</h2>
+                        <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #5a4a3d;">
+                            Track scheduling status, payouts, and net event balances.
+                        </p>
+                    </div>
+                    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                        <button class="btn btn-ghost" id="btn-quick-quote">
+                            <span>On-Walk Quote Builder</span>
+                        </button>
+                        <button class="btn btn-ghost" id="btn-onboard-crew-trigger">
+                            <span>Onboard Crew</span>
+                        </button>
+                        <button class="btn btn-primary" id="btn-create-booking">
+                            <span>Create Event Booking</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Admin Analytics Board -->
+                <div class="dashboard-grid">
+                    <div class="glass-panel stat-card">
+                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--gold);">Total Sales</span>
+                        <div class="stat-val gold" id="stat-sales">₹0.00</div>
+                    </div>
+                    <div class="glass-panel stat-card">
+                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--maroon);">Receivables Balance</span>
+                        <div class="stat-val danger" id="stat-receivable">₹0.00</div>
+                    </div>
+                    <div class="glass-panel stat-card">
+                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--text-secondary);">Total Crew Wages</span>
+                        <div class="stat-val purple" id="stat-wages">₹0.00</div>
+                    </div>
+                    <div class="glass-panel stat-card">
+                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--status-success);">Net Profit Margin</span>
+                        <div class="stat-val success" id="stat-profit">₹0.00 (<span id="stat-margin">0</span>%)</div>
+                    </div>
+                </div>
+
+                <!-- Upcoming Events Table -->
+                <div class="glass-panel" style="margin-bottom: 2rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
+                        <div>
+                            <h3 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); margin-bottom: 0.15rem;">Upcoming Events</h3>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0; font-style: italic;">Sorted by nearest date · Completed events are shown in the Events Projects section.</p>
+                        </div>
+                        <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                            <input type="text" id="dashboard-search-input" placeholder="Search client / venue..." class="search-input" style="max-width: 200px; padding: 0.35rem 0.75rem;">
+                            <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gold); font-weight: 600;" id="timeline-capacity-status">0 Upcoming Events</div>
+                        </div>
+                    </div>
+
+                    <div id="booking-alerts-box"></div>
+
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Client / Location</th>
+                                    <th>Dates</th>
+                                    <th>Status</th>
+                                    <th>Invoice Total</th>
+                                    <th>Paid</th>
+                                    <th>Balance</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bookings-table-body">
+                                <tr>
+                                    <td colspan="7" style="text-align: center;">Loading bookings datasets...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="dashboard-pagination"></div>
+                </div>
+            </section>
+
+            <!-- Warehouse View -->
+            <section id="warehouse-subview" class="app-subview" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <div>
+                        <h2 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.8rem;">Warehouse Catalog Inventory</h2>
+                        <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #5a4a3d;">
+                            Create, update, and manage master physical event assets.
+                        </p>
+                    </div>
+                    <button class="btn btn-primary" id="btn-add-inventory">
+                        <span>Register Catalog Asset</span>
+                    </button>
+                </div>
+
+                <div class="glass-panel" style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                    <input type="text" id="warehouse-search-input" placeholder="Search catalog assets..." class="search-input" style="max-width: 250px; margin-bottom: 0;">
+                </div>
+
+                <div class="glass-panel">
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Category</th>
+                                    <th>Stock Level</th>
+                                    <th>Day Rate</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventory-table-body">
+                                <tr>
+                                    <td colspan="6" style="text-align: center;">Loading catalog entries...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="warehouse-pagination"></div>
+                </div>
+            </section>
+            
+            <!-- Clients CRM View -->
+            <section id="clients-subview" class="app-subview" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <div>
+                        <h2 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.8rem;">Clients CRM Database</h2>
+                        <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #5a4a3d;">
+                            Manage client profiles and register new customer accounts.
+                        </p>
+                    </div>
+                    <button class="btn btn-primary" id="btn-add-client-tab">
+                        <span>Intake New Client</span>
+                    </button>
+                </div>
+
+                <div class="glass-panel" style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                    <input type="text" id="clients-search-input" placeholder="Search clients..." class="search-input" style="max-width: 250px; margin-bottom: 0;">
+                </div>
+
+                <div class="glass-panel">
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Address</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="clients-table-body">
+                                <tr>
+                                    <td colspan="6" style="text-align: center;">Loading clients...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="clients-pagination"></div>
+                </div>
+            </section>
+
+            <!-- Portfolio Gallery View -->
+            <section id="gallery-subview" class="app-subview" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <div>
+                        <h2 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.8rem;">Portfolio Gallery</h2>
+                        <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #5a4a3d;">
+                            Upload, edit, and manage wedding showcase photos displayed on landing page.
+                        </p>
+                    </div>
+                    <button class="btn btn-primary" id="btn-add-gallery-item">
+                        <span>Upload Photo Entry</span>
+                    </button>
+                </div>
+
+                <div class="glass-panel" style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                    <input type="text" id="gallery-search-input" placeholder="Search showcase entries..." class="search-input" style="max-width: 250px; margin-bottom: 0;">
+                </div>
+
+                <div class="glass-panel">
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Photo</th>
+                                    <th>Title</th>
+                                    <th>Category</th>
+                                    <th>Description</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="gallery-table-body">
+                                <tr>
+                                    <td colspan="5" style="text-align: center;">Loading gallery database...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="gallery-pagination"></div>
+                </div>
+            </section>
+
+            <!-- Crew Ledger View -->
+            <section id="crew-subview" class="app-subview" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <div>
+                        <h2 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.8rem;">Crew Wages & Ledger</h2>
+                        <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #5a4a3d;">
+                            Track internal crew profiles, base rates, payment logs, and amounts owed.
+                        </p>
+                    </div>
+                    <button class="btn btn-primary" id="btn-add-crew-member">
+                        <span>Add Team Profile</span>
+                    </button>
+                </div>
+
+                <div class="glass-panel" style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                    <input type="text" id="crew-search-input" placeholder="Search team members..." class="search-input" style="max-width: 250px; margin-bottom: 0;">
+                </div>
+
+                <div class="glass-panel">
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Role</th>
+                                    <th>Contact</th>
+                                    <th>Base Rate (₹)</th>
+                                    <th>Owed Wages (₹)</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="crew-table-body">
+                                <tr>
+                                    <td colspan="7" style="text-align: center;">Loading crew profiles...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="crew-pagination"></div>
+                </div>
+            </section>
+
+            <!-- Finance Hub View -->
+            <section id="finance-subview" class="app-subview" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <div>
+                        <h2 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.8rem;">Finance Hub</h2>
+                        <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #5a4a3d;">
+                            Filter sales, calculate receivables, and view payment transaction logs.
+                        </p>
+                    </div>
+                </div>
+                <div class="glass-panel" style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                    <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; margin-bottom: 0;">
+                        <span style="font-weight: 600;">Filter Payment Status:</span>
+                        <button class="btn btn-ghost active-filter" data-filter="All" id="filter-btn-all" style="padding: 6px 16px;">All</button>
+                        <button class="btn btn-ghost" data-filter="Fully Paid" id="filter-btn-fully" style="padding: 6px 16px;">Fully Paid</button>
+                        <button class="btn btn-ghost" data-filter="Partially Paid" id="filter-btn-partially" style="padding: 6px 16px;">Partially Paid</button>
+                        <button class="btn btn-ghost" data-filter="Unpaid" id="filter-btn-unpaid" style="padding: 6px 16px;">Unpaid</button>
+                    </div>
+                    <div>
+                        <input type="text" id="finance-search-input" placeholder="Search client / venue..." class="search-input" style="max-width: 250px; margin-bottom: 0;">
+                    </div>
+                </div>
+                <div class="glass-panel">
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Client / Venue</th>
+                                    <th>Event Date</th>
+                                    <th>Invoice Total</th>
+                                    <th>Amount Paid</th>
+                                    <th>Balance</th>
+                                    <th>Payment Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="finance-table-body">
+                                <tr>
+                                    <td colspan="7" style="text-align: center;">Loading financial data...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="finance-pagination"></div>
+                </div>
+            </section>
+
+            <!-- Invoices Hub View -->
+            <section id="invoice-subview" class="app-subview" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+                    <div>
+                        <h2 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.8rem;">Invoices Hub</h2>
+                        <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #5a4a3d;">
+                            Manage billing, track event payment collections, and export high-fidelity PDF invoices.
+                        </p>
+                    </div>
+                    <div>
+                        <button class="btn btn-primary" id="btn-create-manual-invoice">
+                            <span>Create Manual Invoice</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Invoice Metrics Board -->
+                <div class="dashboard-grid" style="margin-bottom: 2rem;">
+                    <div class="glass-panel stat-card">
+                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--gold);">Total Invoiced</span>
+                        <div class="stat-val gold" id="invoice-stat-total">₹0.00</div>
+                    </div>
+                    <div class="glass-panel stat-card">
+                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--status-success);">Total Collected</span>
+                        <div class="stat-val success" id="invoice-stat-collected">₹0.00</div>
+                    </div>
+                    <div class="glass-panel stat-card">
+                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--maroon);">Total Remaining</span>
+                        <div class="stat-val danger" id="invoice-stat-remaining">₹0.00</div>
+                    </div>
+                </div>
+
+                <!-- Filters & Search Controls -->
+                <div class="glass-panel" style="margin-bottom: 2rem; display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; justify-content: space-between;">
+                    <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                        <span style="font-weight: 600;">Filter Status:</span>
+                        <button class="btn btn-ghost active-filter" data-invoice-filter="All" id="invoice-filter-btn-all" style="padding: 6px 16px;">All</button>
+                        <button class="btn btn-ghost" data-invoice-filter="Paid" id="invoice-filter-btn-paid" style="padding: 6px 16px;">Paid</button>
+                        <button class="btn btn-ghost" data-invoice-filter="Remaining" id="invoice-filter-btn-remaining" style="padding: 6px 16px;">Remaining</button>
+                        <button class="btn btn-ghost" data-invoice-filter="Unpaid" id="invoice-filter-btn-unpaid" style="padding: 6px 16px;">Unpaid</button>
+                    </div>
+                    <div>
+                        <input type="text" id="invoice-search-input" placeholder="Search Client / Venue..." class="search-input" style="max-width: 250px; margin-bottom: 0;">
+                    </div>
+                </div>
+
+                <!-- Invoices Ledger -->
+                <div class="glass-panel">
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Client / Location</th>
+                                    <th>Invoice Date</th>
+                                    <th>Status</th>
+                                    <th>Invoice Total</th>
+                                    <th>Paid</th>
+                                    <th>Balance</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="invoices-table-body">
+                                <tr>
+                                    <td colspan="7" style="text-align: center;">Loading invoices ledger...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="invoice-pagination"></div>
+                </div>
+            </section>
+
+            <!-- Events Projects View -->
+            <section id="events-subview" class="app-subview" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+                    <div>
+                        <h2 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.8rem;">Events Projects</h2>
+                        <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #5a4a3d;">
+                            Track, filter, search, and manage all booked decoration projects.
+                        </p>
+                    </div>
+                    <button class="btn btn-primary" id="btn-events-create-booking">
+                        <span>Book New Event Project</span>
+                    </button>
+                </div>
+
+                <!-- Search & Filter Controls -->
+                <div class="glass-panel" style="margin-bottom: 2rem; display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; justify-content: space-between;">
+                    <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                        <span style="font-weight: 600;">Filter Status:</span>
+                        <button class="btn btn-ghost active-filter" data-event-status-filter="All" id="event-status-filter-btn-all" style="padding: 6px 16px;">All</button>
+                        <button class="btn btn-ghost" data-event-status-filter="Draft" id="event-status-filter-btn-draft" style="padding: 6px 16px;">Draft</button>
+                        <button class="btn btn-ghost" data-event-status-filter="Confirmed" id="event-status-filter-btn-confirmed" style="padding: 6px 16px;">Confirmed</button>
+                        <button class="btn btn-ghost" data-event-status-filter="Completed" id="event-status-filter-btn-completed" style="padding: 6px 16px;">Completed</button>
+                    </div>
+                    <div>
+                        <input type="text" id="events-search-input" placeholder="Search Client / Venue..." class="search-input" style="max-width: 250px; margin-bottom: 0;">
+                    </div>
+                </div>
+
+                <div class="glass-panel">
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Client / Location</th>
+                                    <th>Dates</th>
+                                    <th>Status</th>
+                                    <th>Invoice Total</th>
+                                    <th>Paid</th>
+                                    <th>Balance</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="events-table-body">
+                                <tr>
+                                    <td colspan="7" style="text-align: center;">Loading events datasets...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="events-pagination"></div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Modals Workspace -->
+
+    <!-- Booking Modal -->
+    <div class="modal-overlay" id="modal-booking">
+        <div class="modal-card glass-panel">
+            <div class="modal-header">
+                <h3 id="booking-modal-title">Book New Event Project</h3>
+                <button class="btn btn-secondary" onclick="closeModal('modal-booking')" style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
+            </div>
+
+            <form id="booking-form">
+                <input type="hidden" id="booking-id">
+
+                <div class="row2">
+                    <div class="form-group">
+                        <label for="booking-client">Client Profile</label>
+                        <select id="booking-client" required>
+                            <!-- Dynamic clients list -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label style="opacity: 0;">Or Intake Client</label>
+                        <button type="button" class="btn btn-secondary" id="btn-quick-client" style="width: 100%; height: 42px;">+ Intake Client</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="booking-venue">Venue Target Address</label>
+                    <input type="text" id="booking-venue" required placeholder="E.g. Grand Ballroom, Taj Mahal Palace, Colaba">
+                </div>
+
+                <div class="row2">
+                    <div class="form-group">
+                        <label for="booking-start">Setup Start Date</label>
+                        <input type="date" id="booking-start" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="booking-end">Cleanup Wrap Deadline</label>
+                        <input type="date" id="booking-end" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Warehouse Reserved Stock Selection</label>
+                    <div id="booking-items-selector" style="max-height: 150px; overflow-y: auto; padding: 0.75rem; border: 1px solid rgba(107,22,35,0.15); border-radius: 4px; display: flex; flex-direction: column; gap: 0.5rem;">
+                        <!-- Checkboxes with quantities of items -->
+                    </div>
+                </div>
+
+                <div class="row2">
+                    <div class="form-group">
+                        <label for="booking-capacity">Crew Workforce Needed</label>
+                        <input type="number" id="booking-capacity" min="1" max="10" value="4">
+                    </div>
+                    <div class="form-group">
+                        <label>Crew Worker Assignments</label>
+                        <button type="button" class="btn btn-secondary" id="btn-assign-crew" style="height: 42px;">Configure Crew Wages</button>
+                    </div>
+                </div>
+
+                <div class="row2">
+                    <div class="form-group">
+                        <label for="booking-discount">Discount (₹)</label>
+                        <input type="number" id="booking-discount" min="0" value="0" step="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="booking-tax-rate">Tax Rate (%)</label>
+                        <input type="number" id="booking-tax-rate" min="0" value="0" step="0.1">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="booking-notes">Special Setup Notes</label>
+                    <textarea id="booking-notes" rows="2" placeholder="Configure lighting to warm yellow..."></textarea>
+                </div>
+
+                <div class="form-group" style="flex-direction: row; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-booking')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Booking</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Client Intake Modal -->
+    <div class="modal-overlay" id="modal-client">
+        <div class="modal-card glass-panel" style="max-width: 450px;">
+            <div class="modal-header">
+                <h3>Mobile Client Intake Form</h3>
+                <button class="btn btn-secondary" onclick="closeModal('modal-client')" style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
+            </div>
+
+            <form id="client-form">
+                <div class="form-group">
+                    <label for="client-name">Full Name</label>
+                    <input type="text" id="client-name" required placeholder="Client Identity">
+                </div>
+                <div class="form-group">
+                    <label for="client-email">Email Address</label>
+                    <input type="email" id="client-email" required placeholder="name@domain.com">
+                </div>
+                <div class="form-group">
+                    <label for="client-phone">Phone Number</label>
+                    <input type="tel" id="client-phone" required placeholder="98765 43210">
+                </div>
+                <div class="form-group">
+                    <label for="client-address">Billing/Primary Address</label>
+                    <input type="text" id="client-address" placeholder="123 Street Ave, Dadar, Mumbai">
+                </div>
+                <div class="form-group" style="flex-direction: row; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-client')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Register Client</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Inventory Registration Modal -->
+    <div class="modal-overlay" id="modal-inventory">
+        <div class="modal-card glass-panel" style="max-width: 450px;">
+            <div class="modal-header">
+                <h3 id="inventory-modal-title">Register Warehouse Asset</h3>
+                <button class="btn btn-secondary" onclick="closeModal('modal-inventory')" style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
+            </div>
+
+            <form id="inventory-form">
+                <input type="hidden" id="inventory-id">
+                <div class="form-group">
+                    <label for="inventory-name">Asset Alphanumeric Name</label>
+                    <input type="text" id="inventory-name" required placeholder="E.g., LED Spot Uplight (Gold)">
+                </div>
+                <div class="form-group">
+                    <label for="inventory-category">Category Designation</label>
+                    <select id="inventory-category" required>
+                        <option value="Lighting">Lighting</option>
+                        <option value="Drapery">Drapery</option>
+                        <option value="Floral">Floral</option>
+                        <option value="Furniture">Furniture</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="row2">
+                    <div class="form-group">
+                        <label for="inventory-qty">Total Stock Owned</label>
+                        <input type="number" id="inventory-qty" required min="1" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label for="inventory-avail">Available Stock</label>
+                        <input type="number" id="inventory-avail" required min="0" value="10">
+                    </div>
+                </div>
+                <div class="row2">
+                    <div class="form-group">
+                        <label for="inventory-rate">Daily Rental Price (₹)</label>
+                        <input type="number" id="inventory-rate" required min="0.00" step="1.00" value="1500">
+                    </div>
+                    <div class="form-group">
+                        <label for="inventory-condition">Condition Status</label>
+                        <select id="inventory-condition" required>
+                            <option value="Excellent">Excellent</option>
+                            <option value="Good">Good</option>
+                            <option value="Fair">Fair</option>
+                            <option value="Damaged">Damaged</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group" style="flex-direction: row; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-inventory')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Asset</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Quote Consultation Calculator Modal -->
+    <div class="modal-overlay" id="modal-quote">
+        <div class="modal-card glass-panel">
+            <div class="modal-header">
+                <h3>On-Walk Quote Checklist Builder</h3>
+                <button class="btn btn-secondary" onclick="closeModal('modal-quote')" style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
+            </div>
+
+            <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1.5rem;">
+                Select catalog items and inputs below to provide an immediate verbal estimate during venue consultation.
+            </p>
+
+            <div class="form-group">
+                <label for="quote-days">Rental Span (Days)</label>
+                <input type="number" id="quote-days" min="1" value="1" style="max-width: 120px;">
+            </div>
+
+            <div id="quote-items-calculator" style="margin-bottom: 1.5rem; max-height: 250px; overflow-y: auto;">
+                <!-- List of items to input quantities -->
+            </div>
+
+            <div class="glass-panel" style="background: rgba(31, 75, 67, 0.1); border: 2px solid var(--gold); display: flex; justify-content: space-between; align-items: center; padding: 1.25rem; border-radius: 4px;">
+                <h4 style="color: var(--maroon); font-family: 'Marcellus', serif;">Estimated Booking Total:</h4>
+                <div style="font-size: 1.75rem; font-weight: 700; color: var(--maroon-deep);" id="quote-total-price">₹0.00</div>
+            </div>
+
+            <div class="form-group" style="flex-direction: row; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modal-quote')">Close Calculator</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Crew Wages Allocation Modal -->
+    <div class="modal-overlay" id="modal-crew-allocation">
+        <div class="modal-card glass-panel" style="max-width: 480px;">
+            <div class="modal-header">
+                <h3>Crew Wages & Allocation</h3>
+                <button class="btn btn-secondary" onclick="closeModal('modal-crew-allocation')" style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
+            </div>
+
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.5rem;">
+                Bind setup workers to this venue schedule and log daily pay rates.
+            </p>
+
+            <div id="crew-list-inputs" style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem;">
+                <!-- Dynamically render crew assignment rows -->
+            </div>
+
+            <div class="form-group" style="flex-direction: row; justify-content: flex-end; gap: 0.75rem;">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modal-crew-allocation')">Cancel</button>
+                <button type="button" class="btn btn-primary" id="btn-apply-crew-allocation">Apply Allocation</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cash Receipts / Invoice Modal -->
+    <div class="modal-overlay" id="modal-invoice-payout">
+        <div class="modal-card glass-panel" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3>Event Invoice Details</h3>
+                <button class="btn btn-secondary" onclick="closeModal('modal-invoice-payout')" style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
+            </div>
+
+            <div id="invoice-details-box" style="margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem;">
+                <!-- Rendered dynamically -->
+            </div>
+
+            <!-- Print Receipt wrapper block -->
+            <div id="print-receipt-section" class="print-receipt-only">
+                <div style="text-align: center; border-bottom: 2px solid #000000; padding-bottom: 1rem; margin-bottom: 1rem;">
+                    <h2>EVENT DECORATION LOGISTICS CONTRACT</h2>
+                    <p style="font-family: 'Marcellus', serif;">Bhoomi Decoration, Mumbai</p>
+                </div>
+                <div id="print-content-body"></div>
+                <div style="margin-top: 3rem; display: flex; justify-content: space-between;">
+                    <div>
+                        <p>___________________________</p>
+                        <p style="font-size: 0.8rem; text-align: center;">Business Administrator</p>
+                    </div>
+                    <div>
+                        <p>___________________________</p>
+                        <p style="font-size: 0.8rem; text-align: center;">Client Signature</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Collect Payment Form -->
+            <form id="payment-form" style="border-top: 1px solid rgba(107,22,35,0.15); padding-top: 1.25rem; margin-top: 1.25rem;">
+                <div class="form-group">
+                    <label for="payment-amount">Record Cash Deposit / Payment Receipt (₹)</label>
+                    <div style="display: flex; gap: 0.75rem;">
+                        <input type="number" id="payment-amount" required min="1" step="1" placeholder="15000" style="flex: 1;">
+                        <button type="submit" class="btn btn-primary">Record Payment</button>
+                    </div>
+                </div>
+            </form>
+
+            <div class="form-group" style="flex-direction: row; justify-content: space-between; align-items: center; margin-top: 1.5rem;">
+                <button type="button" class="btn btn-secondary" id="btn-export-print">
+                    <span>Export Contract & Receipt</span>
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modal-invoice-payout')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Manual Invoice Modal -->
+    <div class="modal-overlay" id="modal-manual-invoice">
+        <div class="modal-card glass-panel" style="max-width: 650px; max-height: 90vh; overflow-y: auto;">
+            <div class="modal-header">
+                <h3 id="manual-invoice-modal-title">Create Manual Custom Invoice</h3>
+                <button class="btn btn-secondary" onclick="closeModal('modal-manual-invoice')" style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
+            </div>
+
+            <form id="manual-invoice-form">
+                <input type="hidden" id="manual-invoice-id">
+
+                <!-- Client Info -->
+                <div class="row2">
+                    <div class="form-group">
+                        <label for="manual-invoice-client-select">Select CRM Client (Optional)</label>
+                        <select id="manual-invoice-client-select">
+                            <!-- Dynamic clients list -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label style="opacity: 0;">Or Add Info Below</label>
+                        <span style="font-size: 0.85rem; color: var(--text-muted); display: block; padding-top: 10px;">Select to autofill, or write custom details below.</span>
+                    </div>
+                </div>
+
+                <div class="row2">
+                    <div class="form-group">
+                        <label for="manual-invoice-client-name">Client Name</label>
+                        <input type="text" id="manual-invoice-client-name" required placeholder="E.g., Priya Sharma">
+                    </div>
+                    <div class="form-group">
+                        <label for="manual-invoice-client-email">Client Email</label>
+                        <input type="email" id="manual-invoice-client-email" required placeholder="E.g., priya@example.com">
+                    </div>
+                </div>
+
+                <div class="row2">
+                    <div class="form-group">
+                        <label for="manual-invoice-client-phone">Client Phone</label>
+                        <input type="text" id="manual-invoice-client-phone" required placeholder="E.g., +91 98765 43210">
+                    </div>
+                    <div class="form-group">
+                        <label for="manual-invoice-client-address">Billing Address</label>
+                        <input type="text" id="manual-invoice-client-address" required placeholder="E.g., 456 Residency Rd, Mumbai">
+                    </div>
+                </div>
+
+                <!-- Event Details -->
+                <div class="form-group">
+                    <label for="manual-invoice-venue">Venue Target Address</label>
+                    <input type="text" id="manual-invoice-venue" required placeholder="E.g., Taj Mahal Palace, Ballroom, Colaba">
+                </div>
+
+                <div class="row2">
+                    <div class="form-group">
+                        <label for="manual-invoice-start">Setup Start Date</label>
+                        <input type="date" id="manual-invoice-start" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="manual-invoice-end">Cleanup Wrap Deadline</label>
+                        <input type="date" id="manual-invoice-end" required>
+                    </div>
+                </div>
+
+                <!-- Custom Items Builder -->
+                <div class="form-group">
+                    <label>Invoice Line Items (Custom Items)</label>
+                    <div id="manual-invoice-items-list" style="margin-bottom: 0.75rem; max-height: 180px; overflow-y: auto; padding: 0.5rem; border: 1px solid rgba(107,22,35,0.15); border-radius: 4px; display: flex; flex-direction: column; gap: 0.5rem; background: rgba(255,255,255,0.2);">
+                        <div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 0.5rem;">No items added yet. Click "Add Custom Item" below.</div>
+                    </div>
+                    
+                    <!-- Add custom item form inline -->
+                    <div style="display: grid; grid-template-columns: 2fr 1.2fr 1.2fr auto; gap: 0.5rem; align-items: end;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label style="font-size: 0.75rem;">Item Description</label>
+                            <input type="text" id="new-item-desc" placeholder="E.g., Stage Floral Arch">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label style="font-size: 0.75rem;">Qty</label>
+                            <input type="number" id="new-item-qty" min="1" value="1">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label style="font-size: 0.75rem;">Daily Rate (₹)</label>
+                            <input type="number" id="new-item-rate" min="0" value="0">
+                        </div>
+                        <button type="button" class="btn btn-secondary" id="btn-add-custom-item" style="padding: 0.5rem 0.75rem; height: 38px;">Add</button>
+                    </div>
+                </div>
+
+                <!-- Discounts & Tax -->
+                <div class="row3">
+                    <div class="form-group">
+                        <label for="manual-invoice-discount">Discount (₹)</label>
+                        <input type="number" id="manual-invoice-discount" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="manual-invoice-tax-rate">Tax Rate (%)</label>
+                        <input type="number" id="manual-invoice-tax-rate" min="0" value="0" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label for="manual-invoice-paid">Initial Paid Amount (₹)</label>
+                        <input type="number" id="manual-invoice-paid" min="0" value="0">
+                    </div>
+                </div>
+
+                <!-- Notes & Status -->
+                <div class="row2">
+                    <div class="form-group">
+                        <label for="manual-invoice-status">Invoice Status</label>
+                        <select id="manual-invoice-status">
+                            <option value="Draft">Draft</option>
+                            <option value="Confirmed">Confirmed</option>
+                            <option value="Completed">Completed</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="manual-invoice-notes">Memo Notes</label>
+                        <input type="text" id="manual-invoice-notes" placeholder="Internal memo notes...">
+                    </div>
+                </div>
+
+                <!-- Grand Total Preview -->
+                <div class="glass-panel" style="background: rgba(31, 75, 67, 0.1); border: 2px solid var(--gold); display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-radius: 4px; margin-top: 1rem;">
+                    <h4 style="color: var(--maroon); font-family: 'Marcellus', serif; margin: 0;">Calculated Invoice Total:</h4>
+                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--maroon-deep);" id="manual-invoice-grand-total">₹0.00</div>
+                </div>
+
+                <div class="form-group" style="flex-direction: row; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-manual-invoice')">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btn-save-manual-invoice">Save & Export PDF</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Upload Layout Modal -->
+    <div class="modal-overlay" id="modal-upload-layout">
+        <div class="modal-card glass-panel" style="max-width: 450px;">
+            <div class="modal-header">
+                <h3>Upload Layout Blueprints / Sketch</h3>
+                <button class="btn btn-secondary" onclick="closeModal('modal-upload-layout')" style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
+            </div>
+
+            <form id="upload-layout-form">
+                <input type="hidden" id="upload-layout-event-id">
+                <div class="form-group">
+                    <label for="upload-layout-file">Select Venue Blueprint Photo / Drawing</label>
+                    <input type="file" id="upload-layout-file" required accept="image/*">
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">
+                        Image will be compressed locally below 1MB to preserve cloud bandwidth.
+                    </p>
+                </div>
+
+                <div class="form-group" style="flex-direction: row; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-upload-layout')">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btn-upload-submit">Upload Layout</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Client Profile Details Modal -->
+    <div class="modal-overlay" id="modal-client-details">
+        <div class="modal-card glass-panel" style="max-width: 550px;">
+            <div class="modal-header">
+                <h3>Client Profile Details</h3>
+                <button class="btn btn-secondary" onclick="closeModal('modal-client-details')" style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
+            </div>
+            <div id="client-details-content" style="display: flex; flex-direction: column; gap: 1.5rem;">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Event Project Details Modal -->
+    <div class="modal-overlay" id="modal-event-details">
+        <div class="modal-card glass-panel" style="max-width: 650px; max-height: 85vh; overflow-y: auto;">
+            <div class="modal-header">
+                <h3>Event Details & Timeline</h3>
+                <button class="btn btn-secondary" onclick="closeModal('modal-event-details')" style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
+            </div>
+            <div id="event-details-content" style="display: flex; flex-direction: column; gap: 1.5rem;">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Crew Onboarding Modal -->
+    <div class="modal-overlay" id="modal-onboard-crew">
+        <div class="modal-card glass-panel" style="max-width: 450px;">
+            <div class="modal-header">
+                <h3>Add Admin Member (Admin Only)</h3>
+                <button class="btn btn-secondary" onclick="closeModal('modal-onboard-crew')" style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
+            </div>
+
+            <form id="onboard-crew-form">
+                <div class="form-group">
+                    <label for="onboard-email">Email Address</label>
+                    <input type="email" id="onboard-email" required placeholder="admin@bhoomidecoration.com">
+                </div>
+                <div class="form-group">
+                    <label for="onboard-password">Initial Password</label>
+                    <input type="password" id="onboard-password" required placeholder="••••••••">
+                </div>
+                <div class="form-group">
+                    <label for="onboard-name">Full Name</label>
+                    <input type="text" id="onboard-name" required placeholder="Marcus Chen">
+                </div>
+                <div class="form-group">
+                    <label for="onboard-role">Access Role</label>
+                    <select id="onboard-role" required>
+                        <option value="admin">Admin (Manager)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="onboard-rate">Base Daily Wage Rate (₹ / Day)</label>
+                    <input type="number" id="onboard-rate" required min="0" value="0" step="10">
+                </div>
+                <div class="form-group" style="flex-direction: row; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-onboard-crew')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Onboard Admin Member</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Gallery Item Upload Modal -->
+    <div class="modal-overlay" id="modal-gallery">
+        <div class="modal-card glass-panel" style="max-width: 450px;">
+            <div class="modal-header">
+                <h3 id="gallery-modal-title">Upload Portfolio Photo</h3>
+                <button class="btn btn-secondary" onclick="closeModal('modal-gallery')" style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
+            </div>
+            <form id="gallery-form">
+                <input type="hidden" id="gallery-id">
+                <div class="form-group">
+                    <label for="gallery-title">Photo Title</label>
+                    <input type="text" id="gallery-title" required placeholder="E.g., Haldi Mandap Elegance">
+                </div>
+                <div class="form-group">
+                    <label for="gallery-category">Category</label>
+                    <select id="gallery-category" required>
+                        <option value="Lighting">Lighting</option>
+                        <option value="Drapery">Drapery</option>
+                        <option value="Floral">Floral</option>
+                        <option value="Furniture">Furniture</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="gallery-desc">Description</label>
+                    <textarea id="gallery-desc" rows="2" placeholder="Brief description of the decoration..."></textarea>
+                </div>
+                <div class="form-group" id="gallery-file-group">
+                    <label for="gallery-file">Select Showcase Image</label>
+                    <input type="file" id="gallery-file" accept="image/*">
+                </div>
+                <div class="form-group" id="gallery-url-group" style="display: none;">
+                    <label for="gallery-url">Image URL</label>
+                    <input type="text" id="gallery-url" placeholder="http://...">
+                </div>
+                <div class="form-group" style="flex-direction: row; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-gallery')">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btn-gallery-save">Upload & Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Crew Member Modal -->
+    <div class="modal-overlay" id="modal-crew">
+        <div class="modal-card glass-panel" style="max-width: 450px;">
+            <div class="modal-header">
+                <h3 id="crew-modal-title">Create Team Profile</h3>
+                <button class="btn btn-secondary" onclick="closeModal('modal-crew')" style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
+            </div>
+            <form id="crew-form">
+                <input type="hidden" id="crew-id">
+                <div class="form-group">
+                    <label for="crew-name">Full Name</label>
+                    <input type="text" id="crew-name" required placeholder="E.g., Rajesh Sharma">
+                </div>
+                <div class="form-group">
+                    <label for="crew-role">Role Specialist</label>
+                    <input type="text" id="crew-role" required placeholder="E.g., Senior Carpenter">
+                </div>
+                <div class="form-group">
+                    <label for="crew-contact">Contact Info</label>
+                    <input type="text" id="crew-contact" required placeholder="E.g., +91 98765 43210">
+                </div>
+                <div class="form-group">
+                    <label for="crew-rate">Base Daily Rate (₹)</label>
+                    <input type="number" id="crew-rate" required min="0" value="150">
+                </div>
+                <div class="form-group" style="flex-direction: row; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-crew')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Profile</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Crew Payment Modal -->
+    <div class="modal-overlay" id="modal-crew-payment">
+        <div class="modal-card glass-panel" style="max-width: 450px;">
+            <div class="modal-header">
+                <h3>Record Crew Wage Payout</h3>
+                <button class="btn btn-secondary" onclick="closeModal('modal-crew-payment')" style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
+            </div>
+            <form id="crew-payment-form">
+                <input type="hidden" id="crew-payment-id">
+                <div class="form-group">
+                    <label>Crew Member</label>
+                    <div style="font-weight: 600;" id="crew-payment-name">Rajesh Sharma</div>
+                </div>
+                <div class="form-group">
+                    <label>Current Outstanding Balance</label>
+                    <div style="font-weight: 600; color: var(--maroon);" id="crew-payment-owed">₹0.00</div>
+                </div>
+                <div class="form-group">
+                    <label for="crew-payment-amount">Payment Amount (₹)</label>
+                    <input type="number" id="crew-payment-amount" required min="1" step="1" placeholder="₹ Amount">
+                </div>
+                <div class="form-group" style="flex-direction: row; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-crew-payment')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Record Payout</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Sidebar Backdrop Overlay -->
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+    <!-- Hidden High-Fidelity PDF Export Template -->
+    <div id="invoice-pdf-template" style="display: none;">
+        <div class="pdf-container" style="padding: 30px; font-family: 'Poppins', sans-serif; color: #333; background: #fff; max-width: 800px; margin: 0 auto; box-sizing: border-box;">
+            <!-- Brand Header -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #6b1623; padding-bottom: 20px; margin-bottom: 30px;">
+                <div>
+                    <h1 style="font-family: 'Marcellus', serif; color: #6b1623; margin: 0 0 5px 0; font-size: 2.2rem; letter-spacing: 2px;">BHOOMI DECORATION</h1>
+                    <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #c9941f; margin: 0 0 10px 0; font-weight: 500;">Luxury Event & Wedding Decorators</p>
+                    <p style="margin: 0; font-size: 0.8rem; color: #666; line-height: 1.4;">Mumbai, Maharashtra, India<br>Email: hello@bhoomidecoration.com | Web: www.bhoomidecoration.com</p>
+                </div>
+                <div style="text-align: right;">
+                    <h2 style="font-family: 'Marcellus', serif; color: #333; margin: 0 0 10px 0; font-size: 1.8rem; letter-spacing: 1px;">INVOICE</h2>
+                    <p style="margin: 0 0 5px 0; font-size: 0.9rem; font-weight: 600;">Invoice No: <span id="pdf-invoice-id" style="color: #6b1623;">#EVT-XXXX</span></p>
+                    <p style="margin: 0; font-size: 0.85rem; color: #666;">Date: <span id="pdf-invoice-date">DD/MM/YYYY</span></p>
+                </div>
+            </div>
+
+            <!-- Client & Event Info Details Grid -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 35px;">
+                <div style="background: #fdfaf7; border-left: 3px solid #c9941f; padding: 15px; border-radius: 4px;">
+                    <h3 style="font-family: 'Marcellus', serif; color: #6b1623; font-size: 1rem; margin: 0 0 10px 0; letter-spacing: 0.5px;">BILLED TO:</h3>
+                    <p style="margin: 0 0 5px 0; font-size: 0.9rem; font-weight: 600;" id="pdf-client-name">Client Name</p>
+                    <p style="margin: 0 0 5px 0; font-size: 0.8rem; color: #555;" id="pdf-client-email">client@email.com</p>
+                    <p style="margin: 0 0 5px 0; font-size: 0.8rem; color: #555;" id="pdf-client-phone">+91 99999 99999</p>
+                    <p style="margin: 0; font-size: 0.8rem; color: #555; line-height: 1.3;" id="pdf-client-address">Billing Address</p>
+                </div>
+                <div style="background: #fdfaf7; border-left: 3px solid #6b1623; padding: 15px; border-radius: 4px;">
+                    <h3 style="font-family: 'Marcellus', serif; color: #6b1623; font-size: 1rem; margin: 0 0 10px 0; letter-spacing: 0.5px;">EVENT LOGISTICS:</h3>
+                    <p style="margin: 0 0 5px 0; font-size: 0.85rem;"><strong>Venue:</strong> <span id="pdf-event-venue">Grand Ballroom, Mumbai</span></p>
+                    <p style="margin: 0 0 5px 0; font-size: 0.85rem;"><strong>Setup Start:</strong> <span id="pdf-event-start">YYYY-MM-DD</span></p>
+                    <p style="margin: 0; font-size: 0.85rem;"><strong>Cleanup Deadline:</strong> <span id="pdf-event-end">YYYY-MM-DD</span></p>
+                </div>
+            </div>
+
+            <!-- Items Table -->
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 35px; font-size: 0.85rem; text-align: left;">
+                <thead>
+                    <tr style="background: #6b1623; color: #fff;">
+                        <th style="padding: 10px 12px; border-bottom: 2px solid #540e1a; font-family: 'Marcellus', serif; font-weight: 500;">Reserved Catalog Item</th>
+                        <th style="padding: 10px 12px; border-bottom: 2px solid #540e1a; font-family: 'Marcellus', serif; font-weight: 500; text-align: center;">Category</th>
+                        <th style="padding: 10px 12px; border-bottom: 2px solid #540e1a; font-family: 'Marcellus', serif; font-weight: 500; text-align: center;">Qty</th>
+                        <th style="padding: 10px 12px; border-bottom: 2px solid #540e1a; font-family: 'Marcellus', serif; font-weight: 500; text-align: right;">Day Rate</th>
+                        <th style="padding: 10px 12px; border-bottom: 2px solid #540e1a; font-family: 'Marcellus', serif; font-weight: 500; text-align: right;">Total Price</th>
+                    </tr>
+                </thead>
+                <tbody id="pdf-items-body">
+                    <!-- Dynamic Rows -->
+                </tbody>
+            </table>
+
+            <!-- Financial Summary Grid -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 20px;">
+                <!-- Payment terms and notes -->
+                <div style="flex: 1; max-width: 50%;">
+                    <h4 style="font-family: 'Marcellus', serif; color: #6b1623; font-size: 0.9rem; margin: 0 0 10px 0;">TERMS & CONDITIONS</h4>
+                    <p style="margin: 0; font-size: 0.72rem; color: #777; line-height: 1.4;">
+                        1. All reservation items are rental assets of Bhoomi Decoration.<br>
+                        2. Payments should be made within the milestone dates.<br>
+                        3. Any damage to physical property during the setup or event span is subject to replacement charges.
+                    </p>
+                </div>
+                <!-- Totals Section -->
+                <div style="width: 250px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 8px; color: #555;">
+                        <span>Rental Subtotal:</span>
+                        <span id="pdf-subtotal">₹0.00</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 8px; color: #555;">
+                        <span>Discount:</span>
+                        <span id="pdf-discount">-₹0.00</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 8px; color: #555; border-bottom: 1px solid #ddd; padding-bottom: 8px;">
+                        <span>Tax Rate:</span>
+                        <span id="pdf-tax">0.00%</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 1rem; font-weight: 700; margin-bottom: 8px; color: #6b1623;">
+                        <span>Invoice Total:</span>
+                        <span id="pdf-total">₹0.00</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 8px; color: #2e7d32;">
+                        <span>Amount Paid:</span>
+                        <span id="pdf-paid">₹0.00</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 1rem; font-weight: 700; border-top: 2px double #6b1623; padding-top: 8px; margin-top: 8px; color: #c62828;">
+                        <span>Balance Due:</span>
+                        <span id="pdf-balance">₹0.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Signature Lines -->
+            <div style="margin-top: 60px; display: flex; justify-content: space-between; align-items: flex-end; padding-top: 20px; border-top: 1px dashed #ddd;">
+                <div style="text-align: center;">
+                    <div style="width: 180px; border-bottom: 1px solid #888; margin-bottom: 5px;"></div>
+                    <p style="margin: 0; font-size: 0.75rem; color: #666; font-weight: 600;">Authorized Signatory</p>
+                    <p style="margin: 2px 0 0 0; font-size: 0.65rem; color: #999;">Bhoomi Decoration</p>
+                </div>
+                <div style="text-align: center;">
+                    <div style="width: 180px; border-bottom: 1px solid #888; margin-bottom: 5px;"></div>
+                    <p style="margin: 0; font-size: 0.75rem; color: #666; font-weight: 600;">Client Signature</p>
+                    <p style="margin: 2px 0 0 0; font-size: 0.65rem; color: #999;">Acceptance of Agreement</p>
+                </div>
+            </div>
+
+            <!-- Footer Message -->
+            <div style="text-align: center; margin-top: 50px; font-size: 0.75rem; color: #999; font-style: italic; border-top: 1px solid #eee; padding-top: 15px;">
+                Thank you for choosing Bhoomi Decoration for your celebration!
+            </div>
+        </div>
+    </div>
+
+    <!-- Shared Utilities Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="common.js"></script>
+    <script src="admin.js?v=invoice-hub"></script>
+</body>
+
+</html>

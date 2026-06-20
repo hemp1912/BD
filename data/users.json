@@ -1,0 +1,26 @@
+[
+    {
+        "id": "usr_admin",
+        "email": "hello@bhoomidecoration.com",
+        "password": "admin123",
+        "role": "admin",
+        "full_name": "Admin Manager",
+        "base_daily_rate": 0.0
+    },
+    {
+        "id": "usr_labor_1",
+        "email": "crew1@bhoomidecoration.com",
+        "password": "crew123",
+        "role": "labor",
+        "full_name": "Marcus Chen",
+        "base_daily_rate": 150.0
+    },
+    {
+        "id": "usr_labor_2",
+        "email": "crew2@bhoomidecoration.com",
+        "password": "crew123",
+        "role": "labor",
+        "full_name": "David Miller",
+        "base_daily_rate": 150.0
+    }
+]

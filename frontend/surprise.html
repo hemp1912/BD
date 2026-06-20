@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Something Special is Coming... | Bhoomi Decoration</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ==================== DESIGN SYSTEM & VARS ==================== */
+        :root {
+            --maroon: #6B1623;
+            --maroon-deep: #4A0F18;
+            --gold: #C9941F;
+            --gold-light: #E8C468;
+            --ivory: #FBF5E9;
+            --dark-bg: #0C0305;
+            --card-bg: rgba(30, 9, 13, 0.55);
+            --border-glow: rgba(201, 148, 31, 0.25);
+            --font-display: 'Marcellus', serif;
+            --font-body: 'Outfit', sans-serif;
+            --transition-smooth: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* ==================== GENERAL RESET ==================== */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--ivory);
+            font-family: var(--font-body);
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* ==================== CANVAS BACKGROUNDS ==================== */
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        #bg-stars {
+            z-index: 0;
+            pointer-events: auto; /* Allow mouse movement interaction */
+        }
+
+        #spark-trail {
+            z-index: 9; /* Spark trail sits on top of text but behind modal clicks */
+        }
+
+        #confetti-canvas {
+            z-index: 10;
+        }
+
+        /* ==================== BACKGROUND GRADIENT GLOWS ==================== */
+        .ambient-glow {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(107, 22, 35, 0.15) 0%, rgba(0,0,0,0) 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+            animation: pulse-glow 10s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulse-glow {
+            0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.8; }
+            100% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+        }
+
+        /* ==================== CONTROLS (SOUND/MUTE) ==================== */
+        .sound-toggle {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            z-index: 20;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .sound-toggle:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: var(--gold);
+            transform: scale(1.08);
+        }
+
+        .sound-toggle svg {
+            width: 18px;
+            height: 18px;
+            fill: var(--ivory);
+            transition: var(--transition-smooth);
+        }
+
+        .sound-toggle.muted svg {
+            fill: #999;
+        }
+
+        .sound-toggle.muted::after {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 2px;
+            background: #e63946;
+            transform: rotate(-45deg);
+            border-radius: 2px;
+        }
+
+        /* ==================== MAIN GLASS CARD ==================== */
+        .container {
+            position: relative;
+            z-index: 5;
+            width: 90%;
+            max-width: 580px;
+            min-height: 450px;
+            padding: 3.5rem 3rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-glow);
+            border-radius: 12px;
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 
+                        inset 0 1px 0 rgba(255, 255, 255, 0.05),
+                        0 0 40px rgba(107, 22, 35, 0.15);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            transition: var(--transition-smooth);
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(232, 196, 104, 0.03) 0%, rgba(0,0,0,0) 60%);
+            pointer-events: none;
+            transform: rotate(30deg);
+        }
+
+        /* ==================== STAGE 1: MYSTERY GATEWAY ==================== */
+        #stage-teaser {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            transition: var(--transition-smooth);
+        }
+
+        .brand-header {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            letter-spacing: 0.35em;
+            color: var(--gold-light);
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+            opacity: 0.85;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .brand-header span {
+            font-size: 0.8rem;
+            color: var(--gold);
+        }
+
+        /* SVG Box Styling and Animations */
+        .box-wrapper {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            margin: 1.5rem 0 2.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            filter: drop-shadow(0 0 20px rgba(201, 148, 31, 0.2));
+            transition: var(--transition-smooth);
+        }
+
+        .mystery-box-svg {
+            width: 140px;
+            height: 140px;
+            animation: float 4s ease-in-out infinite;
+            transform-origin: center bottom;
+            transition: var(--transition-smooth);
+        }
+
+        .box-glow {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(232, 196, 104, 0.45) 0%, rgba(232, 196, 104, 0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0.6;
+            animation: pulse-ring 4s infinite alternate;
+        }
+
+        /* Wobble effect on hover */
+        .box-wrapper:hover .mystery-box-svg {
+            animation: wobble 0.6s ease-in-out infinite alternate;
+            filter: drop-shadow(0 0 35px rgba(232, 196, 104, 0.6));
+        }
+
+        .box-wrapper:hover .box-glow {
+            opacity: 1;
+            transform: scale(1.3);
+        }
+
+        .box-wrapper:active .mystery-box-svg {
+            transform: scale(0.9);
+        }
+
+        .teaser-instruction {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            letter-spacing: 0.05em;
+            color: var(--ivory);
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+        }
+
+        .teaser-subinstruction {
+            font-size: 0.9rem;
+            color: #b09e9f;
+            letter-spacing: 0.02em;
+            max-width: 320px;
+            line-height: 1.6;
+        }
+
+        /* SVG Chest / Box detailing */
+        .chest-base {
+            fill: url(#maroon-gradient);
+            stroke: var(--gold);
+            stroke-width: 2.5px;
+        }
+        .chest-trim {
+            fill: url(#gold-gradient);
+            stroke: var(--maroon-deep);
+            stroke-width: 1px;
+        }
+        .chest-gem {
+            fill: #ffffff;
+            filter: drop-shadow(0 0 6px var(--gold-light));
+            animation: gem-flash 2s infinite alternate;
+        }
+
+        /* Animations */
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-12px) rotate(1deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        @keyframes wobble {
+            0% { transform: translateY(-8px) rotate(-4deg) scale(1.03); }
+            100% { transform: translateY(-8px) rotate(4deg) scale(1.03); }
+        }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(0.85); opacity: 0.4; }
+            100% { transform: scale(1.15); opacity: 0.7; }
+        }
+
+        @keyframes gem-flash {
+            0% { fill: #fdf6e2; opacity: 0.8; filter: drop-shadow(0 0 4px var(--gold-light)); }
+            100% { fill: #ffffff; opacity: 1; filter: drop-shadow(0 0 12px var(--gold-light)); }
+        }
+
+        /* ==================== STAGE 2: THE REVEAL ==================== */
+        #stage-reveal {
+            display: none;
+            opacity: 0;
+            width: 100%;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-smooth);
+        }
+
+        .reveal-header {
+            font-family: var(--font-display);
+            font-size: 2.2rem;
+            line-height: 1.15;
+            letter-spacing: 0.05em;
+            color: var(--ivory);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.6);
+        }
+
+        .reveal-header span {
+            background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 50%, var(--maroon) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+            display: block;
+            margin-bottom: 0.2rem;
+        }
+
+        .reveal-desc {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #d1c5c6;
+            max-width: 440px;
+            margin-bottom: 2.2rem;
+        }
+
+        /* Countdown Elements */
+        .countdown-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 2.5rem;
+        }
+
+        .countdown-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 76px;
+            height: 84px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(232, 196, 104, 0.15);
+            border-radius: 8px;
+            justify-content: center;
+            position: relative;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.2), 0 8px 20px rgba(0,0,0,0.3);
+            backdrop-filter: blur(5px);
+        }
+
+        .countdown-item::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 50%;
+            height: 1px;
+            background: rgba(232, 196, 104, 0.08);
+        }
+
+        .countdown-val {
+            font-family: var(--font-body);
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: var(--gold-light);
+            text-shadow: 0 0 10px rgba(232, 196, 104, 0.3);
+            line-height: 1;
+            margin-bottom: 2px;
+        }
+
+        .countdown-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: #bfaea5;
+            font-weight: 500;
+        }
+
+        /* Signup Form */
+        .signup-form {
+            width: 100%;
+            max-width: 420px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            position: relative;
+        }
+
+        .form-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--gold);
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .input-group {
+            display: flex;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(232, 196, 104, 0.25);
+            border-radius: 30px;
+            padding: 4px 4px 4px 18px;
+            transition: var(--transition-smooth);
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.4);
+        }
+
+        .input-group:focus-within {
+            border-color: var(--gold);
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.4), 0 0 15px rgba(232, 196, 104, 0.2);
+        }
+
+        .input-group input {
+            flex: 1;
+            background: none;
+            border: none;
+            outline: none;
+            color: var(--ivory);
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            font-weight: 400;
+        }
+
+        .input-group input::placeholder {
+            color: rgba(251, 245, 233, 0.35);
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, var(--maroon) 0%, var(--maroon-deep) 100%);
+            border: 1px solid rgba(232, 196, 104, 0.4);
+            color: var(--ivory);
+            font-family: var(--font-body);
+            font-weight: 600;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+            padding: 10px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .submit-btn:hover {
+            transform: translateX(2px) scale(1.02);
+            border-color: var(--gold-light);
+            box-shadow: 0 6px 20px rgba(107, 22, 35, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: scale(0.97);
+        }
+
+        .submit-btn svg {
+            width: 12px;
+            height: 12px;
+            fill: currentColor;
+            transition: var(--transition-smooth);
+        }
+
+        .submit-btn:hover svg {
+            transform: translateX(3px);
+        }
+
+        /* Success Message Panel */
+        .success-panel {
+            display: none;
+            opacity: 0;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition-smooth);
+            padding: 10px 0;
+        }
+
+        .success-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: rgba(31, 75, 67, 0.2);
+            border: 1px solid #1f4b43;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #81C784;
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            box-shadow: 0 0 15px rgba(129, 199, 132, 0.2);
+        }
+
+        .success-text {
+            font-size: 1rem;
+            color: #81C784;
+            font-weight: 500;
+            letter-spacing: 0.01em;
+        }
+
+        .success-sub {
+            font-size: 0.8rem;
+            color: #a49697;
+        }
+
+        /* ==================== FOOTER LINKS ==================== */
+        .portal-link {
+            margin-top: 3rem;
+            font-size: 0.85rem;
+            color: rgba(251, 245, 233, 0.45);
+            text-decoration: none;
+            letter-spacing: 0.05em;
+            transition: var(--transition-smooth);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border-bottom: 1px dashed rgba(251, 245, 233, 0.15);
+            padding-bottom: 2px;
+            z-index: 10;
+        }
+
+        .portal-link:hover {
+            color: var(--gold-light);
+            border-color: var(--gold-light);
+            transform: translateY(-1px);
+        }
+
+        /* ==================== RESPONSIVE WORK ==================== */
+        @media (max-width: 600px) {
+            .container {
+                padding: 2.5rem 1.5rem;
+                min-height: auto;
+            }
+            .reveal-header {
+                font-size: 1.8rem;
+            }
+            .countdown-container {
+                gap: 8px;
+            }
+            .countdown-item {
+                width: 64px;
+                height: 72px;
+            }
+            .countdown-val {
+                font-size: 1.5rem;
+            }
+            .input-group {
+                flex-direction: column;
+                background: none;
+                border: none;
+                padding: 0;
+                gap: 10px;
+                box-shadow: none !important;
+            }
+            .input-group input {
+                background: rgba(0, 0, 0, 0.45);
+                border: 1px solid rgba(232, 196, 104, 0.25);
+                padding: 14px 20px;
+                border-radius: 30px;
+                width: 100%;
+                text-align: center;
+            }
+            .submit-btn {
+                width: 100%;
+                justify-content: center;
+                padding: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Stars & Cosmic Sparkles Background -->
+    <canvas id="bg-stars"></canvas>
+    
+    <!-- Spark pointer trail -->
+    <canvas id="spark-trail"></canvas>
+    
+    <!-- Confetti explosion layer -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- Ambient glowing backgrounds -->
+    <div class="ambient-glow"></div>
+
+    <!-- Mute/Sound controls -->
+    <button class="sound-toggle" id="soundToggle" aria-label="Toggle sound effects">
+        <svg viewBox="0 0 24 24" id="sound-icon">
+            <path d="M6 9H2v6h4l5 5V4L6 9zm8.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM12 3v1.5c2.65.65 4.5 3.03 4.5 5.85s-1.85 5.2-4.5 5.85V18c3.54-.7 6-3.8 6-7.5s-2.46-6.8-6-7.5z"/>
+        </svg>
+    </button>
+
+    <!-- Main Card Container -->
+    <main class="container" id="cardContainer">
+        
+        <!-- ==================== STAGE 1: TEASER / CLOSED STATE ==================== -->
+        <section id="stage-teaser">
+            <div class="brand-header">
+                Bhoomi <span>✦</span> Decoration
+            </div>
+
+            <!-- SVG Jewel Box / Portal -->
+            <div class="box-wrapper" id="mysteryBox" aria-label="Reveal mystery gift">
+                <div class="box-glow"></div>
+                <svg class="mystery-box-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <radialGradient id="gold-gradient" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%" stop-color="#FFF3D1"/>
+                            <stop offset="60%" stop-color="#E8C468"/>
+                            <stop offset="100%" stop-color="#A87F18"/>
+                        </radialGradient>
+                        <linearGradient id="maroon-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#9C293A"/>
+                            <stop offset="50%" stop-color="#6B1623"/>
+                            <stop offset="100%" stop-color="#38080F"/>
+                        </linearGradient>
+                    </defs>
+                    <!-- Floating shadow in SVG for alignment -->
+                    <ellipse cx="50" cy="90" rx="30" ry="6" fill="#000" opacity="0.45"/>
+                    
+                    <!-- Chest Lid -->
+                    <path class="chest-base" d="M15,45 Q15,18 50,18 Q85,18 85,45 Z" />
+                    <!-- Lid bottom trim -->
+                    <path class="chest-trim" d="M12,42 H88 V46 H12 Z" />
+                    
+                    <!-- Chest Base Body -->
+                    <path class="chest-base" d="M15,46 H85 V80 Q85,86 78,86 H22 Q15,86 15,80 Z" />
+                    
+                    <!-- Metal Bands / Trims -->
+                    <rect class="chest-trim" x="24" y="24" width="6" height="62" rx="1" />
+                    <rect class="chest-trim" x="70" y="24" width="6" height="62" rx="1" />
+                    
+                    <!-- Large golden lock plate -->
+                    <rect class="chest-trim" x="42" y="40" width="16" height="18" rx="2" />
+                    
+                    <!-- Lock Keyhole and Gem -->
+                    <circle cx="50" cy="46" r="3" fill="#1A0306" />
+                    <polygon points="48,46 52,46 53,53 47,53" fill="#1A0306" />
+                    <polygon class="chest-gem" points="50,42 53,45 50,48 47,45" />
+                    
+                    <!-- Side Rings -->
+                    <circle cx="13" cy="55" r="5" fill="none" stroke="url(#gold-gradient)" stroke-width="2" />
+                    <circle cx="87" cy="55" r="5" fill="none" stroke="url(#gold-gradient)" stroke-width="2" />
+                </svg>
+            </div>
+
+            <h1 class="teaser-instruction">A Special Surprise Awaits</h1>
+            <p class="teaser-subinstruction">A grand design revolution is unfolding in our workshops. Click the chest to reveal what lies ahead.</p>
+        </section>
+
+        <!-- ==================== STAGE 2: THE REVEAL STATE ==================== -->
+        <section id="stage-reveal">
+            <h1 class="reveal-header" id="revealTitle">
+                <span>Bhoomi Decoration</span>
+                Is Coming
+            </h1>
+            <p class="reveal-desc">
+                We are reimagining luxury wedding decor, custom logistics, and design experiences. The countdown to the unveiling has begun. With the Digital Solution.
+            </p>
+
+            <!-- Countdown Timer -->
+            <div class="countdown-container">
+                <div class="countdown-item">
+                    <div class="countdown-val" id="timer-days">00</div>
+                    <div class="countdown-label">Days</div>
+                </div>
+                <div class="countdown-item">
+                    <div class="countdown-val" id="timer-hours">00</div>
+                    <div class="countdown-label">Hrs</div>
+                </div>
+                <div class="countdown-item">
+                    <div class="countdown-val" id="timer-mins">00</div>
+                    <div class="countdown-label">Mins</div>
+                </div>
+                <div class="countdown-item">
+                    <div class="countdown-val" id="timer-secs">00</div>
+                    <div class="countdown-label">Secs</div>
+                </div>
+            </div>
+
+            <!-- Email Form -->
+            <form class="signup-form" id="signupForm" novalidate>
+                <div class="form-title">Request Early Invitation</div>
+                <div class="input-group">
+                    <input type="email" id="emailInput" placeholder="Enter your email address" required>
+                    <button type="submit" class="submit-btn" id="submitBtn">
+                        <span>Notify Me</span>
+                        <svg viewBox="0 0 24 24">
+                            <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                        </svg>
+                    </button>
+                </div>
+            </form>
+
+            <!-- Success State Panel -->
+            <div class="success-panel" id="successPanel">
+                <div class="success-icon">✓</div>
+                <div class="success-text">Invitation Reserved</div>
+                <div class="success-sub">You'll be notified the exact second we launch.</div>
+            </div>
+        </section>
+
+        <!-- Back Link -->
+        <a href="/" class="portal-link" id="portalLink">
+            Return to main site
+        </a>
+
+    </main>
+
+    <!-- ==================== JAVASCRIPT LOGIC ==================== -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // DOM Elements
+            const mysteryBox = document.getElementById("mysteryBox");
+            const stageTeaser = document.getElementById("stage-teaser");
+            const stageReveal = document.getElementById("stage-reveal");
+            const cardContainer = document.getElementById("cardContainer");
+            const soundToggle = document.getElementById("soundToggle");
+            
+            // Audio System States
+            let audioCtx = null;
+            let isMuted = false;
+            
+            // Initialize Countdown target (dynamic persistent setting)
+            // Ensures the countdown is ALWAYS active and looks realistic, counting down to exactly 14 days and 8 hours from first page view
+            let countdownTarget = localStorage.getItem("bhoomi_surprise_target");
+            if (!countdownTarget) {
+                const targetDate = new Date();
+                targetDate.setDate(targetDate.getDate() + 5); // 14 days in the future
+                targetDate.setHours(targetDate.getHours() + 8); // +8 hours
+                targetDate.setMinutes(targetDate.getMinutes() + 32); // +32 mins
+                countdownTarget = targetDate.getTime();
+                localStorage.setItem("bhoomi_surprise_target", countdownTarget);
+            } else {
+                countdownTarget = parseInt(countdownTarget, 10);
+                // Reset if expired to keep it active for testing
+                if (countdownTarget < Date.now()) {
+                    const targetDate = new Date();
+                    targetDate.setDate(targetDate.getDate() + 14);
+                    countdownTarget = targetDate.getTime();
+                    localStorage.setItem("bhoomi_surprise_target", countdownTarget);
+                }
+            }
+
+            // Sound Toggle Handler
+            soundToggle.addEventListener("click", () => {
+                isMuted = !isMuted;
+                if (isMuted) {
+                    soundToggle.classList.add("muted");
+                } else {
+                    soundToggle.classList.remove("muted");
+                    initAudio();
+                }
+            });
+
+            // Initialize Web Audio Context
+            function initAudio() {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx && audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+            }
+
+            // Create custom Synthesizer Audio Effects
+            function playSynthPluck(freq, duration = 0.15, type = 'sine') {
+                if (isMuted) return;
+                initAudio();
+                if (!audioCtx) return;
+
+                const osc = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                const filter = audioCtx.createBiquadFilter();
+
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+                // Quick attack, exponential release
+                gainNode.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + 0.01);
+                gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+
+                // Highpass/Lowpass dynamic sweeping
+                filter.type = "lowpass";
+                filter.frequency.setValueAtTime(1000, audioCtx.currentTime);
+                filter.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + duration);
+
+                osc.connect(filter);
+                filter.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            }
+
+            // Magical sweeping arpeggio arpeggiated chime
+            function playRevealSound() {
+                if (isMuted) return;
+                initAudio();
+                if (!audioCtx) return;
+
+                // Pentatonic major scales for perfect harmony
+                const notes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99, 1046.50]; // C4, E4, G4, C5, E5, G5, C6
+                
+                notes.forEach((freq, index) => {
+                    const timeOffset = index * 0.07;
+                    setTimeout(() => {
+                        const osc = audioCtx.createOscillator();
+                        const gainNode = audioCtx.createGain();
+                        const filter = audioCtx.createBiquadFilter();
+                        
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+                        gainNode.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+                        gainNode.gain.linearRampToValueAtTime(0.25, audioCtx.currentTime + 0.02);
+                        gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.8);
+
+                        filter.type = "lowpass";
+                        filter.frequency.setValueAtTime(3000, audioCtx.currentTime);
+                        filter.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.8);
+
+                        osc.connect(filter);
+                        filter.connect(gainNode);
+                        gainNode.connect(audioCtx.destination);
+
+                        osc.start();
+                        osc.stop(audioCtx.currentTime + 0.82);
+                    }, timeOffset * 1000);
+                });
+            }
+
+            function playSuccessSound() {
+                if (isMuted) return;
+                initAudio();
+                if (!audioCtx) return;
+
+                // A cheerful double chime note
+                const firstNote = 659.25; // E5
+                const secondNote = 880.00; // A5
+
+                playSynthPluck(firstNote, 0.4, 'sine');
+                setTimeout(() => {
+                    playSynthPluck(secondNote, 0.6, 'sine');
+                }, 120);
+            }
+
+            // Hover sound events
+            const hoverables = [mysteryBox, document.getElementById("portalLink")];
+            hoverables.forEach(el => {
+                if(el) {
+                    el.addEventListener("mouseenter", () => {
+                        playSynthPluck(380, 0.08, 'sine');
+                    });
+                }
+            });
+
+            // ==================== CANVAS 1: BACKGROUND STARFIELD ====================
+            const starCanvas = document.getElementById("bg-stars");
+            const starCtx = starCanvas.getContext("2d");
+            let stars = [];
+            let mouseX = 0;
+            let mouseY = 0;
+            let targetMouseX = 0;
+            let targetMouseY = 0;
+
+            function resizeStarCanvas() {
+                starCanvas.width = window.innerWidth;
+                starCanvas.height = window.innerHeight;
+                initStars();
+            }
+
+            class Star {
+                constructor() {
+                    this.reset(true);
+                }
+                reset(initial = false) {
+                    this.x = Math.random() * starCanvas.width;
+                    this.y = initial ? Math.random() * starCanvas.height : 0;
+                    this.size = Math.random() * 1.5 + 0.5;
+                    this.speed = Math.random() * 0.2 + 0.05;
+                    this.color = Math.random() > 0.3 ? '#FBF5E9' : '#E8C468';
+                    this.opacity = Math.random() * 0.7 + 0.3;
+                    this.twinkleFactor = Math.random() * 0.05 + 0.01;
+                    this.angle = Math.random() * Math.PI * 2;
+                }
+                update() {
+                    this.y += this.speed;
+                    // Twinkle
+                    this.angle += this.twinkleFactor;
+                    this.opacityVal = this.opacity + Math.sin(this.angle) * 0.3;
+                    
+                    // Wind offset based on mouse movement
+                    const mouseDiffX = (mouseX - starCanvas.width / 2) * 0.01;
+                    this.x += mouseDiffX * this.speed;
+
+                    if (this.y > starCanvas.height || this.x < 0 || this.x > starCanvas.width) {
+                        this.reset();
+                    }
+                }
+                draw() {
+                    starCtx.beginPath();
+                    starCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    starCtx.fillStyle = this.color;
+                    starCtx.globalAlpha = Math.max(0.1, Math.min(1, this.opacityVal));
+                    starCtx.fill();
+                }
+            }
+
+            function initStars() {
+                stars = [];
+                const count = Math.floor((starCanvas.width * starCanvas.height) / 8000);
+                for (let i = 0; i < count; i++) {
+                    stars.push(new Star());
+                }
+            }
+
+            // Mouse position dampening for stars wind effect
+            window.addEventListener("mousemove", (e) => {
+                targetMouseX = e.clientX;
+                targetMouseY = e.clientY;
+            });
+
+            window.addEventListener("resize", resizeStarCanvas);
+            resizeStarCanvas();
+
+            // ==================== CANVAS 2: MOUSE SPARK TRAIL ====================
+            const trailCanvas = document.getElementById("spark-trail");
+            const trailCtx = trailCanvas.getContext("2d");
+            let sparks = [];
+
+            function resizeTrailCanvas() {
+                trailCanvas.width = window.innerWidth;
+                trailCanvas.height = window.innerHeight;
+            }
+            window.addEventListener("resize", resizeTrailCanvas);
+            resizeTrailCanvas();
+
+            class Spark {
+                constructor(x, y) {
+                    this.x = x;
+                    this.y = y;
+                    this.vx = (Math.random() - 0.5) * 1.5;
+                    this.vy = (Math.random() - 0.5) * 1.5 - 0.5; // Drift upward
+                    this.alpha = 1;
+                    this.decay = Math.random() * 0.02 + 0.015;
+                    this.size = Math.random() * 2.5 + 1;
+                    this.color = Math.random() > 0.4 ? '#E8C468' : '#C9941F';
+                }
+                update() {
+                    this.x += this.vx;
+                    this.y += this.vy;
+                    this.alpha -= this.decay;
+                }
+                draw() {
+                    trailCtx.beginPath();
+                    trailCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    trailCtx.fillStyle = this.color;
+                    trailCtx.globalAlpha = Math.max(0, this.alpha);
+                    trailCtx.fill();
+                }
+            }
+
+            window.addEventListener("mousemove", (e) => {
+                // Add a new spark on move (but throttle slightly)
+                if (Math.random() > 0.3) {
+                    sparks.push(new Spark(e.clientX, e.clientY));
+                }
+            });
+
+            // ==================== CANVAS 3: CONFETTI PHYSICAL EXPLOSION ====================
+            const confettiCanvas = document.getElementById("confetti-canvas");
+            const confettiCtx = confettiCanvas.getContext("2d");
+            let confetti = [];
+            
+            function resizeConfettiCanvas() {
+                confettiCanvas.width = window.innerWidth;
+                confettiCanvas.height = window.innerHeight;
+            }
+            window.addEventListener("resize", resizeConfettiCanvas);
+            resizeConfettiCanvas();
+
+            class ConfettiParticle {
+                constructor(x, y) {
+                    this.x = x;
+                    this.y = y;
+                    this.size = Math.random() * 8 + 4;
+                    // Spray outward in radial circle
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = Math.random() * 8 + 4;
+                    this.vx = Math.cos(angle) * speed;
+                    this.vy = Math.sin(angle) * speed - 2; // Upward bias
+                    this.gravity = 0.18;
+                    this.drag = 0.98;
+                    this.rotation = Math.random() * Math.PI;
+                    this.rotationSpeed = (Math.random() - 0.5) * 0.25;
+                    
+                    // Curated brand color palette for particles
+                    const colors = ['#C9941F', '#E8C468', '#6B1623', '#4A0F18', '#1F4B43', '#ffffff'];
+                    this.color = colors[Math.floor(Math.random() * colors.length)];
+                    this.opacity = 1;
+                    this.decay = Math.random() * 0.01 + 0.008;
+                }
+                update() {
+                    this.vx *= this.drag;
+                    this.vy *= this.drag;
+                    this.vy += this.gravity;
+                    this.x += this.vx;
+                    this.y += this.vy;
+                    this.rotation += this.rotationSpeed;
+                    this.opacity -= this.decay;
+                }
+                draw() {
+                    confettiCtx.save();
+                    confettiCtx.translate(this.x, this.y);
+                    confettiCtx.rotate(this.rotation);
+                    confettiCtx.fillStyle = this.color;
+                    confettiCtx.globalAlpha = Math.max(0, this.opacity);
+                    
+                    // Render rectangular confetti flakes or star shapes
+                    if (Math.random() > 0.5) {
+                        confettiCtx.fillRect(-this.size/2, -this.size/2, this.size, this.size / 1.5);
+                    } else {
+                        // Render circle flakes
+                        confettiCtx.beginPath();
+                        confettiCtx.arc(0, 0, this.size/2, 0, Math.PI * 2);
+                        confettiCtx.fill();
+                    }
+                    confettiCtx.restore();
+                }
+            }
+
+            function triggerConfettiExplosion(originX, originY, amount = 140) {
+                for (let i = 0; i < amount; i++) {
+                    confetti.push(new ConfettiParticle(originX, originY));
+                }
+            }
+
+            // ==================== RENDERING LOOP ====================
+            function animate() {
+                // 1. Clear backgrounds & trails
+                starCtx.fillStyle = "#0C0305";
+                starCtx.fillRect(0, 0, starCanvas.width, starCanvas.height);
+                
+                trailCtx.clearRect(0, 0, trailCanvas.width, trailCanvas.height);
+                confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+
+                // Interpolate mouse movement dampening
+                mouseX += (targetMouseX - mouseX) * 0.05;
+                mouseY += (targetMouseY - mouseY) * 0.05;
+
+                // 2. Draw Stars
+                stars.forEach(star => {
+                    star.update();
+                    star.draw();
+                });
+
+                // 3. Draw Spark Trail
+                sparks.forEach((spark, index) => {
+                    spark.update();
+                    if (spark.alpha <= 0) {
+                        sparks.splice(index, 1);
+                    } else {
+                        spark.draw();
+                    }
+                });
+
+                // 4. Draw Confetti Explosion
+                confetti.forEach((particle, index) => {
+                    particle.update();
+                    if (particle.opacity <= 0 || particle.y > confettiCanvas.height) {
+                        confetti.splice(index, 1);
+                    } else {
+                        particle.draw();
+                    }
+                });
+
+                requestAnimationFrame(animate);
+            }
+            animate();
+
+            // ==================== STAGE TRANSITION (CLICK ACTION) ====================
+            mysteryBox.addEventListener("click", (e) => {
+                initAudio();
+                
+                // Position of explosion based on box coordinates
+                const rect = mysteryBox.getBoundingClientRect();
+                const x = rect.left + rect.width / 2;
+                const y = rect.top + rect.height / 2;
+
+                // Play arpeggio
+                playRevealSound();
+                
+                // Explode particles
+                triggerConfettiExplosion(x, y, 160);
+                
+                // Animate box shrinking/fading
+                mysteryBox.style.transform = "scale(0) rotate(180deg)";
+                mysteryBox.style.opacity = "0";
+
+                // Morph Card Container size smoothly
+                cardContainer.style.transform = "scale(0.96)";
+                
+                setTimeout(() => {
+                    stageTeaser.style.display = "none";
+                    stageReveal.style.display = "flex";
+                    
+                    // Trigger reflow
+                    stageReveal.offsetHeight;
+                    
+                    stageReveal.style.opacity = "1";
+                    cardContainer.style.transform = "scale(1)";
+                    
+                    // Start the countdown timer intervals
+                    startCountdown();
+                }, 400);
+            });
+
+            // ==================== COUNTDOWN TIMER TIMER LOGIC ====================
+            let countdownInterval = null;
+            function startCountdown() {
+                if (countdownInterval) return;
+
+                function updateTimer() {
+                    const now = Date.now();
+                    const diff = countdownTarget - now;
+
+                    if (diff <= 0) {
+                        document.getElementById("timer-days").innerText = "00";
+                        document.getElementById("timer-hours").innerText = "00";
+                        document.getElementById("timer-mins").innerText = "00";
+                        document.getElementById("timer-secs").innerText = "00";
+                        clearInterval(countdownInterval);
+                        return;
+                    }
+
+                    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    const secs = Math.floor((diff % (1000 * 60)) / 1000);
+
+                    document.getElementById("timer-days").innerText = String(days).padStart(2, '0');
+                    document.getElementById("timer-hours").innerText = String(hours).padStart(2, '0');
+                    document.getElementById("timer-mins").innerText = String(mins).padStart(2, '0');
+                    document.getElementById("timer-secs").innerText = String(secs).padStart(2, '0');
+                }
+
+                updateTimer();
+                countdownInterval = setInterval(updateTimer, 1000);
+            }
+
+            // ==================== SIGNUP FORM HANDLING ====================
+            const signupForm = document.getElementById("signupForm");
+            const emailInput = document.getElementById("emailInput");
+            const successPanel = document.getElementById("successPanel");
+
+            signupForm.addEventListener("submit", (e) => {
+                e.preventDefault();
+                
+                const email = emailInput.value.trim();
+                if (!validateEmail(email)) {
+                    // Show error state (shake input group)
+                    const inputGroup = document.querySelector(".input-group");
+                    inputGroup.style.borderColor = "#ff4d4d";
+                    inputGroup.style.boxShadow = "0 0 15px rgba(255, 77, 77, 0.3)";
+                    
+                    // Simple shake animation in JS
+                    let count = 0;
+                    const shakeInterval = setInterval(() => {
+                        inputGroup.style.transform = count % 2 === 0 ? "translateX(-6px)" : "translateX(6px)";
+                        count++;
+                        if (count > 5) {
+                            clearInterval(shakeInterval);
+                            inputGroup.style.transform = "translateX(0)";
+                        }
+                    }, 50);
+
+                    playSynthPluck(180, 0.25, 'triangle'); // Low buzzer style sound
+                    return;
+                }
+
+                // Play Success sound
+                playSuccessSound();
+
+                // Trigger confetti spray near form
+                const rect = signupForm.getBoundingClientRect();
+                triggerConfettiExplosion(rect.left + rect.width / 2, rect.top + 10, 80);
+
+                // Fade out form and fade in success panel
+                signupForm.style.opacity = "0";
+                setTimeout(() => {
+                    signupForm.style.display = "none";
+                    successPanel.style.display = "flex";
+                    setTimeout(() => {
+                        successPanel.style.opacity = "1";
+                    }, 50);
+                }, 300);
+            });
+
+            // Email format verification
+            function validateEmail(email) {
+                const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return re.test(email);
+            }
+            
+            // Clean up focus styling on input edit
+            emailInput.addEventListener("input", () => {
+                const inputGroup = document.querySelector(".input-group");
+                inputGroup.style.borderColor = "";
+                inputGroup.style.boxShadow = "";
+            });
+        });
+    </script>
+</body>
+</html>
