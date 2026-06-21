@@ -1,6 +1,7 @@
 import json
 import uuid
 import time
+import asyncio
 from appwrite.client import Client
 from appwrite.services.databases import Databases
 from appwrite.services.storage import Storage
@@ -450,7 +451,8 @@ class AppwriteDB(BaseDB):
 
     # Inventory CRUD
     async def get_inventory(self):
-        res = self.databases.list_documents(
+        res = await asyncio.to_thread(
+            self.databases.list_documents,
             self.db_id, 
             config.APPWRITE_INVENTORY_COLLECTION_ID,
             queries=[Query.limit(100)]
@@ -459,32 +461,55 @@ class AppwriteDB(BaseDB):
 
     async def get_inventory_item(self, item_id: str):
         try:
-            doc = self.databases.get_document(self.db_id, config.APPWRITE_INVENTORY_COLLECTION_ID, item_id)
+            doc = await asyncio.to_thread(
+                self.databases.get_document,
+                self.db_id,
+                config.APPWRITE_INVENTORY_COLLECTION_ID,
+                item_id
+            )
             return self._clean_doc(doc)
         except Exception:
             return None
 
     async def create_inventory_item(self, item: dict):
         doc_id = "inv_" + str(uuid.uuid4())[:8]
-        doc = self.databases.create_document(self.db_id, config.APPWRITE_INVENTORY_COLLECTION_ID, doc_id, item)
+        doc = await asyncio.to_thread(
+            self.databases.create_document,
+            self.db_id,
+            config.APPWRITE_INVENTORY_COLLECTION_ID,
+            doc_id,
+            item
+        )
         return self._clean_doc(doc)
 
     async def update_inventory_item(self, item_id: str, item: dict):
         # Remove id from body to avoid trying to modify primary key
         data = {k: v for k, v in item.items() if k != "id"}
-        doc = self.databases.update_document(self.db_id, config.APPWRITE_INVENTORY_COLLECTION_ID, item_id, data)
+        doc = await asyncio.to_thread(
+            self.databases.update_document,
+            self.db_id,
+            config.APPWRITE_INVENTORY_COLLECTION_ID,
+            item_id,
+            data
+        )
         return self._clean_doc(doc)
 
     async def delete_inventory_item(self, item_id: str):
         try:
-            self.databases.delete_document(self.db_id, config.APPWRITE_INVENTORY_COLLECTION_ID, item_id)
+            await asyncio.to_thread(
+                self.databases.delete_document,
+                self.db_id,
+                config.APPWRITE_INVENTORY_COLLECTION_ID,
+                item_id
+            )
             return True
         except Exception:
             return False
 
     # Clients CRUD
     async def get_clients(self):
-        res = self.databases.list_documents(
+        res = await asyncio.to_thread(
+            self.databases.list_documents,
             self.db_id, 
             config.APPWRITE_CLIENTS_COLLECTION_ID,
             queries=[Query.limit(100)]
@@ -493,24 +518,42 @@ class AppwriteDB(BaseDB):
 
     async def create_client(self, client: dict):
         doc_id = "cli_" + str(uuid.uuid4())[:8]
-        doc = self.databases.create_document(self.db_id, config.APPWRITE_CLIENTS_COLLECTION_ID, doc_id, client)
+        doc = await asyncio.to_thread(
+            self.databases.create_document,
+            self.db_id,
+            config.APPWRITE_CLIENTS_COLLECTION_ID,
+            doc_id,
+            client
+        )
         return self._clean_doc(doc)
 
     async def update_client(self, client_id: str, client: dict):
         data = {k: v for k, v in client.items() if k != "id"}
-        doc = self.databases.update_document(self.db_id, config.APPWRITE_CLIENTS_COLLECTION_ID, client_id, data)
+        doc = await asyncio.to_thread(
+            self.databases.update_document,
+            self.db_id,
+            config.APPWRITE_CLIENTS_COLLECTION_ID,
+            client_id,
+            data
+        )
         return self._clean_doc(doc)
 
     async def delete_client(self, client_id: str):
         try:
-            self.databases.delete_document(self.db_id, config.APPWRITE_CLIENTS_COLLECTION_ID, client_id)
+            await asyncio.to_thread(
+                self.databases.delete_document,
+                self.db_id,
+                config.APPWRITE_CLIENTS_COLLECTION_ID,
+                client_id
+            )
             return True
         except Exception:
             return False
 
     # Events CRUD
     async def get_events(self):
-        res = self.databases.list_documents(
+        res = await asyncio.to_thread(
+            self.databases.list_documents,
             self.db_id, 
             config.APPWRITE_EVENTS_COLLECTION_ID,
             queries=[Query.limit(100), Query.order_desc("$createdAt")]
@@ -519,39 +562,73 @@ class AppwriteDB(BaseDB):
 
     async def get_event(self, event_id: str):
         try:
-            doc = self.databases.get_document(self.db_id, config.APPWRITE_EVENTS_COLLECTION_ID, event_id)
+            doc = await asyncio.to_thread(
+                self.databases.get_document,
+                self.db_id,
+                config.APPWRITE_EVENTS_COLLECTION_ID,
+                event_id
+            )
             return self._clean_doc(doc)
         except Exception:
             return None
 
     async def create_event(self, event: dict):
         doc_id = "evt_" + str(uuid.uuid4())[:8]
-        doc = self.databases.create_document(self.db_id, config.APPWRITE_EVENTS_COLLECTION_ID, doc_id, event)
+        doc = await asyncio.to_thread(
+            self.databases.create_document,
+            self.db_id,
+            config.APPWRITE_EVENTS_COLLECTION_ID,
+            doc_id,
+            event
+        )
         return self._clean_doc(doc)
 
     async def update_event(self, event_id: str, event: dict):
         data = {k: v for k, v in event.items() if k != "id"}
-        doc = self.databases.update_document(self.db_id, config.APPWRITE_EVENTS_COLLECTION_ID, event_id, data)
+        doc = await asyncio.to_thread(
+            self.databases.update_document,
+            self.db_id,
+            config.APPWRITE_EVENTS_COLLECTION_ID,
+            event_id,
+            data
+        )
         return self._clean_doc(doc)
 
     async def delete_event(self, event_id: str):
         try:
-            self.databases.delete_document(self.db_id, config.APPWRITE_EVENTS_COLLECTION_ID, event_id)
+            await asyncio.to_thread(
+                self.databases.delete_document,
+                self.db_id,
+                config.APPWRITE_EVENTS_COLLECTION_ID,
+                event_id
+            )
             # Find and delete associated tasks
-            tasks_res = self.databases.list_documents(
+            tasks_res = await asyncio.to_thread(
+                self.databases.list_documents,
                 self.db_id,
                 config.APPWRITE_TASKS_COLLECTION_ID,
                 queries=[Query.equal("event_id", event_id)]
             )
+            del_tasks = []
             for t in self._get_documents_list(tasks_res):
-                self.databases.delete_document(self.db_id, config.APPWRITE_TASKS_COLLECTION_ID, t["$id"])
+                del_tasks.append(
+                    asyncio.to_thread(
+                        self.databases.delete_document,
+                        self.db_id,
+                        config.APPWRITE_TASKS_COLLECTION_ID,
+                        t["$id"]
+                    )
+                )
+            if del_tasks:
+                await asyncio.gather(*del_tasks, return_exceptions=True)
             return True
         except Exception:
             return False
 
     # Tasks CRUD
     async def get_tasks(self):
-        res = self.databases.list_documents(
+        res = await asyncio.to_thread(
+            self.databases.list_documents,
             self.db_id, 
             config.APPWRITE_TASKS_COLLECTION_ID,
             queries=[Query.limit(100)]
@@ -559,7 +636,8 @@ class AppwriteDB(BaseDB):
         return [self._clean_doc(d) for d in self._get_documents_list(res)]
 
     async def get_tasks_for_event(self, event_id: str):
-        res = self.databases.list_documents(
+        res = await asyncio.to_thread(
+            self.databases.list_documents,
             self.db_id,
             config.APPWRITE_TASKS_COLLECTION_ID,
             queries=[Query.equal("event_id", event_id)]
@@ -568,24 +646,42 @@ class AppwriteDB(BaseDB):
 
     async def create_task(self, task: dict):
         doc_id = "tsk_" + str(uuid.uuid4())[:8]
-        doc = self.databases.create_document(self.db_id, config.APPWRITE_TASKS_COLLECTION_ID, doc_id, task)
+        doc = await asyncio.to_thread(
+            self.databases.create_document,
+            self.db_id,
+            config.APPWRITE_TASKS_COLLECTION_ID,
+            doc_id,
+            task
+        )
         return self._clean_doc(doc)
 
     async def update_task(self, task_id: str, task: dict):
         data = {k: v for k, v in task.items() if k != "id"}
-        doc = self.databases.update_document(self.db_id, config.APPWRITE_TASKS_COLLECTION_ID, task_id, data)
+        doc = await asyncio.to_thread(
+            self.databases.update_document,
+            self.db_id,
+            config.APPWRITE_TASKS_COLLECTION_ID,
+            task_id,
+            data
+        )
         return self._clean_doc(doc)
 
     async def delete_task(self, task_id: str):
         try:
-            self.databases.delete_document(self.db_id, config.APPWRITE_TASKS_COLLECTION_ID, task_id)
+            await asyncio.to_thread(
+                self.databases.delete_document,
+                self.db_id,
+                config.APPWRITE_TASKS_COLLECTION_ID,
+                task_id
+            )
             return True
         except Exception:
             return False
 
     # Users CRUD
     async def get_users(self):
-        res = self.databases.list_documents(
+        res = await asyncio.to_thread(
+            self.databases.list_documents,
             self.db_id, 
             config.APPWRITE_USERS_COLLECTION_ID,
             queries=[Query.limit(100)]
@@ -594,7 +690,8 @@ class AppwriteDB(BaseDB):
 
     async def get_user_by_email(self, email: str):
         try:
-            res = self.databases.list_documents(
+            res = await asyncio.to_thread(
+                self.databases.list_documents,
                 self.db_id,
                 config.APPWRITE_USERS_COLLECTION_ID,
                 queries=[Query.equal("email", email.strip().lower())]
@@ -606,12 +703,19 @@ class AppwriteDB(BaseDB):
 
     async def create_user(self, user: dict):
         doc_id = "usr_" + str(uuid.uuid4())[:8]
-        doc = self.databases.create_document(self.db_id, config.APPWRITE_USERS_COLLECTION_ID, doc_id, user)
+        doc = await asyncio.to_thread(
+            self.databases.create_document,
+            self.db_id,
+            config.APPWRITE_USERS_COLLECTION_ID,
+            doc_id,
+            user
+        )
         return self._clean_doc(doc)
 
     # Gallery CRUD
     async def get_gallery(self):
-        res = self.databases.list_documents(
+        res = await asyncio.to_thread(
+            self.databases.list_documents,
             self.db_id, 
             config.APPWRITE_GALLERY_COLLECTION_ID,
             queries=[Query.limit(100)]
@@ -620,31 +724,54 @@ class AppwriteDB(BaseDB):
 
     async def get_gallery_item(self, photo_id: str):
         try:
-            doc = self.databases.get_document(self.db_id, config.APPWRITE_GALLERY_COLLECTION_ID, photo_id)
+            doc = await asyncio.to_thread(
+                self.databases.get_document,
+                self.db_id,
+                config.APPWRITE_GALLERY_COLLECTION_ID,
+                photo_id
+            )
             return self._clean_doc(doc)
         except Exception:
             return None
 
     async def create_gallery_item(self, item: dict):
         doc_id = "gal_" + str(uuid.uuid4())[:8]
-        doc = self.databases.create_document(self.db_id, config.APPWRITE_GALLERY_COLLECTION_ID, doc_id, item)
+        doc = await asyncio.to_thread(
+            self.databases.create_document,
+            self.db_id,
+            config.APPWRITE_GALLERY_COLLECTION_ID,
+            doc_id,
+            item
+        )
         return self._clean_doc(doc)
 
     async def update_gallery_item(self, photo_id: str, item: dict):
         data = {k: v for k, v in item.items() if k != "id"}
-        doc = self.databases.update_document(self.db_id, config.APPWRITE_GALLERY_COLLECTION_ID, photo_id, data)
+        doc = await asyncio.to_thread(
+            self.databases.update_document,
+            self.db_id,
+            config.APPWRITE_GALLERY_COLLECTION_ID,
+            photo_id,
+            data
+        )
         return self._clean_doc(doc)
 
     async def delete_gallery_item(self, photo_id: str):
         try:
-            self.databases.delete_document(self.db_id, config.APPWRITE_GALLERY_COLLECTION_ID, photo_id)
+            await asyncio.to_thread(
+                self.databases.delete_document,
+                self.db_id,
+                config.APPWRITE_GALLERY_COLLECTION_ID,
+                photo_id
+            )
             return True
         except Exception:
             return False
 
     # Crew CRUD
     async def get_crew(self):
-        res = self.databases.list_documents(
+        res = await asyncio.to_thread(
+            self.databases.list_documents,
             self.db_id, 
             config.APPWRITE_CREW_COLLECTION_ID,
             queries=[Query.limit(100)]
@@ -655,24 +782,42 @@ class AppwriteDB(BaseDB):
         doc_id = "crw_" + str(uuid.uuid4())[:8]
         member.setdefault("amount_owed", 0.0)
         member.setdefault("payment_history", "[]")
-        doc = self.databases.create_document(self.db_id, config.APPWRITE_CREW_COLLECTION_ID, doc_id, member)
+        doc = await asyncio.to_thread(
+            self.databases.create_document,
+            self.db_id,
+            config.APPWRITE_CREW_COLLECTION_ID,
+            doc_id,
+            member
+        )
         return self._clean_doc(doc)
 
     async def update_crew_member(self, crew_id: str, member: dict):
         data = {k: v for k, v in member.items() if k != "id"}
-        doc = self.databases.update_document(self.db_id, config.APPWRITE_CREW_COLLECTION_ID, crew_id, data)
+        doc = await asyncio.to_thread(
+            self.databases.update_document,
+            self.db_id,
+            config.APPWRITE_CREW_COLLECTION_ID,
+            crew_id,
+            data
+        )
         return self._clean_doc(doc)
 
     async def delete_crew_member(self, crew_id: str):
         try:
-            self.databases.delete_document(self.db_id, config.APPWRITE_CREW_COLLECTION_ID, crew_id)
+            await asyncio.to_thread(
+                self.databases.delete_document,
+                self.db_id,
+                config.APPWRITE_CREW_COLLECTION_ID,
+                crew_id
+            )
             return True
         except Exception:
             return False
 
     # Attendance CRUD
     async def get_attendance(self, date_str: str):
-        res = self.databases.list_documents(
+        res = await asyncio.to_thread(
+            self.databases.list_documents,
             self.db_id,
             config.APPWRITE_ATTENDANCE_COLLECTION_ID,
             queries=[Query.equal("date", date_str), Query.limit(100)]
@@ -681,7 +826,8 @@ class AppwriteDB(BaseDB):
 
     async def get_attendance_record(self, date_str: str, crew_id: str):
         try:
-            res = self.databases.list_documents(
+            res = await asyncio.to_thread(
+                self.databases.list_documents,
                 self.db_id,
                 config.APPWRITE_ATTENDANCE_COLLECTION_ID,
                 queries=[Query.equal("date", date_str), Query.equal("crew_id", crew_id)]
@@ -692,21 +838,28 @@ class AppwriteDB(BaseDB):
             return None
 
     async def save_attendance_record(self, date_str: str, crew_id: str, record: dict):
-        existing = await self.get_attendance_record(date_str, crew_id)
+        record_id = record.get("id")
+        if not record_id:
+            existing = await self.get_attendance_record(date_str, crew_id)
+            if existing:
+                record_id = existing["id"]
+        
         data = {k: v for k, v in record.items() if k != "id"}
         data["date"] = date_str
         data["crew_id"] = crew_id
         
-        if existing:
-            doc = self.databases.update_document(
+        if record_id:
+            doc = await asyncio.to_thread(
+                self.databases.update_document,
                 self.db_id,
                 config.APPWRITE_ATTENDANCE_COLLECTION_ID,
-                existing["id"],
+                record_id,
                 data
             )
         else:
             doc_id = "att_" + str(uuid.uuid4())[:8]
-            doc = self.databases.create_document(
+            doc = await asyncio.to_thread(
+                self.databases.create_document,
                 self.db_id,
                 config.APPWRITE_ATTENDANCE_COLLECTION_ID,
                 doc_id,
@@ -715,7 +868,8 @@ class AppwriteDB(BaseDB):
         return self._clean_doc(doc)
 
     async def get_all_attendance(self):
-        res = self.databases.list_documents(
+        res = await asyncio.to_thread(
+            self.databases.list_documents,
             self.db_id,
             config.APPWRITE_ATTENDANCE_COLLECTION_ID,
             queries=[Query.limit(1000)]

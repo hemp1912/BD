@@ -468,6 +468,55 @@ async def delete_task(request: Request, task_id: str):
     return {"status": "success"}
 
 # --- Analytics Summary & Payroll Release ---
+@router.get("/dashboard/overview")
+async def get_dashboard_overview(request: Request):
+    await require_admin(request)
+    
+    import asyncio
+    events_task = db_client.get_events()
+    inventory_task = db_client.get_inventory()
+    tasks_task = db_client.get_tasks()
+    crew_task = db_client.get_crew()
+    
+    events, inventory, tasks, crew = await asyncio.gather(
+        events_task, inventory_task, tasks_task, crew_task
+    )
+    
+    active_bookings = sum(1 for e in events if e.get("status") in ("Confirmed", "Draft"))
+    pending_tasks = sum(1 for t in tasks if t.get("status") == "Pending")
+    
+    crew_on_duty_set = set()
+    for e in events:
+        if e.get("status") in ("Confirmed", "Draft"):
+            try:
+                assignments = json.loads(e.get("crew_assignments") or "[]")
+                for worker in assignments:
+                    w_id = worker.get("worker_id")
+                    if w_id:
+                        crew_on_duty_set.add(w_id)
+            except Exception:
+                pass
+    crew_on_duty = len(crew_on_duty_set)
+    
+    low_stock_count = 0
+    for item in inventory:
+        owned = item.get("quantity_owned", 0)
+        avail = item.get("available_stock")
+        if avail is None:
+            avail = owned
+        if owned > 0 and (avail / owned) <= 0.20:
+            low_stock_count += 1
+            
+    return {
+        "events": [add_payment_status(e) for e in events],
+        "stats": {
+            "active_bookings": active_bookings,
+            "pending_tasks": pending_tasks,
+            "crew_on_duty": crew_on_duty,
+            "low_stock_alerts": low_stock_count
+        }
+    }
+
 @router.get("/analytics/summary")
 async def get_dashboard_summary(request: Request):
     await require_admin(request)

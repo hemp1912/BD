@@ -1568,3 +1568,60 @@ body.labor-mode tr:hover td {
         grid-template-columns: 1fr !important;
     }
 }
+
+/* Crew wages allocation row layout */
+.crew-allocation-row {
+    padding: 0.75rem;
+    display: grid;
+    grid-template-columns: 1.5fr 1fr auto;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+/* Ensure table elements wrap correctly and are readable on mobile */
+.table-wrapper table {
+    min-width: 750px;
+    width: 100%;
+}
+
+/* Base class for hiding desktop alignment placeholders on mobile */
+.desktop-only {
+    display: block;
+}
+
+/* Responsive updates for inputs and modals */
+@media (max-width: 768px) {
+    /* Prevent iOS browser auto-zoom on form focus */
+    .app-container input, .app-container select, .app-container textarea,
+    .modal-card input, .modal-card select, .modal-card textarea {
+        font-size: 16px !important;
+    }
+}
+
+@media (max-width: 560px) {
+    /* Tighten modal layouts on mobile */
+    .modal-card {
+        padding: 1.25rem !important;
+        width: 95% !important;
+        margin: 10px auto;
+    }
+    
+    /* Hide desktop-specific empty labels */
+    .desktop-only {
+        display: none !important;
+    }
+    
+    /* Adapt crew allocation grid */
+    .crew-allocation-row {
+        grid-template-columns: 1fr !important;
+        gap: 0.75rem;
+        padding: 1rem !important;
+    }
+    
+    /* Align controls */
+    .crew-allocation-row div:last-child {
+        justify-content: flex-start !important;
+    }
+}
+

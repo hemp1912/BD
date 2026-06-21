@@ -184,20 +184,20 @@
                 <!-- Admin Analytics Board -->
                 <div class="dashboard-grid">
                     <div class="glass-panel stat-card">
-                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--gold);">Total Sales</span>
-                        <div class="stat-val gold" id="stat-sales">₹0.00</div>
+                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--gold);">Active Bookings</span>
+                        <div class="stat-val gold" id="stat-active-bookings">0</div>
                     </div>
                     <div class="glass-panel stat-card">
-                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--maroon);">Receivables Balance</span>
-                        <div class="stat-val danger" id="stat-receivable">₹0.00</div>
+                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--maroon);">Pending Tasks</span>
+                        <div class="stat-val danger" id="stat-pending-tasks">0</div>
                     </div>
                     <div class="glass-panel stat-card">
-                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--text-secondary);">Total Crew Wages</span>
-                        <div class="stat-val purple" id="stat-wages">₹0.00</div>
+                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--text-secondary);">Crew On Duty</span>
+                        <div class="stat-val purple" id="stat-crew-on-duty">0</div>
                     </div>
                     <div class="glass-panel stat-card">
-                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--status-success);">Net Profit Margin</span>
-                        <div class="stat-val success" id="stat-profit">₹0.00 (<span id="stat-margin">0</span>%)</div>
+                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--status-success);">Low Stock Items</span>
+                        <div class="stat-val success" id="stat-low-stock">0</div>
                     </div>
                 </div>
 
@@ -254,6 +254,22 @@
                     </button>
                 </div>
 
+                <!-- Warehouse Analytics Board -->
+                <div class="dashboard-grid" style="margin-bottom: 2rem;">
+                    <div class="glass-panel stat-card">
+                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--gold);">Total Unique Items</span>
+                        <div class="stat-val gold" id="warehouse-stat-items">0</div>
+                    </div>
+                    <div class="glass-panel stat-card">
+                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--text-secondary);">Total Unit Stock</span>
+                        <div class="stat-val purple" id="warehouse-stat-stock">0</div>
+                    </div>
+                    <div class="glass-panel stat-card">
+                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--maroon);">Low Stock Alerts</span>
+                        <div class="stat-val danger" id="warehouse-stat-low">0</div>
+                    </div>
+                </div>
+
                 <div class="glass-panel" style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
                     <input type="text" id="warehouse-search-input" placeholder="Search catalog assets..." class="search-input" style="max-width: 250px; margin-bottom: 0;">
                 </div>
@@ -294,6 +310,22 @@
                     <button class="btn btn-primary" id="btn-add-client-tab">
                         <span>Intake New Client</span>
                     </button>
+                </div>
+
+                <!-- Clients Analytics Board -->
+                <div class="dashboard-grid" style="margin-bottom: 2rem;">
+                    <div class="glass-panel stat-card">
+                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--text-secondary);">Total Clients</span>
+                        <div class="stat-val purple" id="clients-stat-total">0</div>
+                    </div>
+                    <div class="glass-panel stat-card">
+                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--status-success);">Active Clients</span>
+                        <div class="stat-val success" id="clients-stat-active">0</div>
+                    </div>
+                    <div class="glass-panel stat-card">
+                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--gold);">New Leads (YTD)</span>
+                        <div class="stat-val gold" id="clients-stat-new">0</div>
+                    </div>
                 </div>
 
                 <div class="glass-panel" style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
@@ -384,6 +416,22 @@
                     </div>
                 </div>
 
+                <!-- Crew Analytics Board -->
+                <div class="dashboard-grid" style="margin-bottom: 2rem;">
+                    <div class="glass-panel stat-card">
+                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--gold);">Roster Strength</span>
+                        <div class="stat-val gold" id="crew-stat-total">0</div>
+                    </div>
+                    <div class="glass-panel stat-card">
+                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--maroon);">Wages Owed</span>
+                        <div class="stat-val danger" id="crew-stat-owed">₹0.00</div>
+                    </div>
+                    <div class="glass-panel stat-card">
+                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--text-secondary);">Active Assignments</span>
+                        <div class="stat-val purple" id="crew-stat-active">0</div>
+                    </div>
+                </div>
+
                 <div class="glass-panel" style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
                     <input type="text" id="crew-search-input" placeholder="Search team members..." class="search-input" style="max-width: 250px; margin-bottom: 0;">
                 </div>
@@ -422,6 +470,26 @@
                         <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #5a4a3d;">
                             Filter sales, calculate receivables, and view payment transaction logs.
                         </p>
+                    </div>
+                </div>
+
+                <!-- Finance Analytics Board -->
+                <div class="dashboard-grid" style="margin-bottom: 2rem;">
+                    <div class="glass-panel stat-card">
+                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--gold);">Total Sales</span>
+                        <div class="stat-val gold" id="finance-stat-sales">₹0.00</div>
+                    </div>
+                    <div class="glass-panel stat-card">
+                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--maroon);">Receivables Balance</span>
+                        <div class="stat-val danger" id="finance-stat-receivable">₹0.00</div>
+                    </div>
+                    <div class="glass-panel stat-card">
+                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--text-secondary);">Total Crew Wages</span>
+                        <div class="stat-val purple" id="finance-stat-wages">₹0.00</div>
+                    </div>
+                    <div class="glass-panel stat-card">
+                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--status-success);">Net Profit Margin</span>
+                        <div class="stat-val success" id="finance-stat-profit">₹0.00 (<span id="finance-stat-margin">0</span>%)</div>
                     </div>
                 </div>
                 <div class="glass-panel" style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
@@ -547,6 +615,22 @@
                     </button>
                 </div>
 
+                <!-- Events Analytics Board -->
+                <div class="dashboard-grid" style="margin-bottom: 2rem;">
+                    <div class="glass-panel stat-card">
+                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--text-secondary);">Total Bookings</span>
+                        <div class="stat-val purple" id="events-stat-total">0</div>
+                    </div>
+                    <div class="glass-panel stat-card">
+                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--status-success);">Confirmed Projects</span>
+                        <div class="stat-val success" id="events-stat-confirmed">0</div>
+                    </div>
+                    <div class="glass-panel stat-card">
+                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--gold);">Draft Bookings</span>
+                        <div class="stat-val gold" id="events-stat-draft">0</div>
+                    </div>
+                </div>
+
                 <!-- Search & Filter Controls -->
                 <div class="glass-panel" style="margin-bottom: 2rem; display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; justify-content: space-between;">
                     <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
@@ -610,7 +694,7 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label style="opacity: 0;">Or Intake Client</label>
+                        <label style="opacity: 0;" class="desktop-only">Or Intake Client</label>
                         <button type="button" class="btn btn-secondary" id="btn-quick-client" style="width: 100%; height: 42px;">+ Intake Client</button>
                     </div>
                 </div>
@@ -1380,11 +1464,11 @@
             <table style="width: 100%; border-collapse: collapse; margin-bottom: 35px; font-size: 0.85rem; text-align: left;">
                 <thead>
                     <tr style="background: #6b1623; color: #fff;">
-                        <th style="padding: 10px 12px; border-bottom: 2px solid #540e1a; font-family: 'Marcellus', serif; font-weight: 500;">Reserved Catalog Item</th>
-                        <th style="padding: 10px 12px; border-bottom: 2px solid #540e1a; font-family: 'Marcellus', serif; font-weight: 500; text-align: center;">Category</th>
-                        <th style="padding: 10px 12px; border-bottom: 2px solid #540e1a; font-family: 'Marcellus', serif; font-weight: 500; text-align: center;">Qty</th>
-                        <th style="padding: 10px 12px; border-bottom: 2px solid #540e1a; font-family: 'Marcellus', serif; font-weight: 500; text-align: right;">Day Rate</th>
-                        <th style="padding: 10px 12px; border-bottom: 2px solid #540e1a; font-family: 'Marcellus', serif; font-weight: 500; text-align: right;">Total Price</th>
+                        <th style="padding: 10px 12px; border-bottom: 2px solid #540e1a; font-family: 'Marcellus', serif; font-weight: 500; color: #ffffff;">Reserved Catalog Item</th>
+                        <th style="padding: 10px 12px; border-bottom: 2px solid #540e1a; font-family: 'Marcellus', serif; font-weight: 500; text-align: center; color: #ffffff;">Category</th>
+                        <th style="padding: 10px 12px; border-bottom: 2px solid #540e1a; font-family: 'Marcellus', serif; font-weight: 500; text-align: center; color: #ffffff;">Qty</th>
+                        <th style="padding: 10px 12px; border-bottom: 2px solid #540e1a; font-family: 'Marcellus', serif; font-weight: 500; text-align: right; color: #ffffff;">Day Rate</th>
+                        <th style="padding: 10px 12px; border-bottom: 2px solid #540e1a; font-family: 'Marcellus', serif; font-weight: 500; text-align: right; color: #ffffff;">Total Price</th>
                     </tr>
                 </thead>
                 <tbody id="pdf-items-body">
@@ -1452,6 +1536,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Sidebar Backdrop Overlay -->
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
 
     <!-- Shared Utilities Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>

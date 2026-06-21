@@ -132,6 +132,28 @@ async function loadWarehouseData(page) {
     if (page !== undefined) warehousePage = page;
     try {
         inventoryList = await apiFetch("/api/inventory");
+
+        // Calculate and set stats
+        let totalUniqueItems = inventoryList.length;
+        let totalStockUnits = 0;
+        let lowStockCount = 0;
+        inventoryList.forEach(item => {
+            const owned = item.quantity_owned || 0;
+            totalStockUnits += owned;
+            const avail = item.available_stock !== undefined ? item.available_stock : owned;
+            if (owned > 0 && (avail / owned) <= 0.20) {
+                lowStockCount++;
+            }
+        });
+
+        const setVal = (id, val) => {
+            const el = document.getElementById(id);
+            if (el) el.innerText = val;
+        };
+        setVal("warehouse-stat-items", totalUniqueItems);
+        setVal("warehouse-stat-stock", totalStockUnits);
+        setVal("warehouse-stat-low", lowStockCount);
+
         const tbody = document.getElementById("inventory-table-body");
         tbody.innerHTML = "";
 
@@ -188,6 +210,9 @@ async function handleInventorySubmit(e) {
     const method = id ? "PUT" : "POST";
     const endpoint = id ? `/api/inventory/${id}` : "/api/inventory";
     
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    if (submitBtn) submitBtn.disabled = true;
+    
     try {
         await apiFetch(endpoint, {
             method,
@@ -198,6 +223,9 @@ async function handleInventorySubmit(e) {
         closeModal("modal-inventory");
         loadWarehouseData();
     } catch (err) {}
+    finally {
+        if (submitBtn) submitBtn.disabled = false;
+    }
 }
 
 function editInventoryItem(itemId) {
@@ -242,6 +270,9 @@ async function handleClientSubmit(e) {
     const method = editingClientId ? "PUT" : "POST";
     const endpoint = editingClientId ? `/api/clients/${editingClientId}` : "/api/clients";
     
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    if (submitBtn) submitBtn.disabled = true;
+    
     try {
         const client = await apiFetch(endpoint, {
             method,
@@ -265,6 +296,9 @@ async function handleClientSubmit(e) {
             }
         }
     } catch (err) {}
+    finally {
+        if (submitBtn) submitBtn.disabled = false;
+    }
 }
 
 async function populateClientsDropdown() {
@@ -314,27 +348,24 @@ async function fetchDashboardData() {
         return Promise.race([promise, timeout]);
     }
 
-    const [statsRes, eventsRes, inventoryRes] = await Promise.allSettled([
-        withTimeout(apiFetch("/api/analytics/summary"), 8000),
-        withTimeout(apiFetch("/api/events"),            8000),
-        withTimeout(apiFetch("/api/inventory"),         8000)
-    ]);
-
-    // Update globals only if fetch succeeded
-    const stats     = statsRes.status     === "fulfilled" ? statsRes.value     : null;
-    const events    = eventsRes.status    === "fulfilled" ? eventsRes.value    : null;
-    const inventory = inventoryRes.status === "fulfilled" ? inventoryRes.value : null;
-
-    if (events    !== null) eventsList    = events;
-    if (inventory !== null) inventoryList = inventory;
-
-    // Update stat cards
-    const fmt = (v) => (typeof v === "number" ? `₹${v.toFixed(2)}` : "—");
-    document.getElementById("stat-sales").innerText      = fmt(stats?.total_sales);
-    document.getElementById("stat-receivable").innerText = fmt(stats?.total_receivable);
-    document.getElementById("stat-wages").innerText      = fmt(stats?.total_wages);
-    document.getElementById("stat-profit").innerText     = fmt(stats?.net_profit);
-    document.getElementById("stat-margin").innerText     = stats?.net_margin_percentage ?? "—";
+    try {
+        const res = await withTimeout(apiFetch("/api/dashboard/overview"), 8000);
+        if (res) {
+            if (res.events) eventsList = res.events;
+            const stats = res.stats || {};
+            
+            const setVal = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) el.innerText = val !== undefined ? val : "0";
+            };
+            setVal("stat-active-bookings", stats.active_bookings);
+            setVal("stat-pending-tasks", stats.pending_tasks);
+            setVal("stat-crew-on-duty", stats.crew_on_duty);
+            setVal("stat-low-stock", stats.low_stock_alerts);
+        }
+    } catch (err) {
+        console.error("Dashboard fetch error:", err);
+    }
 }
 
 // Pure render function — reads from eventsList global, no async
@@ -502,12 +533,7 @@ async function openCrewWagesAllocationModal() {
             const paidStr = assigned && assigned.paid ? "checked" : "";
             
             const div = document.createElement("div");
-            div.className = "glass-panel";
-            div.style.padding = "0.75rem";
-            div.style.display = "grid";
-            div.style.gridTemplateColumns = "1.5fr 1fr auto";
-            div.style.alignItems = "center";
-            div.style.gap = "0.5rem";
+            div.className = "glass-panel crew-allocation-row";
             
             div.innerHTML = `
                 <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
@@ -618,6 +644,9 @@ async function handleBookingSubmit(e) {
     const method = id ? "PUT" : "POST";
     const endpoint = id ? `/api/events/${id}` : "/api/events";
     
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    if (submitBtn) submitBtn.disabled = true;
+    
     try {
         const result = await apiFetch(endpoint, {
             method,
@@ -648,6 +677,9 @@ async function handleBookingSubmit(e) {
         }
         
     } catch (err) {}
+    finally {
+        if (submitBtn) submitBtn.disabled = false;
+    }
 }
 
 async function addSampleTasks(eventId) {
@@ -741,13 +773,7 @@ async function openQuoteToolModal() {
     
     inventoryList.forEach(item => {
         const div = document.createElement("div");
-        div.style.display = "grid";
-        div.style.gridTemplateColumns = "1.5fr 1fr 1fr";
-        div.style.alignItems = "center";
-        div.style.gap = "1rem";
-        div.style.marginBottom = "0.75rem";
-        div.style.borderBottom = "1px dashed rgba(107,22,35,0.08)";
-        div.style.paddingBottom = "0.5rem";
+        div.className = "quote-item-grid";
         
         div.innerHTML = `
             <div>
@@ -933,6 +959,9 @@ async function openInvoiceModal(eventId) {
         const amount = parseFloat(document.getElementById("payment-amount").value);
         if (!amount || amount <= 0) return;
         
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        if (submitBtn) submitBtn.disabled = true;
+        
         try {
             await apiFetch(`/api/events/${evt.id}/payments`, {
                 method: "POST",
@@ -943,6 +972,9 @@ async function openInvoiceModal(eventId) {
             closeModal("modal-invoice-payout");
             loadDashboardData();
         } catch (err) {}
+        finally {
+            if (submitBtn) submitBtn.disabled = false;
+        }
     };
 
     openModal("modal-invoice-payout");
@@ -1063,6 +1095,9 @@ async function handleOnboardCrewSubmit(e) {
     const role = document.getElementById("onboard-role").value;
     const base_daily_rate = parseFloat(document.getElementById("onboard-rate").value) || 0.0;
     
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    if (submitBtn) submitBtn.disabled = true;
+    
     try {
         await apiFetch("/api/auth/onboard", {
             method: "POST",
@@ -1072,6 +1107,9 @@ async function handleOnboardCrewSubmit(e) {
         showToast("Manager onboarded successfully!");
         closeModal("modal-onboard-crew");
     } catch (err) {}
+    finally {
+        if (submitBtn) submitBtn.disabled = false;
+    }
 }
 
 // ─── NEW MODULE CONTROLLERS ─────────────────────────────────────────────────
@@ -1082,6 +1120,20 @@ async function loadEventsData(page) {
     if (page !== undefined) eventsPage = page;
     try {
         eventsList = await apiFetch("/api/events");
+
+        // Calculate and set stats
+        let totalEvents = eventsList.length;
+        let confirmedEvents = eventsList.filter(e => e.status === "Confirmed").length;
+        let draftEvents = eventsList.filter(e => e.status === "Draft").length;
+
+        const setVal = (id, val) => {
+            const el = document.getElementById(id);
+            if (el) el.innerText = val;
+        };
+        setVal("events-stat-total", totalEvents);
+        setVal("events-stat-confirmed", confirmedEvents);
+        setVal("events-stat-draft", draftEvents);
+
         const tbody = document.getElementById("events-table-body");
         tbody.innerHTML = "";
 
@@ -1152,6 +1204,33 @@ async function loadClientsData(page) {
     if (page !== undefined) clientsPage = page;
     try {
         clientsList = await apiFetch("/api/clients");
+        if (eventsList.length === 0) {
+            eventsList = await apiFetch("/api/events");
+        }
+
+        // Calculate and set stats
+        const activeClientIds = new Set();
+        eventsList.forEach(e => {
+            if (e.status === "Confirmed" || e.status === "Completed") {
+                activeClientIds.add(e.client_id);
+            }
+        });
+
+        const totalClients = clientsList.length;
+        const activeClients = clientsList.filter(c => activeClientIds.has(c.id)).length;
+        const newLeads = clientsList.filter(c => {
+            const clientEvents = eventsList.filter(e => e.client_id === c.id);
+            return clientEvents.length === 0 || clientEvents.every(e => e.status === "Draft");
+        }).length;
+
+        const setVal = (id, val) => {
+            const el = document.getElementById(id);
+            if (el) el.innerText = val;
+        };
+        setVal("clients-stat-total", totalClients);
+        setVal("clients-stat-active", activeClients);
+        setVal("clients-stat-new", newLeads);
+
         const tbody = document.getElementById("clients-table-body");
         tbody.innerHTML = "";
 
@@ -1271,6 +1350,9 @@ async function handleGallerySubmit(e) {
     const category = document.getElementById("gallery-category").value;
     const description = document.getElementById("gallery-desc").value;
     
+    const saveBtn = document.getElementById("btn-gallery-save") || e.target.querySelector('button[type="submit"]');
+    if (saveBtn) saveBtn.disabled = true;
+    
     if (id) {
         const image_url = document.getElementById("gallery-url").value;
         try {
@@ -1283,17 +1365,19 @@ async function handleGallerySubmit(e) {
             closeModal("modal-gallery");
             loadGalleryData();
         } catch (err) {}
+        finally {
+            if (saveBtn) saveBtn.disabled = false;
+        }
     } else {
         const fileInput = document.getElementById("gallery-file");
         const file = fileInput.files[0];
         if (!file) {
             showToast("Please choose an image file to upload", "warning");
+            if (saveBtn) saveBtn.disabled = false;
             return;
         }
         
-        const saveBtn = document.getElementById("btn-gallery-save");
-        saveBtn.disabled = true;
-        saveBtn.innerText = "Uploading...";
+        if (saveBtn) saveBtn.innerText = "Uploading...";
         
         try {
             const compressedFile = await compressImageLocally(file);
@@ -1312,8 +1396,10 @@ async function handleGallerySubmit(e) {
             loadGalleryData();
         } catch (err) {
         } finally {
-            saveBtn.disabled = false;
-            saveBtn.innerText = "Upload & Save";
+            if (saveBtn) {
+                saveBtn.disabled = false;
+                saveBtn.innerText = "Upload & Save";
+            }
         }
     }
 }
@@ -1354,6 +1440,32 @@ async function loadCrewData(page) {
     if (page !== undefined) crewPage = page;
     try {
         crewList = await apiFetch("/api/crew");
+        if (eventsList.length === 0) {
+            eventsList = await apiFetch("/api/events");
+        }
+
+        // Calculate and set stats
+        let totalCrew = crewList.length;
+        let wagesOwed = crewList.reduce((sum, c) => sum + (c.amount_owed || 0), 0);
+        
+        let activeAssignments = 0;
+        eventsList.forEach(e => {
+            if (e.status === "Confirmed" || e.status === "Draft") {
+                try {
+                    const assignments = JSON.parse(e.crew_assignments || "[]");
+                    activeAssignments += assignments.length;
+                } catch (err) {}
+            }
+        });
+
+        const setVal = (id, val) => {
+            const el = document.getElementById(id);
+            if (el) el.innerText = val;
+        };
+        setVal("crew-stat-total", totalCrew);
+        setVal("crew-stat-owed", `₹${wagesOwed.toFixed(2)}`);
+        setVal("crew-stat-active", activeAssignments);
+
         const tbody = document.getElementById("crew-table-body");
         tbody.innerHTML = "";
 
@@ -1415,6 +1527,9 @@ async function handleCrewSubmit(e) {
     const method = id ? "PUT" : "POST";
     const endpoint = id ? `/api/crew/${id}` : "/api/crew";
     
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    if (submitBtn) submitBtn.disabled = true;
+    
     try {
         await apiFetch(endpoint, {
             method,
@@ -1425,6 +1540,9 @@ async function handleCrewSubmit(e) {
         closeModal("modal-crew");
         loadCrewData();
     } catch (err) {}
+    finally {
+        if (submitBtn) submitBtn.disabled = false;
+    }
 }
 
 function editCrewMember(crewId) {
@@ -1475,6 +1593,9 @@ async function handleCrewPaymentSubmit(e) {
     const amount = parseFloat(document.getElementById("crew-payment-amount").value);
     if (!amount || amount <= 0) return;
     
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    if (submitBtn) submitBtn.disabled = true;
+    
     try {
         await apiFetch(`/api/crew/${id}/payments`, {
             method: "POST",
@@ -1494,6 +1615,9 @@ async function handleCrewPaymentSubmit(e) {
         
         loadCrewData();
     } catch (err) {}
+    finally {
+        if (submitBtn) submitBtn.disabled = false;
+    }
 }
 
 function openCrewHistoryModal(crewId) {
@@ -1621,7 +1745,30 @@ async function loadFinanceData(filterType = "All", page) {
     if (activeBtn) activeBtn.classList.add("active-filter");
 
     try {
-        eventsList = await apiFetch("/api/events");
+        const [stats, events] = await Promise.all([
+            apiFetch("/api/analytics/summary"),
+            apiFetch("/api/events")
+        ]);
+        eventsList = events;
+
+        if (stats) {
+            const fmt = (v) => (typeof v === "number" ? `₹${v.toFixed(2)}` : "₹0.00");
+            const setVal = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) el.innerText = val;
+            };
+            setVal("finance-stat-sales", fmt(stats.total_sales));
+            setVal("finance-stat-receivable", fmt(stats.total_receivable));
+            setVal("finance-stat-wages", fmt(stats.total_wages));
+            
+            const profitEl = document.getElementById("finance-stat-profit");
+            if (profitEl) {
+                const profitVal = fmt(stats.net_profit);
+                const marginVal = stats.net_margin_percentage !== undefined ? stats.net_margin_percentage : "0";
+                profitEl.innerHTML = `${profitVal} (<span id="finance-stat-margin">${marginVal}</span>%)`;
+            }
+        }
+
         const tbody = document.getElementById("finance-table-body");
         tbody.innerHTML = "";
 
@@ -1995,9 +2142,11 @@ async function handleManualInvoiceSubmit(e) {
     const status = document.getElementById("manual-invoice-status").value;
     const memoNotes = document.getElementById("manual-invoice-notes").value.trim();
 
-    const saveBtn = document.getElementById("btn-save-manual-invoice");
-    saveBtn.disabled = true;
-    saveBtn.innerText = "Saving...";
+    const saveBtn = document.getElementById("btn-save-manual-invoice") || e.target.querySelector('button[type="submit"]');
+    if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.innerText = "Saving...";
+    }
 
     try {
         // Step 1: Ensure client exists or create new one
@@ -2067,8 +2216,10 @@ async function handleManualInvoiceSubmit(e) {
     } catch (err) {
         console.error("Manual invoice save error:", err);
     } finally {
-        saveBtn.disabled = false;
-        saveBtn.innerText = "Save & Export PDF";
+        if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.innerText = "Save & Export PDF";
+        }
     }
 }
 
