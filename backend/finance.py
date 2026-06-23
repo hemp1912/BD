@@ -7,6 +7,7 @@ from typing import Dict, List, Optional
 from fastapi import APIRouter, HTTPException, Request, status, File, UploadFile
 from pydantic import BaseModel
 from backend import config
+from appwrite.input_file import InputFile
 from backend.db_client import db_client
 from backend.auth import require_admin, get_current_session
 from backend.alerts import dispatch_telegram_alert
@@ -244,10 +245,22 @@ def add_payment_status(evt: dict) -> dict:
     return evt
 
 @router.get("/events")
-async def get_events(request: Request):
+async def get_events(
+    request: Request,
+    page: Optional[int] = None,
+    limit: int = 10,
+    search: Optional[str] = None,
+    status: Optional[str] = None,
+    payment_status: Optional[str] = None
+):
     await require_admin(request)
-    events = await db_client.get_events()
-    return [add_payment_status(evt) for evt in events]
+    if page is not None:
+        res = await db_client.get_events(page=page, limit=limit, search=search, status=status, payment_status=payment_status)
+        res["items"] = [add_payment_status(evt) for evt in res["items"]]
+        return res
+    else:
+        events = await db_client.get_events(search=search, status=status, payment_status=payment_status)
+        return [add_payment_status(evt) for evt in events]
 
 @router.get("/events/{event_id}")
 async def get_event(request: Request, event_id: str):
@@ -412,11 +425,11 @@ async def upload_layout(request: Request, event_id: str, file: UploadFile = File
             res = db_client.storage.create_file(
                 config.APPWRITE_STORAGE_BUCKET_ID,
                 "unique()",
-                temp_path
+                InputFile.from_path(temp_path)
             )
             os.remove(temp_path)
             
-            file_id = res["$id"]
+            file_id = res.id if hasattr(res, "id") else res["$id"]
             file_url = f"{config.APPWRITE_ENDPOINT}/storage/buckets/{config.APPWRITE_STORAGE_BUCKET_ID}/files/{file_id}/view?project={config.APPWRITE_PROJECT_ID}"
             event["design_layout_url"] = file_url
             await db_client.update_event(event_id, event)

@@ -7,13 +7,27 @@
     <title>Bhoomi Decoration</title>
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Poppins:wght@300;400;500;600&family=Noto+Sans+Gujarati:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- CSS Link -->
     <link rel="stylesheet" href="styles.css">
     
     <!-- Instant Redirect Protection -->
     <script>
         (function() {
+            // Theme check
+            const theme = localStorage.getItem("settings_theme") || "crimson_red";
+            const root = document.documentElement;
+            if (theme === "emerald_green") {
+                root.style.setProperty("--maroon", "#1F4B43");
+                root.style.setProperty("--maroon-deep", "#0B291E");
+                root.style.setProperty("--border-glass", "rgba(31, 75, 67, 0.15)");
+            } else if (theme === "midnight_blue") {
+                root.style.setProperty("--maroon", "#1b365d");
+                root.style.setProperty("--maroon-deep", "#0f2038");
+                root.style.setProperty("--border-glass", "rgba(27, 54, 93, 0.15)");
+            }
+
+            // Redirect protection
             const token = localStorage.getItem("eventflow_token");
             const role = localStorage.getItem("eventflow_role");
             if (token) {
@@ -495,11 +509,40 @@
                             data.forEach((item, index) => {
                                 const itemDiv = document.createElement("div");
                                 const gridClass = `g${(index % 7) + 1}`;
-                                itemDiv.className = gridClass;
-                                itemDiv.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.65)), url('${item.image_url}')`;
-                                itemDiv.style.backgroundSize = "cover";
-                                itemDiv.style.backgroundPosition = "center";
-                                itemDiv.innerHTML = `${item.title}${item.category ? ' (' + item.category + ')' : ''}`;
+                                itemDiv.className = `gallery-card ${gridClass}`;
+                                
+                                const img = document.createElement("img");
+                                img.src = item.image_url;
+                                img.alt = item.title;
+                                
+                                const overlay = document.createElement("div");
+                                overlay.className = "gallery-overlay";
+                                
+                                const textDiv = document.createElement("div");
+                                textDiv.className = "gallery-text";
+                                
+                                const h4 = document.createElement("h4");
+                                h4.style.margin = "0 0 4px 0";
+                                h4.style.fontFamily = "'Marcellus', serif";
+                                h4.style.fontSize = "1.1rem";
+                                h4.style.color = "#ffffff";
+                                h4.innerText = item.title;
+                                
+                                textDiv.appendChild(h4);
+                                if (item.category) {
+                                    const span = document.createElement("span");
+                                    span.className = "category-badge";
+                                    span.style.color = "var(--gold-light)";
+                                    span.style.fontSize = "0.75rem";
+                                    span.style.textTransform = "uppercase";
+                                    span.style.fontWeight = "600";
+                                    span.innerText = item.category;
+                                    textDiv.appendChild(span);
+                                }
+                                
+                                overlay.appendChild(textDiv);
+                                itemDiv.appendChild(img);
+                                itemDiv.appendChild(overlay);
                                 galleryGrid.appendChild(itemDiv);
                             });
                         }

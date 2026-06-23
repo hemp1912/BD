@@ -3,6 +3,7 @@ from datetime import datetime
 from typing import Optional
 from fastapi import APIRouter, Request, HTTPException, Form, File, UploadFile
 from pydantic import BaseModel
+from appwrite.input_file import InputFile
 from backend import config
 from backend.db_client import db_client
 from backend.auth import require_admin
@@ -19,7 +20,13 @@ class GalleryUpdateSchema(BaseModel):
     image_url: str
 
 @router.get("/gallery")
-async def get_gallery():
+async def get_gallery(
+    page: Optional[int] = None,
+    limit: int = 10,
+    search: Optional[str] = None
+):
+    if page is not None:
+        return await db_client.get_gallery(page=page, limit=limit, search=search)
     return await db_client.get_gallery()
 
 @router.post("/gallery")
@@ -41,11 +48,11 @@ async def create_gallery_item(
             res = db_client.storage.create_file(
                 config.APPWRITE_STORAGE_BUCKET_ID,
                 "unique()",
-                temp_path
+                InputFile.from_path(temp_path)
             )
             os.remove(temp_path)
             
-            file_id = res["$id"]
+            file_id = res.id if hasattr(res, "id") else res["$id"]
             image_url = f"{config.APPWRITE_ENDPOINT}/storage/buckets/{config.APPWRITE_STORAGE_BUCKET_ID}/files/{file_id}/view?project={config.APPWRITE_PROJECT_ID}"
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Appwrite storage upload failed: {e}")

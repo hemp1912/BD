@@ -22,9 +22,14 @@ class ClientSchema(BaseModel):
 
 # --- Warehouse Catalog CRUD ---
 @router.get("/inventory")
-async def get_inventory(request: Request):
+async def get_inventory(
+    request: Request,
+    page: Optional[int] = None,
+    limit: int = 10,
+    search: Optional[str] = None
+):
     await require_admin(request)
-    return await db_client.get_inventory()
+    return await db_client.get_inventory(page=page, limit=limit, search=search)
 
 @router.post("/inventory")
 async def create_inventory_item(request: Request, item: InventoryItemSchema):
@@ -49,9 +54,14 @@ async def delete_inventory_item(request: Request, item_id: str):
 
 # --- Clients CRUD ---
 @router.get("/clients")
-async def get_clients(request: Request):
+async def get_clients(
+    request: Request,
+    page: Optional[int] = None,
+    limit: int = 10,
+    search: Optional[str] = None
+):
     await require_admin(request)
-    return await db_client.get_clients()
+    return await db_client.get_clients(page=page, limit=limit, search=search)
 
 @router.post("/clients")
 async def create_client(request: Request, client: ClientSchema):

@@ -7,7 +7,7 @@
     <title>Bhoomi Decoration - Admin Panel</title>
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Poppins:wght@300;400;500;600&family=Noto+Sans+Gujarati:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- CSS Link -->
     <link rel="stylesheet" href="styles.css">
     
@@ -98,50 +98,62 @@
         <!-- Sidebar Navigation -->
         <aside class="sidebar" id="app-sidebar">
             <button id="sidebar-close" class="mobile-only-btn" aria-label="Close Sidebar" style="position: absolute; top: 1rem; right: 1rem; background: transparent; border: none; font-size: 1.25rem; color: var(--maroon); cursor: pointer;">✕</button>
-            <div class="sidebar-logo" style="font-family: 'Marcellus', serif; font-size: 1.5rem; text-align: center; color: var(--maroon);">
+            <div class="sidebar-logo" style="font-family: 'Marcellus', serif; font-size: 1.5rem; text-align: center; color: var(--maroon); margin-bottom: 0.5rem;">
                 Bhoomi <span>✦</span>
             </div>
 
-            <nav style="flex: 1;">
+            <div class="lang-selector-container" style="padding: 0 1.5rem 1rem 1.5rem; border-bottom: 1px solid rgba(107,22,35,0.15);">
+                <select id="lang-selector" style="width: 100%; padding: 0.5rem; border-radius: 4px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-glass); color: var(--text-primary); font-family: 'Poppins', sans-serif; font-size: 0.85rem; cursor: pointer; outline: none; transition: border-color 0.2s;">
+                    <option value="en" style="background: var(--bg-primary); color: var(--text-primary);">English</option>
+                    <option value="gu" style="background: var(--bg-primary); color: var(--text-primary);">ગુજરાતી (Gujarati)</option>
+                </select>
+            </div>
+
+            <nav style="flex: 1; margin-top: 1rem;">
                 <ul class="nav-list" id="sidebar-nav-links">
                     <li>
                         <a class="nav-item active" data-target="dashboard-view" id="nav-btn-dashboard">
-                            <span>Operations Dashboard</span>
+                            <span data-i18n="nav_dashboard">Operations Dashboard</span>
                         </a>
                     </li>
                     <li>
                         <a class="nav-item" data-target="events-view" id="nav-btn-events">
-                            <span>Events Projects</span>
+                            <span data-i18n="nav_events">Events Projects</span>
                         </a>
                     </li>
                     <li>
                         <a class="nav-item" data-target="warehouse-view" id="nav-btn-warehouse">
-                            <span>Warehouse Catalog</span>
+                            <span data-i18n="nav_warehouse">Warehouse Catalog</span>
                         </a>
                     </li>
                     <li>
                         <a class="nav-item" data-target="clients-view" id="nav-btn-clients">
-                            <span>Clients CRM</span>
+                            <span data-i18n="nav_clients">Clients CRM</span>
                         </a>
                     </li>
                     <li>
                         <a class="nav-item" data-target="gallery-view" id="nav-btn-gallery">
-                            <span>Portfolio Gallery</span>
+                            <span data-i18n="nav_gallery">Portfolio Gallery</span>
                         </a>
                     </li>
                     <li>
                         <a class="nav-item" data-target="crew-view" id="nav-btn-crew">
-                            <span>Crew Ledger</span>
+                            <span data-i18n="nav_crew">Crew Ledger</span>
                         </a>
                     </li>
                     <li>
                         <a class="nav-item" data-target="finance-view" id="nav-btn-finance">
-                            <span>Finance Hub</span>
+                            <span data-i18n="nav_finance">Finance Hub</span>
                         </a>
                     </li>
                     <li>
                         <a class="nav-item" data-target="invoice-view" id="nav-btn-invoice">
-                            <span>Invoices Hub</span>
+                            <span data-i18n="nav_invoices">Invoices Hub</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-item" data-target="settings-view" id="nav-btn-settings">
+                            <span data-i18n="nav_settings">System Settings</span>
                         </a>
                     </li>
                 </ul>
@@ -149,9 +161,9 @@
 
             <div class="user-profile-panel" style="border-top: 1px solid rgba(107,22,35,0.15); padding-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
                 <div style="font-size: 0.9rem; font-weight: 600; color: var(--maroon);" id="user-display-name">Loading...</div>
-                <div style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gold); font-weight: 600;" id="user-display-role">Business Administrator</div>
+                <div style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gold); font-weight: 600;" id="user-display-role" data-i18n="role_admin">Business Administrator</div>
                 <button id="logout-btn" class="btn btn-ghost" style="margin-top: 0.5rem; padding: 0.5rem 1rem; font-size: 0.8rem; border-color: var(--maroon);">
-                    <span>Secure Sign Out</span>
+                    <span data-i18n="nav_signout">Secure Sign Out</span>
                 </button>
             </div>
         </aside>
@@ -163,20 +175,20 @@
             <section id="dashboard-subview" class="app-subview">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
                     <div>
-                        <h2 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.8rem;">Operations Dashboard</h2>
-                        <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #5a4a3d;">
+                        <h2 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.8rem;" data-i18n="dash_title">Operations Dashboard</h2>
+                        <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #5a4a3d;" data-i18n="dash_subtitle">
                             Track scheduling status, payouts, and net event balances.
                         </p>
                     </div>
                     <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
                         <button class="btn btn-ghost" id="btn-quick-quote">
-                            <span>On-Walk Quote Builder</span>
+                            <span data-i18n="dash_btn_quote">On-Walk Quote Builder</span>
                         </button>
                         <button class="btn btn-ghost" id="btn-onboard-crew-trigger">
-                            <span>Onboard Crew</span>
+                            <span data-i18n="dash_btn_onboard">Onboard Crew</span>
                         </button>
                         <button class="btn btn-primary" id="btn-create-booking">
-                            <span>Create Event Booking</span>
+                            <span data-i18n="dash_btn_booking">Create Event Booking</span>
                         </button>
                     </div>
                 </div>
@@ -184,19 +196,19 @@
                 <!-- Admin Analytics Board -->
                 <div class="dashboard-grid">
                     <div class="glass-panel stat-card">
-                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--gold);">Active Bookings</span>
+                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--gold);" data-i18n="dash_stat_active">Active Bookings</span>
                         <div class="stat-val gold" id="stat-active-bookings">0</div>
                     </div>
                     <div class="glass-panel stat-card">
-                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--maroon);">Pending Tasks</span>
+                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--maroon);" data-i18n="dash_stat_tasks">Pending Tasks</span>
                         <div class="stat-val danger" id="stat-pending-tasks">0</div>
                     </div>
                     <div class="glass-panel stat-card">
-                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--text-secondary);">Crew On Duty</span>
+                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--text-secondary);" data-i18n="dash_stat_crew">Crew On Duty</span>
                         <div class="stat-val purple" id="stat-crew-on-duty">0</div>
                     </div>
                     <div class="glass-panel stat-card">
-                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--status-success);">Low Stock Items</span>
+                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--status-success);" data-i18n="dash_stat_lowstock">Low Stock Items</span>
                         <div class="stat-val success" id="stat-low-stock">0</div>
                     </div>
                 </div>
@@ -249,9 +261,14 @@
                             Create, update, and manage master physical event assets.
                         </p>
                     </div>
-                    <button class="btn btn-primary" id="btn-add-inventory">
-                        <span>Register Catalog Asset</span>
-                    </button>
+                    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                        <button class="btn btn-ghost" id="btn-export-warehouse">
+                            <span data-i18n="export_csv">Export CSV</span>
+                        </button>
+                        <button class="btn btn-primary" id="btn-add-inventory">
+                            <span>Register Catalog Asset</span>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Warehouse Analytics Board -->
@@ -307,9 +324,14 @@
                             Manage client profiles and register new customer accounts.
                         </p>
                     </div>
-                    <button class="btn btn-primary" id="btn-add-client-tab">
-                        <span>Intake New Client</span>
-                    </button>
+                    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                        <button class="btn btn-ghost" id="btn-export-clients">
+                            <span data-i18n="export_csv">Export CSV</span>
+                        </button>
+                        <button class="btn btn-primary" id="btn-add-client-tab">
+                            <span>Intake New Client</span>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Clients Analytics Board -->
@@ -406,7 +428,10 @@
                             Track internal crew profiles, base rates, payment logs, and amounts owed.
                         </p>
                     </div>
-                    <div style="display: flex; gap: 0.75rem;">
+                    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                        <button class="btn btn-ghost" id="btn-export-crew">
+                            <span data-i18n="export_csv">Export CSV</span>
+                        </button>
                         <button class="btn btn-secondary" id="btn-manage-attendance" style="border: 2px solid var(--gold); border-radius: 4px; padding: 10px 20px;">
                             <span>Daily Attendance Register</span>
                         </button>
@@ -464,13 +489,16 @@
 
             <!-- Finance Hub View -->
             <section id="finance-subview" class="app-subview" style="display: none;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
                     <div>
                         <h2 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.8rem;">Finance Hub</h2>
                         <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #5a4a3d;">
                             Filter sales, calculate receivables, and view payment transaction logs.
                         </p>
                     </div>
+                    <button class="btn btn-ghost" id="btn-export-finance">
+                        <span data-i18n="export_csv">Export CSV</span>
+                    </button>
                 </div>
 
                 <!-- Finance Analytics Board -->
@@ -538,7 +566,10 @@
                             Manage billing, track event payment collections, and export high-fidelity PDF invoices.
                         </p>
                     </div>
-                    <div>
+                    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                        <button class="btn btn-ghost" id="btn-export-invoices">
+                            <span data-i18n="export_csv">Export CSV</span>
+                        </button>
                         <button class="btn btn-primary" id="btn-create-manual-invoice">
                             <span>Create Manual Invoice</span>
                         </button>
@@ -610,9 +641,14 @@
                             Track, filter, search, and manage all booked decoration projects.
                         </p>
                     </div>
-                    <button class="btn btn-primary" id="btn-events-create-booking">
-                        <span>Book New Event Project</span>
-                    </button>
+                    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                        <button class="btn btn-ghost" id="btn-export-events">
+                            <span data-i18n="export_csv">Export CSV</span>
+                        </button>
+                        <button class="btn btn-primary" id="btn-events-create-booking">
+                            <span>Book New Event Project</span>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Events Analytics Board -->
@@ -667,6 +703,72 @@
                         </table>
                     </div>
                     <div id="events-pagination"></div>
+                </div>
+            </section>
+            
+            <!-- System Settings View -->
+            <section id="settings-subview" class="app-subview" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <div>
+                        <h2 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.8rem;" data-i18n="settings_title">System Settings</h2>
+                        <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #5a4a3d;" data-i18n="settings_subtitle">
+                            Configure booking defaults, business profile details, and appearance themes.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="glass-panel" style="max-width: 700px; margin-bottom: 2rem;">
+                    <form id="settings-form">
+                        <h3 style="font-family: 'Marcellus', serif; color: var(--maroon); margin-bottom: 1rem;" data-i18n="settings_sec_defaults">Booking Defaults</h3>
+                        <div class="row2" style="margin-bottom: 1.5rem;">
+                            <div class="field">
+                                <label for="settings-default-tax-rate" data-i18n="settings_tax_rate">Default Tax Rate (%)</label>
+                                <input type="number" id="settings-default-tax-rate" min="0" max="100" step="0.1" placeholder="18">
+                            </div>
+                            <div class="field">
+                                <label for="settings-default-discount" data-i18n="settings_discount">Default Discount (₹)</label>
+                                <input type="number" id="settings-default-discount" min="0" step="100" placeholder="0">
+                            </div>
+                        </div>
+
+                        <h3 style="font-family: 'Marcellus', serif; color: var(--maroon); margin-bottom: 1rem;" data-i18n="settings_sec_profile">Company Business Profile</h3>
+                        <div class="field" style="margin-bottom: 1rem;">
+                            <label for="settings-company-name" data-i18n="settings_company_name">Company Name</label>
+                            <input type="text" id="settings-company-name" placeholder="Bhoomi Decoration">
+                        </div>
+                        <div class="field" style="margin-bottom: 1rem;">
+                            <label for="settings-company-address" data-i18n="settings_company_address">Business Address</label>
+                            <textarea id="settings-company-address" rows="3" placeholder="Mumbai, Maharashtra, India"></textarea>
+                        </div>
+                        <div class="row2" style="margin-bottom: 1.5rem;">
+                            <div class="field">
+                                <label for="settings-company-email" data-i18n="settings_company_email">Business Email</label>
+                                <input type="email" id="settings-company-email" placeholder="hello@bhoomidecoration.com">
+                            </div>
+                            <div class="field">
+                                <label for="settings-company-phone" data-i18n="settings_company_phone">Contact Phone</label>
+                                <input type="text" id="settings-company-phone" placeholder="+91 99999 99999">
+                            </div>
+                        </div>
+                        <div class="field" style="margin-bottom: 1.5rem;">
+                            <label for="settings-company-website" data-i18n="settings_company_website">Company Website</label>
+                            <input type="text" id="settings-company-website" placeholder="www.bhoomidecoration.com">
+                        </div>
+
+                        <h3 style="font-family: 'Marcellus', serif; color: var(--maroon); margin-bottom: 1rem;" data-i18n="settings_sec_appearance">Appearance Color Scheme</h3>
+                        <div class="field" style="margin-bottom: 2rem;">
+                            <label for="settings-theme" data-i18n="settings_theme_label">Theme Palette</label>
+                            <select id="settings-theme" style="background: transparent;">
+                                <option value="crimson_red" data-i18n="settings_theme_crimson" style="background: var(--bg-primary); color: var(--text-primary);">Crimson Red (Default Brand)</option>
+                                <option value="emerald_green" data-i18n="settings_theme_emerald" style="background: var(--bg-primary); color: var(--text-primary);">Emerald Green</option>
+                                <option value="midnight_blue" data-i18n="settings_theme_midnight" style="background: var(--bg-primary); color: var(--text-primary);">Midnight Blue</option>
+                            </select>
+                        </div>
+
+                        <div style="display: flex; justify-content: flex-end;">
+                            <button type="submit" class="btn btn-primary" id="btn-save-settings" data-i18n="settings_btn_save">Save Settings</button>
+                        </div>
+                    </form>
                 </div>
             </section>
 
@@ -906,7 +1008,7 @@
     <div class="modal-overlay" id="modal-invoice-payout">
         <div class="modal-card glass-panel" style="max-width: 500px;">
             <div class="modal-header">
-                <h3>Event Invoice Details</h3>
+                <h3 data-i18n="payout_modal_title">Event Invoice Details</h3>
                 <button class="btn btn-secondary" onclick="closeModal('modal-invoice-payout')" style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
             </div>
 
@@ -917,18 +1019,18 @@
             <!-- Print Receipt wrapper block -->
             <div id="print-receipt-section" class="print-receipt-only">
                 <div style="text-align: center; border-bottom: 2px solid #000000; padding-bottom: 1rem; margin-bottom: 1rem;">
-                    <h2>EVENT DECORATION LOGISTICS CONTRACT</h2>
-                    <p style="font-family: 'Marcellus', serif;">Bhoomi Decoration, Mumbai</p>
+                    <h2 data-i18n="receipt_contract_title">EVENT DECORATION LOGISTICS CONTRACT</h2>
+                    <p id="print-receipt-comp-header" style="font-family: 'Marcellus', serif;">Bhoomi Decoration, Mumbai</p>
                 </div>
                 <div id="print-content-body"></div>
                 <div style="margin-top: 3rem; display: flex; justify-content: space-between;">
                     <div>
                         <p>___________________________</p>
-                        <p style="font-size: 0.8rem; text-align: center;">Business Administrator</p>
+                        <p style="font-size: 0.8rem; text-align: center;" data-i18n="receipt_admin">Business Administrator</p>
                     </div>
                     <div>
                         <p>___________________________</p>
-                        <p style="font-size: 0.8rem; text-align: center;">Client Signature</p>
+                        <p style="font-size: 0.8rem; text-align: center;" data-i18n="pdf_client_sign">Client Signature</p>
                     </div>
                 </div>
             </div>
@@ -936,19 +1038,19 @@
             <!-- Collect Payment Form -->
             <form id="payment-form" style="border-top: 1px solid rgba(107,22,35,0.15); padding-top: 1.25rem; margin-top: 1.25rem;">
                 <div class="form-group">
-                    <label for="payment-amount">Record Cash Deposit / Payment Receipt (₹)</label>
+                    <label for="payment-amount" data-i18n="payout_record_label">Record Cash Deposit / Payment Receipt (₹)</label>
                     <div style="display: flex; gap: 0.75rem;">
                         <input type="number" id="payment-amount" required min="1" step="1" placeholder="15000" style="flex: 1;">
-                        <button type="submit" class="btn btn-primary">Record Payment</button>
+                        <button type="submit" class="btn btn-primary" data-i18n="payout_btn_record">Record Payment</button>
                     </div>
                 </div>
             </form>
 
             <div class="form-group" style="flex-direction: row; justify-content: space-between; align-items: center; margin-top: 1.5rem;">
                 <button type="button" class="btn btn-secondary" id="btn-export-print">
-                    <span>Export Contract & Receipt</span>
+                    <span data-i18n="payout_btn_export">Export Contract & Receipt</span>
                 </button>
-                <button type="button" class="btn btn-secondary" onclick="closeModal('modal-invoice-payout')">Close</button>
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modal-invoice-payout')" data-i18n="payout_btn_close">Close</button>
             </div>
         </div>
     </div>
@@ -1365,13 +1467,13 @@
 
     <!-- Hidden Crew Payout PDF Template -->
     <div id="crew-payout-pdf-template" style="display: none;">
-        <div class="pdf-container" style="padding: 40px; font-family: 'Poppins', sans-serif; color: #333; background: #fff; max-width: 800px; margin: 0 auto; box-sizing: border-box; border: 1px solid #eee; border-radius: 8px;">
+        <div class="pdf-container" style="padding: 40px; font-family: 'Poppins', 'Noto Sans Gujarati', sans-serif; color: #333; background: #fff; max-width: 800px; margin: 0 auto; box-sizing: border-box; border: 1px solid #eee; border-radius: 8px;">
             <!-- Brand Header -->
             <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #6b1623; padding-bottom: 20px; margin-bottom: 30px;">
                 <div>
-                    <h1 style="font-family: 'Marcellus', serif; color: #6b1623; margin: 0 0 5px 0; font-size: 2.2rem; letter-spacing: 2px;">BHOOMI DECORATION</h1>
+                    <h1 id="pdf-crew-comp-name" style="font-family: 'Marcellus', serif; color: #6b1623; margin: 0 0 5px 0; font-size: 2.2rem; letter-spacing: 2px;">BHOOMI DECORATION</h1>
                     <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #c9941f; margin: 0 0 10px 0; font-weight: 500;">Luxury Event & Wedding Decorators</p>
-                    <p style="margin: 0; font-size: 0.8rem; color: #666; line-height: 1.4;">Mumbai, Maharashtra, India<br>Email: hello@bhoomidecoration.com | Web: www.bhoomidecoration.com</p>
+                    <p id="pdf-crew-comp-details" style="margin: 0; font-size: 0.8rem; color: #666; line-height: 1.4;">Mumbai, Maharashtra, India<br>Email: hello@bhoomidecoration.com | Web: www.bhoomidecoration.com</p>
                 </div>
                 <div style="text-align: right;">
                     <h2 style="font-family: 'Marcellus', serif; color: #333; margin: 0 0 10px 0; font-size: 1.8rem; letter-spacing: 1px;">PAYOUT RECEIPT</h2>
@@ -1428,35 +1530,35 @@
 
     <!-- Hidden High-Fidelity PDF Export Template -->
     <div id="invoice-pdf-template" style="display: none;">
-        <div class="pdf-container" style="padding: 30px; font-family: 'Poppins', sans-serif; color: #333; background: #fff; max-width: 800px; margin: 0 auto; box-sizing: border-box;">
+        <div class="pdf-container" style="padding: 30px; font-family: 'Poppins', 'Noto Sans Gujarati', sans-serif; color: #333; background: #fff; max-width: 800px; margin: 0 auto; box-sizing: border-box;">
             <!-- Brand Header -->
             <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #6b1623; padding-bottom: 20px; margin-bottom: 30px;">
                 <div>
-                    <h1 style="font-family: 'Marcellus', serif; color: #6b1623; margin: 0 0 5px 0; font-size: 2.2rem; letter-spacing: 2px;">BHOOMI DECORATION</h1>
+                    <h1 id="pdf-invoice-comp-name" style="font-family: 'Marcellus', serif; color: #6b1623; margin: 0 0 5px 0; font-size: 2.2rem; letter-spacing: 2px;">BHOOMI DECORATION</h1>
                     <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #c9941f; margin: 0 0 10px 0; font-weight: 500;">Luxury Event & Wedding Decorators</p>
-                    <p style="margin: 0; font-size: 0.8rem; color: #666; line-height: 1.4;">Mumbai, Maharashtra, India<br>Email: hello@bhoomidecoration.com | Web: www.bhoomidecoration.com</p>
+                    <p id="pdf-invoice-comp-details" style="margin: 0; font-size: 0.8rem; color: #666; line-height: 1.4;">Mumbai, Maharashtra, India<br>Email: hello@bhoomidecoration.com | Web: www.bhoomidecoration.com</p>
                 </div>
                 <div style="text-align: right;">
-                    <h2 style="font-family: 'Marcellus', serif; color: #333; margin: 0 0 10px 0; font-size: 1.8rem; letter-spacing: 1px;">INVOICE</h2>
-                    <p style="margin: 0 0 5px 0; font-size: 0.9rem; font-weight: 600;">Invoice No: <span id="pdf-invoice-id" style="color: #6b1623;">#EVT-XXXX</span></p>
-                    <p style="margin: 0; font-size: 0.85rem; color: #666;">Date: <span id="pdf-invoice-date">DD/MM/YYYY</span></p>
+                    <h2 style="font-family: 'Marcellus', serif; color: #333; margin: 0 0 10px 0; font-size: 1.8rem; letter-spacing: 1px;" data-i18n="pdf_invoice_title">INVOICE</h2>
+                    <p style="margin: 0 0 5px 0; font-size: 0.9rem; font-weight: 600;"><span data-i18n="pdf_invoice_no">Invoice No:</span> <span id="pdf-invoice-id" style="color: #6b1623;">#EVT-XXXX</span></p>
+                    <p style="margin: 0; font-size: 0.85rem; color: #666;"><span data-i18n="pdf_date_label">Date:</span> <span id="pdf-invoice-date">DD/MM/YYYY</span></p>
                 </div>
             </div>
 
             <!-- Client & Event Info Details Grid -->
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 35px;">
                 <div style="background: #fdfaf7; border-left: 3px solid #c9941f; padding: 15px; border-radius: 4px;">
-                    <h3 style="font-family: 'Marcellus', serif; color: #6b1623; font-size: 1rem; margin: 0 0 10px 0; letter-spacing: 0.5px;">BILLED TO:</h3>
+                    <h3 style="font-family: 'Marcellus', serif; color: #6b1623; font-size: 1rem; margin: 0 0 10px 0; letter-spacing: 0.5px;" data-i18n="pdf_invoice_to">BILLED TO:</h3>
                     <p style="margin: 0 0 5px 0; font-size: 0.9rem; font-weight: 600;" id="pdf-client-name">Client Name</p>
                     <p style="margin: 0 0 5px 0; font-size: 0.8rem; color: #555;" id="pdf-client-email">client@email.com</p>
                     <p style="margin: 0 0 5px 0; font-size: 0.8rem; color: #555;" id="pdf-client-phone">+91 99999 99999</p>
                     <p style="margin: 0; font-size: 0.8rem; color: #555; line-height: 1.3;" id="pdf-client-address">Billing Address</p>
                 </div>
                 <div style="background: #fdfaf7; border-left: 3px solid #6b1623; padding: 15px; border-radius: 4px;">
-                    <h3 style="font-family: 'Marcellus', serif; color: #6b1623; font-size: 1rem; margin: 0 0 10px 0; letter-spacing: 0.5px;">EVENT LOGISTICS:</h3>
-                    <p style="margin: 0 0 5px 0; font-size: 0.85rem;"><strong>Venue:</strong> <span id="pdf-event-venue">Grand Ballroom, Mumbai</span></p>
-                    <p style="margin: 0 0 5px 0; font-size: 0.85rem;"><strong>Setup Start:</strong> <span id="pdf-event-start">YYYY-MM-DD</span></p>
-                    <p style="margin: 0; font-size: 0.85rem;"><strong>Cleanup Deadline:</strong> <span id="pdf-event-end">YYYY-MM-DD</span></p>
+                    <h3 style="font-family: 'Marcellus', serif; color: #6b1623; font-size: 1rem; margin: 0 0 10px 0; letter-spacing: 0.5px;" data-i18n="pdf_event_details">EVENT LOGISTICS:</h3>
+                    <p style="margin: 0 0 5px 0; font-size: 0.85rem;"><strong data-i18n="pdf_venue">Venue:</strong> <span id="pdf-event-venue">Grand Ballroom, Mumbai</span></p>
+                    <p style="margin: 0 0 5px 0; font-size: 0.85rem;"><strong data-i18n="pdf_start_date">Setup Start:</strong> <span id="pdf-event-start">YYYY-MM-DD</span></p>
+                    <p style="margin: 0; font-size: 0.85rem;"><strong data-i18n="pdf_end_date">Cleanup Deadline:</strong> <span id="pdf-event-end">YYYY-MM-DD</span></p>
                 </div>
             </div>
 
@@ -1464,11 +1566,11 @@
             <table style="width: 100%; border-collapse: collapse; margin-bottom: 35px; font-size: 0.85rem; text-align: left;">
                 <thead>
                     <tr style="background: #6b1623; color: #fff;">
-                        <th style="padding: 10px 12px; border-bottom: 2px solid #540e1a; font-family: 'Marcellus', serif; font-weight: 500; color: #ffffff;">Reserved Catalog Item</th>
-                        <th style="padding: 10px 12px; border-bottom: 2px solid #540e1a; font-family: 'Marcellus', serif; font-weight: 500; text-align: center; color: #ffffff;">Category</th>
-                        <th style="padding: 10px 12px; border-bottom: 2px solid #540e1a; font-family: 'Marcellus', serif; font-weight: 500; text-align: center; color: #ffffff;">Qty</th>
-                        <th style="padding: 10px 12px; border-bottom: 2px solid #540e1a; font-family: 'Marcellus', serif; font-weight: 500; text-align: right; color: #ffffff;">Day Rate</th>
-                        <th style="padding: 10px 12px; border-bottom: 2px solid #540e1a; font-family: 'Marcellus', serif; font-weight: 500; text-align: right; color: #ffffff;">Total Price</th>
+                        <th style="padding: 10px 12px; border-bottom: 2px solid #540e1a; font-family: 'Marcellus', serif; font-weight: 500; color: #ffffff;" data-i18n="pdf_decor_item">Reserved Catalog Item</th>
+                        <th style="padding: 10px 12px; border-bottom: 2px solid #540e1a; font-family: 'Marcellus', serif; font-weight: 500; text-align: center; color: #ffffff;" data-i18n="pdf_category">Category</th>
+                        <th style="padding: 10px 12px; border-bottom: 2px solid #540e1a; font-family: 'Marcellus', serif; font-weight: 500; text-align: center; color: #ffffff;" data-i18n="pdf_qty">Qty</th>
+                        <th style="padding: 10px 12px; border-bottom: 2px solid #540e1a; font-family: 'Marcellus', serif; font-weight: 500; text-align: right; color: #ffffff;" data-i18n="pdf_rate">Day Rate</th>
+                        <th style="padding: 10px 12px; border-bottom: 2px solid #540e1a; font-family: 'Marcellus', serif; font-weight: 500; text-align: right; color: #ffffff;" data-i18n="pdf_total">Total Price</th>
                     </tr>
                 </thead>
                 <tbody id="pdf-items-body">
@@ -1480,8 +1582,8 @@
             <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 20px;">
                 <!-- Payment terms and notes -->
                 <div style="flex: 1; max-width: 50%;">
-                    <h4 style="font-family: 'Marcellus', serif; color: #6b1623; font-size: 0.9rem; margin: 0 0 10px 0;">TERMS & CONDITIONS</h4>
-                    <p style="margin: 0; font-size: 0.72rem; color: #777; line-height: 1.4;">
+                    <h4 style="font-family: 'Marcellus', serif; color: #6b1623; font-size: 0.9rem; margin: 0 0 10px 0;" data-i18n="pdf_terms_title">TERMS & CONDITIONS</h4>
+                    <p style="margin: 0; font-size: 0.72rem; color: #777; line-height: 1.4;" data-i18n="pdf_terms_text">
                         1. All reservation items are rental assets of Bhoomi Decoration.<br>
                         2. Payments should be made within the milestone dates.<br>
                         3. Any damage to physical property during the setup or event span is subject to replacement charges.
@@ -1490,27 +1592,27 @@
                 <!-- Totals Section -->
                 <div style="width: 250px;">
                     <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 8px; color: #555;">
-                        <span>Rental Subtotal:</span>
+                        <span data-i18n="pdf_subtotal">Rental Subtotal:</span>
                         <span id="pdf-subtotal">₹0.00</span>
                     </div>
                     <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 8px; color: #555;">
-                        <span>Discount:</span>
+                        <span data-i18n="pdf_discount">Discount:</span>
                         <span id="pdf-discount">-₹0.00</span>
                     </div>
                     <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 8px; color: #555; border-bottom: 1px solid #ddd; padding-bottom: 8px;">
-                        <span>Tax Rate:</span>
+                        <span data-i18n="pdf_tax">Tax Rate:</span>
                         <span id="pdf-tax">0.00%</span>
                     </div>
                     <div style="display: flex; justify-content: space-between; font-size: 1rem; font-weight: 700; margin-bottom: 8px; color: #6b1623;">
-                        <span>Invoice Total:</span>
+                        <span data-i18n="pdf_total">Invoice Total:</span>
                         <span id="pdf-total">₹0.00</span>
                     </div>
                     <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 8px; color: #2e7d32;">
-                        <span>Amount Paid:</span>
+                        <span data-i18n="pdf_amount_paid">Amount Paid:</span>
                         <span id="pdf-paid">₹0.00</span>
                     </div>
                     <div style="display: flex; justify-content: space-between; font-size: 1rem; font-weight: 700; border-top: 2px double #6b1623; padding-top: 8px; margin-top: 8px; color: #c62828;">
-                        <span>Balance Due:</span>
+                        <span data-i18n="pdf_balance_due">Balance Due:</span>
                         <span id="pdf-balance">₹0.00</span>
                     </div>
                 </div>
@@ -1520,18 +1622,18 @@
             <div style="margin-top: 60px; display: flex; justify-content: space-between; align-items: flex-end; padding-top: 20px; border-top: 1px dashed #ddd;">
                 <div style="text-align: center;">
                     <div style="width: 180px; border-bottom: 1px solid #888; margin-bottom: 5px;"></div>
-                    <p style="margin: 0; font-size: 0.75rem; color: #666; font-weight: 600;">Authorized Signatory</p>
+                    <p style="margin: 0; font-size: 0.75rem; color: #666; font-weight: 600;" data-i18n="pdf_auth_sign">Authorized Signatory</p>
                     <p style="margin: 2px 0 0 0; font-size: 0.65rem; color: #999;">Bhoomi Decoration</p>
                 </div>
                 <div style="text-align: center;">
                     <div style="width: 180px; border-bottom: 1px solid #888; margin-bottom: 5px;"></div>
-                    <p style="margin: 0; font-size: 0.75rem; color: #666; font-weight: 600;">Client Signature</p>
-                    <p style="margin: 2px 0 0 0; font-size: 0.65rem; color: #999;">Acceptance of Agreement</p>
+                    <p style="margin: 0; font-size: 0.75rem; color: #666; font-weight: 600;" data-i18n="pdf_client_sign">Client Signature</p>
+                    <p style="margin: 2px 0 0 0; font-size: 0.65rem; color: #999;" data-i18n="pdf_agreement_accept">Acceptance of Agreement</p>
                 </div>
             </div>
 
             <!-- Footer Message -->
-            <div style="text-align: center; margin-top: 50px; font-size: 0.75rem; color: #999; font-style: italic; border-top: 1px solid #eee; padding-top: 15px;">
+            <div style="text-align: center; margin-top: 50px; font-size: 0.75rem; color: #999; font-style: italic; border-top: 1px solid #eee; padding-top: 15px;" data-i18n="pdf_thank_you">
                 Thank you for choosing Bhoomi Decoration for your celebration!
             </div>
         </div>
@@ -1543,7 +1645,7 @@
     <!-- Shared Utilities Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="common.js"></script>
-    <script src="admin.js?v=invoice-hub"></script>
+    <script src="admin.js?v=invoice-hub-v3"></script>
 </body>
 
 </html>

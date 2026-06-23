@@ -30,9 +30,516 @@ let invoicePage = 1;
 let eventsPage = 1;
 
 // Global page size limit
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 10;
 
 // Toast and Modals are handled via common.js
+
+// Translation Dictionary
+const TRANSLATIONS = {
+    en: {
+        // Sidebar & General
+        "nav_dashboard": "Operations Dashboard",
+        "nav_events": "Events Projects",
+        "nav_warehouse": "Warehouse Catalog",
+        "nav_clients": "Clients CRM",
+        "nav_gallery": "Portfolio Gallery",
+        "nav_crew": "Crew Ledger",
+        "nav_finance": "Finance Hub",
+        "nav_invoices": "Invoices Hub",
+        "nav_signout": "Secure Sign Out",
+        "role_admin": "Business Administrator",
+        "edit": "Edit",
+        "delete": "Delete",
+        "save": "Save",
+        "cancel": "Cancel",
+        "actions": "Actions",
+        "status": "Status",
+
+        // Dashboard
+        "dash_title": "Operations Dashboard",
+        "dash_subtitle": "Track scheduling status, payouts, and net event balances.",
+        "dash_btn_quote": "On-Walk Quote Builder",
+        "dash_btn_onboard": "Onboard Crew",
+        "dash_btn_booking": "Create Event Booking",
+        "dash_stat_active": "Active Bookings",
+        "dash_stat_tasks": "Pending Tasks",
+        "dash_stat_crew": "Crew On Duty",
+        "dash_stat_lowstock": "Low Stock Items",
+        "dash_upcoming_title": "Upcoming Events",
+        "dash_upcoming_sub": "Sorted by nearest date · Completed events are shown in the Events Projects section.",
+        "dash_search_placeholder": "Search client / venue...",
+        "dash_table_client": "Client / Location",
+        "dash_table_dates": "Dates",
+        "dash_table_total": "Invoice Total",
+        "dash_table_paid": "Paid",
+        "dash_table_balance": "Balance",
+
+        // Events Projects
+        "events_title": "Events Projects",
+        "events_subtitle": "Track, filter, search, and manage all booked decoration projects.",
+        "events_btn_booking": "Book New Event Project",
+        "events_stat_total": "Total Bookings",
+        "events_stat_confirmed": "Confirmed Projects",
+        "events_stat_draft": "Draft Bookings",
+        "events_filter_status": "Filter Status:",
+        "events_filter_all": "All",
+        "events_filter_draft": "Draft",
+        "events_filter_confirmed": "Confirmed",
+        "events_filter_completed": "Completed",
+        "events_search_placeholder": "Search Client / Venue...",
+
+        // Warehouse Catalog
+        "wh_title": "Warehouse Catalog Inventory",
+        "wh_subtitle": "Create, update, and manage master physical event assets.",
+        "wh_btn_register": "Register Catalog Asset",
+        "wh_stat_unique": "Total Unique Items",
+        "wh_stat_stock": "Total Unit Stock",
+        "wh_stat_low": "Low Stock Alerts",
+        "wh_search_placeholder": "Search catalog assets...",
+        "wh_table_id": "ID",
+        "wh_table_name": "Name",
+        "wh_table_category": "Category",
+        "wh_table_stock": "Stock Level",
+        "wh_table_rate": "Day Rate",
+
+        // Clients CRM
+        "cli_title": "Clients CRM Database",
+        "cli_subtitle": "Manage client profiles and register new customer accounts.",
+        "cli_btn_intake": "Intake New Client",
+        "cli_stat_total": "Total Clients",
+        "cli_stat_active": "Active Clients",
+        "cli_stat_new": "New Leads (YTD)",
+        "cli_search_placeholder": "Search clients...",
+        "cli_table_id": "ID",
+        "cli_table_name": "Name",
+        "cli_table_email": "Email",
+        "cli_table_phone": "Phone",
+        "cli_table_address": "Address",
+
+        // Portfolio Gallery
+        "gal_title": "Portfolio Gallery",
+        "gal_subtitle": "Upload, edit, and manage wedding showcase photos displayed on landing page.",
+        "gal_btn_upload": "Upload Photo Entry",
+        "gal_search_placeholder": "Search showcase entries...",
+        "gal_table_photo": "Photo",
+        "gal_table_title": "Title",
+        "gal_table_category": "Category",
+        "gal_table_desc": "Description",
+
+        // Crew Ledger
+        "crew_title": "Crew Wages & Ledger",
+        "crew_subtitle": "Track internal crew profiles, base rates, payment logs, and amounts owed.",
+        "crew_btn_attendance": "Daily Attendance Register",
+        "crew_btn_add": "Add Team Profile",
+        "crew_stat_strength": "Roster Strength",
+        "crew_stat_owed": "Wages Owed",
+        "crew_stat_active": "Active Assignments",
+        "crew_search_placeholder": "Search team members...",
+        "crew_table_id": "ID",
+        "crew_table_name": "Name",
+        "crew_table_role": "Role",
+        "crew_table_contact": "Contact",
+        "crew_table_rate": "Base Rate (₹)",
+        "crew_table_days": "Days Worked",
+        "crew_table_owed": "Owed Wages (₹)",
+
+        // Finance Hub
+        "fin_title": "Finance Hub",
+        "fin_subtitle": "Filter sales, calculate receivables, and view payment transaction logs.",
+        "fin_stat_sales": "Total Sales",
+        "fin_stat_receivables": "Receivables Balance",
+        "fin_stat_wages": "Total Crew Wages",
+        "fin_stat_profit": "Net Profit Margin",
+        "fin_filter_payment": "Filter Payment Status:",
+        "fin_filter_all": "All",
+        "fin_filter_fully": "Fully Paid",
+        "fin_filter_partially": "Partially Paid",
+        "fin_filter_unpaid": "Unpaid",
+        "fin_search_placeholder": "Search client / venue...",
+        "fin_table_client": "Client / Venue",
+        "fin_table_date": "Event Date",
+        "fin_table_total": "Invoice Total",
+        "fin_table_paid": "Amount Paid",
+        "fin_table_balance": "Balance",
+        "fin_table_status": "Payment Status",
+        "fin_table_action": "Action",
+
+        // Invoices Hub
+        "inv_title": "Invoices Hub",
+        "inv_subtitle": "Manage billing, track event payment collections, and export high-fidelity PDF invoices.",
+        "inv_btn_manual": "Create Manual Invoice",
+        "inv_stat_total": "Total Invoiced",
+        "inv_stat_collected": "Total Collected",
+        "inv_stat_remaining": "Total Remaining",
+        "inv_filter_status": "Filter Status:",
+        "inv_filter_all": "All",
+        "inv_filter_paid": "Paid",
+        "inv_filter_remaining": "Remaining",
+        "inv_filter_unpaid": "Unpaid",
+        "inv_search_placeholder": "Search Client / Venue...",
+        "inv_table_client": "Client / Location",
+        "inv_table_date": "Invoice Date",
+        "inv_table_status": "Status",
+        "inv_table_total": "Invoice Total",
+        "inv_table_paid": "Paid",
+        "inv_table_balance": "Balance",
+        
+        // Invoices print/PDF words
+        "pdf_invoice_title": "INVOICE",
+        "pdf_invoice_from": "FROM:",
+        "pdf_invoice_to": "BILLED TO:",
+        "pdf_event_details": "EVENT LOGISTICS:",
+        "pdf_venue": "Venue:",
+        "pdf_start_date": "Setup Start:",
+        "pdf_end_date": "Cleanup Deadline:",
+        "pdf_decor_item": "Reserved Catalog Item",
+        "pdf_category": "Category",
+        "pdf_qty": "Qty",
+        "pdf_rate": "Day Rate",
+        "pdf_subtotal": "Rental Subtotal:",
+        "pdf_discount": "Discount:",
+        "pdf_tax": "Tax Rate:",
+        "pdf_total": "Invoice Total:",
+        "pdf_amount_paid": "Amount Paid:",
+        "pdf_balance_due": "Balance Due:",
+        "pdf_terms_title": "TERMS & CONDITIONS",
+        "pdf_terms_text": "1. All reservation items are rental assets of Bhoomi Decoration.\n2. Payments should be made within the milestone dates.\n3. Any damage to physical property during the setup or event span is subject to replacement charges.",
+        "pdf_invoice_no": "Invoice No:",
+        "pdf_date_label": "Date:",
+        "pdf_auth_sign": "Authorized Signatory",
+        "pdf_client_sign": "Client Signature",
+        "pdf_agreement_accept": "Acceptance of Agreement",
+        "pdf_thank_you": "Thank you for choosing Bhoomi Decoration for your celebration!",
+        "pdf_no_items": "No reserved catalog items found.",
+        "pdf_custom_category": "Custom",
+        "payout_modal_title": "Event Invoice Details",
+        "payout_client_profile": "Client Profile:",
+        "payout_venue": "Target Venue:",
+        "payout_dates": "Dates Range:",
+        "payout_days": "Days Rental",
+        "payout_reserved_title": "Reserved Stock Breakdown:",
+        "payout_wage_title": "Setup Crew Wages & Payroll:",
+        "payout_wage_label": "Wage:",
+        "payout_released": "Released",
+        "payout_no_workers": "No workers assigned.",
+        "payout_subtotal": "Subtotal:",
+        "payout_discount": "Discount:",
+        "payout_tax": "Tax",
+        "payout_total": "Invoice Total:",
+        "payout_paid": "Deposits Paid:",
+        "payout_balance": "Remaining Balance Due:",
+        "payout_record_label": "Record Cash Deposit / Payment Receipt (₹)",
+        "payout_btn_record": "Record Payment",
+        "payout_btn_export": "Export Contract & Receipt",
+        "payout_btn_close": "Close",
+        "receipt_contract_title": "EVENT DECORATION LOGISTICS CONTRACT",
+        "receipt_admin": "Business Administrator",
+        "receipt_client": "Customer Client:",
+        "receipt_address": "Setup Address:",
+        "receipt_dates": "Booked Dates:",
+        "receipt_ref_code": "Invoice Reference Code:",
+        "receipt_item": "Decor Item",
+        "receipt_qty": "Qty",
+        "receipt_rate": "Day Rate",
+        "receipt_subtotal": "Subtotal Amount:",
+        "receipt_discount": "Deducted Discount:",
+        "receipt_tax": "Applied Tax",
+        "receipt_invoice_total": "Total Invoice Amount:",
+        "receipt_total_paid": "Total Paid (Receipts):",
+        "receipt_remaining": "Remaining Accounts Balance:",
+        
+        // System Settings & Exports
+        "settings_title": "System Settings",
+        "settings_subtitle": "Configure booking defaults, business profile details, and appearance themes.",
+        "settings_sec_defaults": "Booking Defaults",
+        "settings_tax_rate": "Default Tax Rate (%)",
+        "settings_discount": "Default Discount (₹)",
+        "settings_sec_profile": "Company Business Profile",
+        "settings_company_name": "Company Name",
+        "settings_company_address": "Business Address",
+        "settings_company_email": "Business Email",
+        "settings_company_phone": "Contact Phone",
+        "settings_company_website": "Company Website",
+        "settings_sec_appearance": "Appearance Color Scheme",
+        "settings_theme_label": "Theme Palette",
+        "settings_theme_crimson": "Crimson Red (Default Brand)",
+        "settings_theme_emerald": "Emerald Green",
+        "settings_theme_midnight": "Midnight Blue",
+        "settings_btn_save": "Save Settings",
+        "nav_settings": "System Settings",
+        "export_csv": "Export CSV",
+        "details_btn": "Details"
+    },
+    gu: {
+        // Sidebar & General
+        "nav_dashboard": "ઓપરેશન્સ ડેશબોર્ડ",
+        "nav_events": "ઇવેન્ટ પ્રોજેક્ટ્સ",
+        "nav_warehouse": "વેરહાઉસ કેટલોગ",
+        "nav_clients": "ગ્રાહક સીઆરએમ",
+        "nav_gallery": "પોર્ટફોલિયો ગેલેરી",
+        "nav_crew": "ક્રૂ લેજર",
+        "nav_finance": "ફાઇનાન્સ હબ",
+        "nav_invoices": "ઇન્વૉઇસ હબ",
+        "nav_signout": "સુરક્ષિત સાઇન આઉટ",
+        "role_admin": "વ્યવસાય સંચાલક",
+        "edit": "ફેરફાર કરો",
+        "delete": "કાઢી નાખો",
+        "save": "સાચવો",
+        "cancel": "રદ કરો",
+        "actions": "ક્રિયાઓ",
+        "status": "સ્થિતિ",
+
+        // Dashboard
+        "dash_title": "ઓપરેશન્સ ડેશબોર્ડ",
+        "dash_subtitle": "શેડ્યુલિંગ સ્થિતિ, ચુકવણીઓ અને નેટ ઇવેન્ટ બેલેન્સ ટ્રૅક કરો.",
+        "dash_btn_quote": "ઓન-વોક ક્વોટ બિલ્ડર",
+        "dash_btn_onboard": "ક્રૂ ઓનબોર્ડ કરો",
+        "dash_btn_booking": "ઇવેન્ટ બુકિંગ બનાવો",
+        "dash_stat_active": "સક્રિય બુકિંગ",
+        "dash_stat_tasks": "બાકી કાર્યો",
+        "dash_stat_crew": "ફરજ પર ક્રૂ",
+        "dash_stat_lowstock": "ઓછો સ્ટોક ધરાવતી વસ્તુઓ",
+        "dash_upcoming_title": "આગામી ઇવેન્ટ્સ",
+        "dash_upcoming_sub": "સૌથી નજીકની તારીખ દ્વારા ક્રમાંકિત · પૂર્ણ થયેલ ઇવેન્ટ્સ ઇવેન્ટ પ્રોજેક્ટ્સ વિભાગમાં બતાવવામાં આવે છે.",
+        "dash_search_placeholder": "ગ્રાહક / સ્થળ શોધો...",
+        "dash_table_client": "ગ્રાહક / સ્થાન",
+        "dash_table_dates": "તારીખો",
+        "dash_table_total": "ઇન્વૉઇસ કુલ",
+        "dash_table_paid": "ચૂકવેલ",
+        "dash_table_balance": "બાકી રકમ",
+
+        // Events Projects
+        "events_title": "ઇવેન્ટ પ્રોજેક્ટ્સ",
+        "events_subtitle": "બધા બુક કરેલા ડેકોરેશન પ્રોજેક્ટ્સ ટ્રૅક કરો, ફિલ્ટર કરો, શોધો અને સંચાલિત કરો.",
+        "events_btn_booking": "નવો ઇવેન્ટ પ્રોજેક્ટ બુક કરો",
+        "events_stat_total": "કુલ બુકિંગ",
+        "events_stat_confirmed": "કન્ફર્મ પ્રોજેક્ટ્સ",
+        "events_stat_draft": "ડ્રાફ્ટ બુકિંગ",
+        "events_filter_status": "સ્થિતિ ફિલ્ટર:",
+        "events_filter_all": "બધા",
+        "events_filter_draft": "ડ્રાફ્ટ",
+        "events_filter_confirmed": "કન્ફર્મ",
+        "events_filter_completed": "પૂર્ણ થયેલ",
+        "events_search_placeholder": "ગ્રાહક / સ્થળ શોધો...",
+
+        // Warehouse Catalog
+        "wh_title": "વેરહાઉસ સ્ટોક કેટલોગ",
+        "wh_subtitle": "ભૌતિક ઇવેન્ટ સંપત્તિઓ બનાવો, અપડેટ કરો અને સંચાલિત કરો.",
+        "wh_btn_register": "નવી સંપત્તિ રજીસ્ટર કરો",
+        "wh_stat_unique": "કુલ અનન્ય વસ્તુઓ",
+        "wh_stat_stock": "કુલ યુનિટ સ્ટોક",
+        "wh_stat_low": "ઓછા સ્ટોકની ચેતવણીઓ",
+        "wh_search_placeholder": "કેટલોગ સંપત્તિઓ શોધો...",
+        "wh_table_id": "આઈડી",
+        "wh_table_name": "નામ",
+        "wh_table_category": "શ્રેણી",
+        "wh_table_stock": "સ્ટોક લેવલ",
+        "wh_table_rate": "દૈનિક દર",
+
+        // Clients CRM
+        "cli_title": "ગ્રાહક સીઆરએમ ડેટાબેઝ",
+        "cli_subtitle": "ગ્રાહક પ્રોફાઇલ્સ સંચાલિત કરો અને નવા ગ્રાહક એકાઉન્ટ્સ રજીસ્ટર કરો.",
+        "cli_btn_intake": "નવા ગ્રાહકની નોંધણી",
+        "cli_stat_total": "કુલ ગ્રાહકો",
+        "cli_stat_active": "સક્રિય ગ્રાહકો",
+        "cli_stat_new": "નવા લીડ્સ (YTD)",
+        "cli_search_placeholder": "ગ્રાહકો શોધો...",
+        "cli_table_id": "આઈડી",
+        "cli_table_name": "નામ",
+        "cli_table_email": "ઈમેઈલ",
+        "cli_table_phone": "ફોન",
+        "cli_table_address": "સરનામું",
+
+        // Portfolio Gallery
+        "gal_title": "પોર્ટફોલિયો ગેલેરી",
+        "gal_subtitle": "લેન્ડિંગ પેજ પર દર્શાવવામાં આવતા લગ્ન પ્રદર્શનના ફોટા અપલોડ અને સંપાદિત કરો.",
+        "gal_btn_upload": "ફોટો અપલોડ કરો",
+        "gal_search_placeholder": "પ્રદર્શન એન્ટ્રીઓ શોધો...",
+        "gal_table_photo": "ફોટો",
+        "gal_table_title": "શીર્ષક",
+        "gal_table_category": "શ્રેણી",
+        "gal_table_desc": "વર્ણન",
+
+        // Crew Ledger
+        "crew_title": "ક્રૂ વેતન અને ખાતાવહી",
+        "crew_subtitle": "આંતરિક ક્રૂ પ્રોફાઇલ્સ, બેઝ રેટ, પેમેન્ટ લોગ અને બાકી રકમ ટ્રૅક કરો.",
+        "crew_btn_attendance": "દૈનિક હાજરી પત્રક",
+        "crew_btn_add": "નવી પ્રોફાઇલ ઉમેરો",
+        "crew_stat_strength": "રોસ્ટર સભ્યો",
+        "crew_stat_owed": "બાકી વેતન",
+        "crew_stat_active": "સક્રિય અસાઇનમેન્ટ્સ",
+        "crew_search_placeholder": "ટીમના સભ્યો શોધો...",
+        "crew_table_id": "આઈડી",
+        "crew_table_name": "નામ",
+        "crew_table_role": "ભૂમિકા",
+        "crew_table_contact": "સંપર્ક",
+        "crew_table_rate": "બેઝ રેટ (₹)",
+        "crew_table_days": "કામ કરેલા દિવસો",
+        "crew_table_owed": "બાકી વેતન (₹)",
+
+        // Finance Hub
+        "fin_title": "નાણાકીય હબ (Finance)",
+        "fin_subtitle": "વેચાણ ફિલ્ટર કરો, લેણી રકમની ગણતરી કરો અને વ્યવહારો જુઓ.",
+        "fin_stat_sales": "કુલ વેચાણ",
+        "fin_stat_receivables": "બાકી લેણી રકમ",
+        "fin_stat_wages": "કુલ ક્રૂ વેતન",
+        "fin_stat_profit": "ચોખ્ખો નફો",
+        "fin_filter_payment": "ચુકવણી સ્થિતિ ફિલ્ટર કરો:",
+        "fin_filter_all": "બધા",
+        "fin_filter_fully": "પૂર્ણ ચૂકવેલ",
+        "fin_filter_partially": "અંશતઃ ચૂકવેલ",
+        "fin_filter_unpaid": "નહીં ચૂકવેલ",
+        "fin_search_placeholder": "ગ્રાહક / સ્થળ શોધો...",
+        "fin_table_client": "ગ્રાહક / સ્થળ",
+        "fin_table_date": "ઇવેન્ટ તારીખ",
+        "fin_table_total": "ઇન્વૉઇસ કુલ",
+        "fin_table_paid": "ચૂકવેલ રકમ",
+        "fin_table_balance": "બાકી રકમ",
+        "fin_table_status": "ચુકવણી સ્થિતિ",
+        "fin_table_action": "ક્રિયા",
+
+        // Invoices Hub
+        "inv_title": "ઇન્વૉઇસ હબ",
+        "inv_subtitle": "બિલિંગ મેનેજ કરો, ઇવેન્ટ પેમેન્ટ કલેક્શન ટ્રૅક કરો અને પીડીએફ ઇન્વૉઇસ નિકાસ કરો.",
+        "inv_btn_manual": "મેન્યુઅલ ઇન્વૉઇસ બનાવો",
+        "inv_stat_total": "કુલ ઇન્વૉઇસ કરેલ",
+        "inv_stat_collected": "કુલ એકત્રિત કરેલ",
+        "inv_stat_remaining": "કુલ બાકી",
+        "inv_filter_status": "સ્થિતિ ફિલ્ટર:",
+        "inv_filter_all": "બધા",
+        "inv_filter_paid": "ચૂકવેલ",
+        "inv_filter_remaining": "બાકી",
+        "inv_filter_unpaid": "નહીં ચૂકવેલ",
+        "inv_search_placeholder": "ગ્રાહક / સ્થળ શોધો...",
+        "inv_table_client": "ગ્રાહક / સ્થાન",
+        "inv_table_date": "ઇન્વૉઇસ તારીખ",
+        "inv_table_status": "સ્થિતિ",
+        "inv_table_total": "ઇન્વૉઇસ કુલ",
+        "inv_table_paid": "ચૂકવેલ",
+        "inv_table_balance": "બાકી રકમ",
+        
+        // Invoices print/PDF words
+        "pdf_invoice_title": "ઇન્વૉઇસ પહોંચ",
+        "pdf_invoice_from": "તરફથી:",
+        "pdf_invoice_to": "પ્રતિ:",
+        "pdf_event_details": "ઇવેન્ટ વિગતો",
+        "pdf_venue": "સ્થળ:",
+        "pdf_start_date": "સેટઅપ શરૂઆત:",
+        "pdf_end_date": "ડેડલાઇન પૂર્ણ:",
+        "pdf_decor_item": "ડેકોર આઇટમ",
+        "pdf_category": "શ્રેણી",
+        "pdf_qty": "જથ્થો",
+        "pdf_rate": "દૈનિક દર",
+        "pdf_subtotal": "પેટા સરવાળો:",
+        "pdf_discount": "ડિસ્કાઉન્ટ:",
+        "pdf_tax": "ટેક્સ:",
+        "pdf_total": "કુલ રકમ:",
+        "pdf_amount_paid": "ચૂકવેલ રકમ:",
+        "pdf_balance_due": "બાકી ચૂકવણી:",
+        "pdf_terms_title": "નિયમો અને શરતો",
+        "pdf_terms_text": "૧. બધી બુકિંગ આઇટમો ભૂમિ ડેકોરેશનની ભાડાની સંપત્તિ છે.\n૨. ચૂકવણી નિર્ધારિત સમય મર્યાદામાં થવી જોઈએ.\n૩. સેટઅપ અથવા ઇવેન્ટ દરમિયાન ભૌતિક સંપત્તિને નુકસાન થવાના કિસ્સામાં બદલી ખર્ચ લાગુ થશે.",
+        "pdf_invoice_no": "ઇન્વૉઇસ નં:",
+        "pdf_date_label": "તારીખ:",
+        "pdf_auth_sign": "અધિકૃત હસ્તાક્ષરકર્તા",
+        "pdf_client_sign": "ગ્રાહક સહી",
+        "pdf_agreement_accept": "કરારની સ્વીકૃતિ",
+        "pdf_thank_you": "તમારી ઉજવણી માટે ભૂમિ ડેકોરેશન પસંદ કરવા બદલ આભાર!",
+        "pdf_no_items": "કોઈ આરક્ષિત કેટલોગ વસ્તુઓ મળી નથી.",
+        "pdf_custom_category": "કસ્ટમ",
+        "payout_modal_title": "ઇવેન્ટ ઇન્વૉઇસ વિગતો",
+        "payout_client_profile": "ગ્રાહક પ્રોફાઇલ:",
+        "payout_venue": "લક્ષ્ય સ્થળ:",
+        "payout_dates": "તારીખ શ્રેણી:",
+        "payout_days": "દિવસો ભાડું",
+        "payout_reserved_title": "આરક્ષિત સ્ટોક વિગત:",
+        "payout_wage_title": "સેટઅપ ક્રૂ વેતન અને પેરોલ:",
+        "payout_wage_label": "વેતન:",
+        "payout_released": "ચૂકવેલ",
+        "payout_no_workers": "કોઈ કામદારો સોંપવામાં આવ્યા નથી.",
+        "payout_subtotal": "પેટા સરવાળો:",
+        "payout_discount": "ડિસ્કાઉન્ટ:",
+        "payout_tax": "ટેક્સ",
+        "payout_total": "કુલ ઇન્વૉઇસ રકમ:",
+        "payout_paid": "ચૂકવેલ થાપણો:",
+        "payout_balance": "બાકી લેણી રકમ:",
+        "payout_record_label": "રોકડ ડિપોઝિટ / ચુકવણી પહોંચ નોંધો (₹)",
+        "payout_btn_record": "ચુકવણી નોંધો",
+        "payout_btn_export": "કરાર અને પહોંચ નિકાસ કરો",
+        "payout_btn_close": "બંધ કરો",
+        "receipt_contract_title": "ઇવેન્ટ ડેકોરેશન લોજિસ્ટિક્સ કરાર",
+        "receipt_admin": "વ્યવસાય સંચાલક",
+        "receipt_client": "ગ્રાહક અસીલ:",
+        "receipt_address": "સેટઅપ સરનામું:",
+        "receipt_dates": "બુક કરેલી તારીખો:",
+        "receipt_ref_code": "ઇન્વૉઇસ સંદર્ભ કોડ:",
+        "receipt_item": "ડેકોર આઇટમ",
+        "receipt_qty": "જથ્થો",
+        "receipt_rate": "દૈનિક દર",
+        "receipt_subtotal": "પેટા સરવાળો રકમ:",
+        "receipt_discount": "ડિસ્કાઉન્ટ રકમ:",
+        "receipt_tax": "લાગુ ટેક્સ",
+        "receipt_invoice_total": "કુલ ઇન્વૉઇસ રકમ:",
+        "receipt_total_paid": "કુલ ચૂકવેલ (પહોંચ):",
+        "receipt_remaining": "બાકી રહેતી રકમ:",
+        
+        // System Settings & Exports
+        "settings_title": "સિસ્ટમ સેટિંગ્સ",
+        "settings_subtitle": "બુકિંગ ડિફોલ્ટ્સ, વ્યવસાય પ્રોફાઇલ વિગતો અને દેખાવ થીમ્સ ગોઠવો.",
+        "settings_sec_defaults": "બુકિંગ ડિફોલ્ટ્સ",
+        "settings_tax_rate": "ડિફોલ્ટ ટેક્સ રેટ (%)",
+        "settings_discount": "ડિફોલ્ટ ડિસ્કાઉન્ટ (₹)",
+        "settings_sec_profile": "કંપની વ્યવસાય પ્રોફાઇલ",
+        "settings_company_name": "કંપનીનું નામ",
+        "settings_company_address": "વ્યવસાય સરનામું",
+        "settings_company_email": "વ્યવસાય ઇમેઇલ",
+        "settings_company_phone": "સંપર્ક ફોન",
+        "settings_company_website": "કંપનીની વેબસાઇટ",
+        "settings_sec_appearance": "દેખાવ રંગ યોજના",
+        "settings_theme_label": "થીમ પેલેટ",
+        "settings_theme_crimson": "ક્રિમસન રેડ (ડિફોલ્ટ બ્રાન્ડ)",
+        "settings_theme_emerald": "એમરાલ્ડ ગ્રીન",
+        "settings_theme_midnight": "મિડનાઇટ બ્લુ",
+        "settings_btn_save": "સેટિંગ્સ સાચવો",
+        "nav_settings": "સિસ્ટમ સેટિંગ્સ",
+        "export_csv": "સીએસવી નિકાસ",
+        "details_btn": "વિગતો"
+    }
+};
+
+let currentLanguage = localStorage.getItem("admin_lang") || "en";
+
+function t(key) {
+    const dict = TRANSLATIONS[currentLanguage] || TRANSLATIONS["en"];
+    return dict[key] || TRANSLATIONS["en"][key] || key;
+}
+
+function translatePage() {
+    // Scan all elements with data-i18n attribute
+    document.querySelectorAll("[data-i18n]").forEach(el => {
+        const key = el.getAttribute("data-i18n");
+        if (key) {
+            el.innerText = t(key);
+        }
+    });
+
+    // Scan placeholders
+    document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+        const key = el.getAttribute("data-i18n-placeholder");
+        if (key) {
+            el.setAttribute("placeholder", t(key));
+        }
+    });
+}
+
+function translateDOMNode(node) {
+    node.querySelectorAll("[data-i18n]").forEach(el => {
+        const key = el.getAttribute("data-i18n");
+        if (key) {
+            el.innerText = t(key);
+        }
+    });
+    return node;
+}
 
 // Initialize Session
 async function initializeSession() {
@@ -49,6 +556,7 @@ async function initializeSession() {
     
     // Bind Profile Display Details
     document.getElementById("user-display-name").innerText = name;
+    translatePage();
     
     // Set view structure without triggering loadDashboardData from switchView immediately
     const subviews = document.querySelectorAll(".app-subview");
@@ -97,6 +605,9 @@ function switchView(targetViewId) {
     } else if (targetViewId === "invoice-view") {
         document.getElementById("invoice-subview").style.display = "block";
         loadInvoicesData();
+    } else if (targetViewId === "settings-view") {
+        document.getElementById("settings-subview").style.display = "block";
+        loadSettingsData();
     }
     
     // Highlight nav link
@@ -131,51 +642,31 @@ function renderPaginationControls(containerId, totalItems, currentPage, onPageCh
 async function loadWarehouseData(page) {
     if (page !== undefined) warehousePage = page;
     try {
-        inventoryList = await apiFetch("/api/inventory");
-
-        // Calculate and set stats
-        let totalUniqueItems = inventoryList.length;
-        let totalStockUnits = 0;
-        let lowStockCount = 0;
-        inventoryList.forEach(item => {
-            const owned = item.quantity_owned || 0;
-            totalStockUnits += owned;
-            const avail = item.available_stock !== undefined ? item.available_stock : owned;
-            if (owned > 0 && (avail / owned) <= 0.20) {
-                lowStockCount++;
-            }
-        });
+        const query = `?page=${warehousePage}&limit=${PAGE_SIZE}&search=${encodeURIComponent(warehouseSearchQuery)}`;
+        const res = await apiFetch(`/api/inventory${query}`);
+        
+        inventoryList = res.items || [];
+        const total = res.total || 0;
+        const stats = res.stats || { totalUniqueItems: 0, totalStockUnits: 0, lowStockCount: 0 };
 
         const setVal = (id, val) => {
             const el = document.getElementById(id);
             if (el) el.innerText = val;
         };
-        setVal("warehouse-stat-items", totalUniqueItems);
-        setVal("warehouse-stat-stock", totalStockUnits);
-        setVal("warehouse-stat-low", lowStockCount);
+        setVal("warehouse-stat-items", stats.totalUniqueItems);
+        setVal("warehouse-stat-stock", stats.totalStockUnits);
+        setVal("warehouse-stat-low", stats.lowStockCount);
 
         const tbody = document.getElementById("inventory-table-body");
         tbody.innerHTML = "";
 
-        let filtered = inventoryList;
-        if (warehouseSearchQuery.trim()) {
-            const q = warehouseSearchQuery.toLowerCase();
-            filtered = filtered.filter(i =>
-                (i.name && i.name.toLowerCase().includes(q)) ||
-                (i.category && i.category.toLowerCase().includes(q))
-            );
-        }
-
-        if (filtered.length === 0) {
+        if (inventoryList.length === 0) {
             tbody.innerHTML = `<tr><td colspan="6" style="text-align: center;">No catalog assets found.</td></tr>`;
             renderPaginationControls("warehouse-pagination", 0, warehousePage, "loadWarehouseData");
             return;
         }
 
-        const start = (warehousePage - 1) * PAGE_SIZE;
-        const pageItems = filtered.slice(start, start + PAGE_SIZE);
-
-        pageItems.forEach(item => {
+        inventoryList.forEach(item => {
             const avail = item.available_stock !== undefined ? item.available_stock : item.quantity_owned;
             const cond = item.condition_status || "Excellent";
             const tr = document.createElement("tr");
@@ -186,13 +677,13 @@ async function loadWarehouseData(page) {
                 <td>${avail} / ${item.quantity_owned} units</td>
                 <td>₹${item.rental_price_per_day.toFixed(2)}/day</td>
                 <td>
-                    <button class="btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;" onclick="editInventoryItem('${item.id}')">Edit</button>
+                    <button class="btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;" onclick="editInventoryItem('${item.id}')">${t('edit')}</button>
                     <button class="btn-danger" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; border-radius: 8px;" onclick="deleteInventoryItem('${item.id}')">✕</button>
                 </td>
             `;
             tbody.appendChild(tr);
         });
-        renderPaginationControls("warehouse-pagination", filtered.length, warehousePage, "loadWarehouseData");
+        renderPaginationControls("warehouse-pagination", total, warehousePage, "loadWarehouseData");
     } catch (err) {}
 }
 
@@ -460,6 +951,7 @@ function renderDashboardTable(tbody, alertsBox) {
             <td>${balHtml}</td>
             <td>
                 <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+                    <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem; border: 1px solid var(--gold);" onclick="openEventDetailsViewModal('${evt.id}')">${t('details_btn')}</button>
                     <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem;" onclick="openInvoiceModal('${evt.id}')">Invoice/Receipt</button>
                     <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem;" onclick="openLayoutUploadModal('${evt.id}')">Upload Layout</button>
                     <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem;" onclick="editEventBooking('${evt.id}')">Edit</button>
@@ -843,7 +1335,7 @@ async function openInvoiceModal(eventId) {
             subtotal += cost;
             itemsHtml += `
                 <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border-glass); padding: 0.25rem 0;">
-                    <span>${item.name} (Qty: ${qty})</span>
+                    <span>${item.name} (${t('pdf_qty')}: ${qty})</span>
                     <span>₹${cost.toFixed(2)}</span>
                 </div>
             `;
@@ -862,10 +1354,10 @@ async function openInvoiceModal(eventId) {
         const checked = worker.paid ? "checked" : "";
         crewHtml += `
             <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
-                <span>${worker.name} (Wage: ₹${worker.pay_rate.toFixed(2)})</span>
+                <span>${worker.name} (${t('payout_wage_label')} ₹${worker.pay_rate.toFixed(2)})</span>
                 <label style="display: flex; align-items: center; gap: 0.25rem; font-size: 0.8rem; cursor: pointer;">
                     <input type="checkbox" class="crew-payroll-release" data-event-id="${evt.id}" data-index="${index}" ${checked} onchange="toggleCrewPayrollPaid('${evt.id}', ${index})" style="width: auto;">
-                    Released
+                    ${t('payout_released')}
                 </label>
             </div>
         `;
@@ -878,77 +1370,84 @@ async function openInvoiceModal(eventId) {
 
     detailsDiv.innerHTML = `
         <div style="border-bottom: 1px solid var(--border-glass); padding-bottom: 0.75rem;">
-            <strong>Client Profile:</strong> ${evt.client_name}<br>
-            <strong>Target Venue:</strong> ${evt.venue_address}<br>
-            <strong>Dates Range:</strong> ${evt.start_date} to ${evt.end_date} (${days} days)
+            <strong>${t('payout_client_profile')}</strong> ${evt.client_name}<br>
+            <strong>${t('payout_venue')}</strong> ${evt.venue_address}<br>
+            <strong>${t('payout_dates')}</strong> ${evt.start_date} - ${evt.end_date} (${days} ${t('payout_days')})
         </div>
         
         <div>
-            <h4 style="margin-bottom: 0.5rem;">Reserved Stock Breakdown:</h4>
+            <h4 style="margin-bottom: 0.5rem;">${t('payout_reserved_title')}</h4>
             ${itemsHtml}
         </div>
         
         <div style="background: rgba(255,255,255,0.02); padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border-glass); display: flex; flex-direction: column; gap: 0.25rem;">
             <div style="display: flex; justify-content: space-between;">
-                <span>Subtotal:</span>
+                <span>${t('payout_subtotal')}</span>
                 <span>₹${subtotal.toFixed(2)}</span>
             </div>
             <div style="display: flex; justify-content: space-between; color: var(--status-danger);">
-                <span>Discount:</span>
+                <span>${t('payout_discount')}</span>
                 <span>- ₹${discount.toFixed(2)}</span>
             </div>
             <div style="display: flex; justify-content: space-between;">
-                <span>Tax (${taxRate}%):</span>
+                <span>${t('payout_tax')} (${taxRate}%):</span>
                 <span>₹${taxAmount.toFixed(2)}</span>
             </div>
             <div style="display: flex; justify-content: space-between; border-top: 1px solid var(--border-glass); padding-top: 0.25rem;">
-                <span>Invoice Total:</span>
+                <span>${t('payout_total')}</span>
                 <strong>₹${evt.total_invoice_amount.toFixed(2)}</strong>
             </div>
             <div style="display: flex; justify-content: space-between; color: var(--status-success);">
-                <span>Deposits Paid:</span>
+                <span>${t('payout_paid')}</span>
                 <span>₹${evt.amount_paid.toFixed(2)}</span>
             </div>
             <div style="display: flex; justify-content: space-between; border-top: 1px solid var(--border-glass); padding-top: 0.25rem;">
-                <span>Remaining Balance Due:</span>
+                <span>${t('payout_balance')}</span>
                 <strong class="${evt.remaining_balance > 0 ? 'text-danger' : 'text-success'}" style="font-size: 1.1rem;">₹${evt.remaining_balance.toFixed(2)}</strong>
             </div>
         </div>
 
         <div style="border-top: 1px solid var(--border-glass); padding-top: 1rem;">
-            <h4 style="margin-bottom: 0.5rem;">Setup Crew Wages & Payroll:</h4>
-            ${crewHtml || '<p style="color: var(--text-muted); font-size: 0.8rem;">No workers assigned.</p>'}
+            <h4 style="margin-bottom: 0.5rem;">${t('payout_wage_title')}</h4>
+            ${crewHtml || `<p style="color: var(--text-muted); font-size: 0.8rem;">${t('payout_no_workers')}</p>`}
         </div>
     `;
 
     // Cache the print preview block content
+    const printReceiptCompHeader = document.getElementById("print-receipt-comp-header");
+    if (printReceiptCompHeader) {
+        const compName = localStorage.getItem("settings_company_name") || "Bhoomi Decoration";
+        const compAddress = localStorage.getItem("settings_company_address") || "Mumbai, Maharashtra, India";
+        printReceiptCompHeader.innerText = `${compName}, ${compAddress.split(',')[0]}`;
+    }
+
     document.getElementById("print-content-body").innerHTML = `
         <div style="margin-bottom: 1.5rem;">
-            <p><strong>Customer Client:</strong> ${evt.client_name}</p>
-            <p><strong>Setup Address:</strong> ${evt.venue_address}</p>
-            <p><strong>Booked Dates:</strong> ${evt.start_date} to ${evt.end_date} (${days} Days Rental)</p>
-            <p><strong>Invoice Reference Code:</strong> ${evt.id}</p>
+            <p><strong>${t('receipt_client')}</strong> ${evt.client_name}</p>
+            <p><strong>${t('receipt_address')}</strong> ${evt.venue_address}</p>
+            <p><strong>${t('receipt_dates')}</strong> ${evt.start_date} - ${evt.end_date} (${days} ${t('payout_days')})</p>
+            <p><strong>${t('receipt_ref_code')}</strong> ${evt.id}</p>
         </div>
         <table style="width: 100%; border-collapse: collapse; margin-bottom: 1.5rem;">
             <thead>
                 <tr style="background-color: #f3f4f6;">
-                    <th style="border: 1px solid #e5e7eb; padding: 8px;">Decor Item</th>
-                    <th style="border: 1px solid #e5e7eb; padding: 8px;">Qty</th>
-                    <th style="border: 1px solid #e5e7eb; padding: 8px;">Day Rate</th>
-                    <th style="border: 1px solid #e5e7eb; padding: 8px;">Subtotal</th>
+                    <th style="border: 1px solid #e5e7eb; padding: 8px;">${t('receipt_item')}</th>
+                    <th style="border: 1px solid #e5e7eb; padding: 8px;">${t('receipt_qty')}</th>
+                    <th style="border: 1px solid #e5e7eb; padding: 8px;">${t('receipt_rate')}</th>
+                    <th style="border: 1px solid #e5e7eb; padding: 8px;">${t('pdf_subtotal').replace(':', '')}</th>
                 </tr>
             </thead>
             <tbody>
-                ${itemsListTextForPrint}
+                ${itemsListTextForPrint || `<tr><td colspan="4" style="text-align: center; padding: 8px; color: #888;">${t('pdf_no_items')}</td></tr>`}
             </tbody>
         </table>
         <div style="text-align: right; font-size: 1.1rem; line-height: 1.6;">
-            <p><strong>Subtotal Amount:</strong> ₹${subtotal.toFixed(2)}</p>
-            <p style="color: #b91c1c;"><strong>Deducted Discount:</strong> - ₹${discount.toFixed(2)}</p>
-            <p><strong>Applied Tax (${taxRate}%):</strong> ₹${taxAmount.toFixed(2)}</p>
-            <p style="border-top: 1px solid #000; padding-top: 4px;"><strong>Total Invoice Amount:</strong> ₹${evt.total_invoice_amount.toFixed(2)}</p>
-            <p style="color: #15803d;"><strong>Total Paid (Receipts):</strong> ₹${evt.amount_paid.toFixed(2)}</p>
-            <p><strong>Remaining Accounts Balance:</strong> ₹${evt.remaining_balance.toFixed(2)}</p>
+            <p><strong>${t('receipt_subtotal')}</strong> ₹${subtotal.toFixed(2)}</p>
+            <p style="color: #b91c1c;"><strong>${t('receipt_discount')}</strong> - ₹${discount.toFixed(2)}</p>
+            <p><strong>${t('receipt_tax')} (${taxRate}%):</strong> ₹${taxAmount.toFixed(2)}</p>
+            <p style="border-top: 1px solid #000; padding-top: 4px;"><strong>${t('receipt_invoice_total')}</strong> ₹${evt.total_invoice_amount.toFixed(2)}</p>
+            <p style="color: #15803d;"><strong>${t('receipt_total_paid')}</strong> ₹${evt.amount_paid.toFixed(2)}</p>
+            <p><strong>${t('receipt_remaining')}</strong> ₹${evt.remaining_balance.toFixed(2)}</p>
         </div>
     `;
 
@@ -1119,20 +1618,20 @@ let currentEventsStatusFilter = "All";
 async function loadEventsData(page) {
     if (page !== undefined) eventsPage = page;
     try {
-        eventsList = await apiFetch("/api/events");
-
-        // Calculate and set stats
-        let totalEvents = eventsList.length;
-        let confirmedEvents = eventsList.filter(e => e.status === "Confirmed").length;
-        let draftEvents = eventsList.filter(e => e.status === "Draft").length;
+        const query = `?page=${eventsPage}&limit=${PAGE_SIZE}&search=${encodeURIComponent(eventsSearchQuery)}&status=${currentEventsStatusFilter}`;
+        const res = await apiFetch(`/api/events${query}`);
+        
+        eventsList = res.items || [];
+        const total = res.total || 0;
+        const stats = res.stats || { totalEvents: 0, confirmedEvents: 0, draftEvents: 0 };
 
         const setVal = (id, val) => {
             const el = document.getElementById(id);
             if (el) el.innerText = val;
         };
-        setVal("events-stat-total", totalEvents);
-        setVal("events-stat-confirmed", confirmedEvents);
-        setVal("events-stat-draft", draftEvents);
+        setVal("events-stat-total", stats.totalEvents);
+        setVal("events-stat-confirmed", stats.confirmedEvents);
+        setVal("events-stat-draft", stats.draftEvents);
 
         const tbody = document.getElementById("events-table-body");
         tbody.innerHTML = "";
@@ -1146,28 +1645,13 @@ async function loadEventsData(page) {
         const activeBtn = document.getElementById(`event-status-filter-btn-${activeBtnKey}`);
         if (activeBtn) activeBtn.classList.add("active-filter");
 
-        let filtered = eventsList;
-        if (currentEventsStatusFilter !== "All") {
-            filtered = filtered.filter(e => e.status === currentEventsStatusFilter);
-        }
-        if (eventsSearchQuery.trim()) {
-            const q = eventsSearchQuery.toLowerCase();
-            filtered = filtered.filter(e =>
-                (e.client_name && e.client_name.toLowerCase().includes(q)) ||
-                (e.venue_address && e.venue_address.toLowerCase().includes(q))
-            );
-        }
-
-        if (filtered.length === 0) {
+        if (eventsList.length === 0) {
             tbody.innerHTML = `<tr><td colspan="7" style="text-align: center;">No events found matching the selected filter.</td></tr>`;
             renderPaginationControls("events-pagination", 0, eventsPage, "loadEventsData");
             return;
         }
 
-        const start = (eventsPage - 1) * PAGE_SIZE;
-        const pageItems = filtered.slice(start, start + PAGE_SIZE);
-
-        pageItems.forEach(evt => {
+        eventsList.forEach(evt => {
             const tr = document.createElement("tr");
             const badgeClass = evt.status === "Completed" ? "badge-completed" :
                                evt.status === "Confirmed" ? "badge-confirmed" : "badge-draft";
@@ -1186,16 +1670,17 @@ async function loadEventsData(page) {
                 <td><strong class="${evt.remaining_balance > 0 ? 'text-danger' : 'text-success'}" style="font-size: 0.9rem;">₹${evt.remaining_balance.toFixed(2)}</strong></td>
                 <td>
                     <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+                        <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem; border: 1px solid var(--gold);" onclick="openEventDetailsViewModal('${evt.id}')">${t('details_btn')}</button>
                         <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem;" onclick="exportInvoiceToPDF('${evt.id}')">Export PDF</button>
                         <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem;" onclick="openInvoiceModal('${evt.id}')">Receipt/Pay</button>
-                        <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem;" onclick="editEventBooking('${evt.id}')">Edit</button>
+                        <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem;" onclick="editEventBooking('${evt.id}')">${t('edit')}</button>
                         <button class="btn-danger" style="padding: 0.35rem 0.5rem; font-size: 0.75rem; border-radius: 8px;" onclick="deleteEventBooking('${evt.id}')">✕</button>
                     </div>
                 </td>
             `;
             tbody.appendChild(tr);
         });
-        renderPaginationControls("events-pagination", filtered.length, eventsPage, "loadEventsData");
+        renderPaginationControls("events-pagination", total, eventsPage, "loadEventsData");
     } catch (err) {}
 }
 
@@ -1203,57 +1688,31 @@ async function loadEventsData(page) {
 async function loadClientsData(page) {
     if (page !== undefined) clientsPage = page;
     try {
-        clientsList = await apiFetch("/api/clients");
-        if (eventsList.length === 0) {
-            eventsList = await apiFetch("/api/events");
-        }
-
-        // Calculate and set stats
-        const activeClientIds = new Set();
-        eventsList.forEach(e => {
-            if (e.status === "Confirmed" || e.status === "Completed") {
-                activeClientIds.add(e.client_id);
-            }
-        });
-
-        const totalClients = clientsList.length;
-        const activeClients = clientsList.filter(c => activeClientIds.has(c.id)).length;
-        const newLeads = clientsList.filter(c => {
-            const clientEvents = eventsList.filter(e => e.client_id === c.id);
-            return clientEvents.length === 0 || clientEvents.every(e => e.status === "Draft");
-        }).length;
+        const query = `?page=${clientsPage}&limit=${PAGE_SIZE}&search=${encodeURIComponent(clientsSearchQuery)}`;
+        const res = await apiFetch(`/api/clients${query}`);
+        
+        clientsList = res.items || [];
+        const total = res.total || 0;
+        const stats = res.stats || { totalClients: 0, activeClients: 0, newLeads: 0 };
 
         const setVal = (id, val) => {
             const el = document.getElementById(id);
             if (el) el.innerText = val;
         };
-        setVal("clients-stat-total", totalClients);
-        setVal("clients-stat-active", activeClients);
-        setVal("clients-stat-new", newLeads);
+        setVal("clients-stat-total", stats.totalClients);
+        setVal("clients-stat-active", stats.activeClients);
+        setVal("clients-stat-new", stats.newLeads);
 
         const tbody = document.getElementById("clients-table-body");
         tbody.innerHTML = "";
 
-        let filtered = clientsList;
-        if (clientsSearchQuery.trim()) {
-            const q = clientsSearchQuery.toLowerCase();
-            filtered = filtered.filter(c =>
-                (c.name && c.name.toLowerCase().includes(q)) ||
-                (c.email && c.email.toLowerCase().includes(q)) ||
-                (c.phone && c.phone.toLowerCase().includes(q))
-            );
-        }
-
-        if (filtered.length === 0) {
+        if (clientsList.length === 0) {
             tbody.innerHTML = `<tr><td colspan="6" style="text-align: center;">No client profiles found.</td></tr>`;
             renderPaginationControls("clients-pagination", 0, clientsPage, "loadClientsData");
             return;
         }
 
-        const start = (clientsPage - 1) * PAGE_SIZE;
-        const pageItems = filtered.slice(start, start + PAGE_SIZE);
-
-        pageItems.forEach(c => {
+        clientsList.forEach(c => {
             const tr = document.createElement("tr");
             tr.innerHTML = `
                 <td><code style="color: var(--maroon); font-size: 0.8rem;">${c.id}</code></td>
@@ -1262,13 +1721,13 @@ async function loadClientsData(page) {
                 <td>${c.phone}</td>
                 <td>${c.address || ''}</td>
                 <td>
-                    <button class="btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;" onclick="editClientItem('${c.id}')">Edit</button>
+                    <button class="btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;" onclick="editClientItem('${c.id}')">${t('edit')}</button>
                     <button class="btn-danger" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; border-radius: 8px;" onclick="deleteClientItem('${c.id}')">✕</button>
                 </td>
             `;
             tbody.appendChild(tr);
         });
-        renderPaginationControls("clients-pagination", filtered.length, clientsPage, "loadClientsData");
+        renderPaginationControls("clients-pagination", total, clientsPage, "loadClientsData");
     } catch (err) {}
 }
 
@@ -1302,30 +1761,21 @@ async function deleteClientItem(clientId) {
 async function loadGalleryData(page) {
     if (page !== undefined) galleryPage = page;
     try {
-        galleryList = await apiFetch("/api/gallery");
+        const query = `?page=${galleryPage}&limit=${PAGE_SIZE}&search=${encodeURIComponent(gallerySearchQuery)}`;
+        const res = await apiFetch(`/api/gallery${query}`);
+        
+        galleryList = res.items || [];
+        const total = res.total || 0;
         const tbody = document.getElementById("gallery-table-body");
         tbody.innerHTML = "";
 
-        let filtered = galleryList;
-        if (gallerySearchQuery.trim()) {
-            const q = gallerySearchQuery.toLowerCase();
-            filtered = filtered.filter(g =>
-                (g.title && g.title.toLowerCase().includes(q)) ||
-                (g.category && g.category.toLowerCase().includes(q)) ||
-                (g.description && g.description.toLowerCase().includes(q))
-            );
-        }
-
-        if (filtered.length === 0) {
+        if (galleryList.length === 0) {
             tbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">No gallery entries found.</td></tr>`;
             renderPaginationControls("gallery-pagination", 0, galleryPage, "loadGalleryData");
             return;
         }
 
-        const start = (galleryPage - 1) * PAGE_SIZE;
-        const pageItems = filtered.slice(start, start + PAGE_SIZE);
-
-        pageItems.forEach(g => {
+        galleryList.forEach(g => {
             const tr = document.createElement("tr");
             tr.innerHTML = `
                 <td><img src="${g.image_url}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;" alt="${g.title}"></td>
@@ -1333,13 +1783,13 @@ async function loadGalleryData(page) {
                 <td><span class="badge" style="background: rgba(201,148,31,0.05); color: var(--gold);">${g.category}</span></td>
                 <td>${g.description || ''}</td>
                 <td>
-                    <button class="btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;" onclick="editGalleryItem('${g.id}')">Edit</button>
+                    <button class="btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;" onclick="editGalleryItem('${g.id}')">${t('edit')}</button>
                     <button class="btn-danger" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; border-radius: 8px;" onclick="deleteGalleryItem('${g.id}')">✕</button>
                 </td>
             `;
             tbody.appendChild(tr);
         });
-        renderPaginationControls("gallery-pagination", filtered.length, galleryPage, "loadGalleryData");
+        renderPaginationControls("gallery-pagination", total, galleryPage, "loadGalleryData");
     } catch (err) {}
 }
 
@@ -1439,56 +1889,31 @@ async function deleteGalleryItem(photoId) {
 async function loadCrewData(page) {
     if (page !== undefined) crewPage = page;
     try {
-        crewList = await apiFetch("/api/crew");
-        if (eventsList.length === 0) {
-            eventsList = await apiFetch("/api/events");
-        }
-
-        // Calculate and set stats
-        let totalCrew = crewList.length;
-        let wagesOwed = crewList.reduce((sum, c) => sum + (c.amount_owed || 0), 0);
+        const query = `?page=${crewPage}&limit=${PAGE_SIZE}&search=${encodeURIComponent(crewSearchQuery)}`;
+        const res = await apiFetch(`/api/crew${query}`);
         
-        let activeAssignments = 0;
-        eventsList.forEach(e => {
-            if (e.status === "Confirmed" || e.status === "Draft") {
-                try {
-                    const assignments = JSON.parse(e.crew_assignments || "[]");
-                    activeAssignments += assignments.length;
-                } catch (err) {}
-            }
-        });
+        crewList = res.items || [];
+        const total = res.total || 0;
+        const stats = res.stats || { totalCrew: 0, owedWages: 0, activeAssignments: 0 };
 
         const setVal = (id, val) => {
             const el = document.getElementById(id);
             if (el) el.innerText = val;
         };
-        setVal("crew-stat-total", totalCrew);
-        setVal("crew-stat-owed", `₹${wagesOwed.toFixed(2)}`);
-        setVal("crew-stat-active", activeAssignments);
+        setVal("crew-stat-total", stats.totalCrew);
+        setVal("crew-stat-owed", `₹${stats.owedWages.toFixed(2)}`);
+        setVal("crew-stat-active", stats.activeAssignments);
 
         const tbody = document.getElementById("crew-table-body");
         tbody.innerHTML = "";
 
-        let filtered = crewList;
-        if (crewSearchQuery.trim()) {
-            const q = crewSearchQuery.toLowerCase();
-            filtered = filtered.filter(c =>
-                (c.name && c.name.toLowerCase().includes(q)) ||
-                (c.role && c.role.toLowerCase().includes(q)) ||
-                (c.contact && c.contact.toLowerCase().includes(q))
-            );
-        }
-
-        if (filtered.length === 0) {
+        if (crewList.length === 0) {
             tbody.innerHTML = `<tr><td colspan="8" style="text-align: center;">No crew profiles found.</td></tr>`;
             renderPaginationControls("crew-pagination", 0, crewPage, "loadCrewData");
             return;
         }
 
-        const start = (crewPage - 1) * PAGE_SIZE;
-        const pageItems = filtered.slice(start, start + PAGE_SIZE);
-
-        pageItems.forEach(c => {
+        crewList.forEach(c => {
             const tr = document.createElement("tr");
             tr.innerHTML = `
                 <td><code style="color: var(--maroon); font-size: 0.8rem;">${c.id}</code></td>
@@ -1502,14 +1927,14 @@ async function loadCrewData(page) {
                     <div style="display: flex; gap: 0.4rem;">
                         <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.8rem;" onclick="openCrewPaymentModal('${c.id}')">Payout</button>
                         <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.8rem;" onclick="openCrewHistoryModal('${c.id}')">History</button>
-                        <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.8rem;" onclick="editCrewMember('${c.id}')">Edit</button>
+                        <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.8rem;" onclick="editCrewMember('${c.id}')">${t('edit')}</button>
                         <button class="btn-danger" style="padding: 0.35rem 0.5rem; font-size: 0.8rem; border-radius: 8px;" onclick="deleteCrewMember('${c.id}')">✕</button>
                     </div>
                 </td>
             `;
             tbody.appendChild(tr);
         });
-        renderPaginationControls("crew-pagination", filtered.length, crewPage, "loadCrewData");
+        renderPaginationControls("crew-pagination", total, crewPage, "loadCrewData");
     } catch (err) {}
 }
 
@@ -1689,6 +2114,20 @@ function exportCrewPayoutPDF(crewId, paymentIndex) {
     const printArea = template.cloneNode(true);
     printArea.style.display = "block";
     
+    const compName = localStorage.getItem("settings_company_name") || "Bhoomi Decoration";
+    const compEmail = localStorage.getItem("settings_company_email") || "hello@bhoomidecoration.com";
+    const compPhone = localStorage.getItem("settings_company_phone") || "+91 99999 99999";
+    const compWebsite = localStorage.getItem("settings_company_website") || "www.bhoomidecoration.com";
+    const compAddress = localStorage.getItem("settings_company_address") || "Mumbai, Maharashtra, India";
+
+    const nameEl = printArea.querySelector("#pdf-crew-comp-name");
+    if (nameEl) nameEl.innerText = compName.toUpperCase();
+    
+    const detailsEl = printArea.querySelector("#pdf-crew-comp-details");
+    if (detailsEl) {
+        detailsEl.innerHTML = `${compAddress}<br>Email: ${compEmail} | Web: ${compWebsite}`;
+    }
+    
     const dateStr = new Date(pay.date).toLocaleDateString('en-IN', {
         year: 'numeric',
         month: 'long',
@@ -1745,11 +2184,14 @@ async function loadFinanceData(filterType = "All", page) {
     if (activeBtn) activeBtn.classList.add("active-filter");
 
     try {
-        const [stats, events] = await Promise.all([
+        const query = `?page=${financePage}&limit=${PAGE_SIZE}&search=${encodeURIComponent(financeSearchQuery)}&payment_status=${encodeURIComponent(filterType)}`;
+        const [stats, res] = await Promise.all([
             apiFetch("/api/analytics/summary"),
-            apiFetch("/api/events")
+            apiFetch(`/api/events${query}`)
         ]);
-        eventsList = events;
+        
+        eventsList = res.items || [];
+        const total = res.total || 0;
 
         if (stats) {
             const fmt = (v) => (typeof v === "number" ? `₹${v.toFixed(2)}` : "₹0.00");
@@ -1772,28 +2214,13 @@ async function loadFinanceData(filterType = "All", page) {
         const tbody = document.getElementById("finance-table-body");
         tbody.innerHTML = "";
 
-        let filtered = eventsList;
-        if (filterType !== "All") {
-            filtered = filtered.filter(evt => evt.payment_status === filterType);
-        }
-        if (financeSearchQuery.trim()) {
-            const q = financeSearchQuery.toLowerCase();
-            filtered = filtered.filter(evt =>
-                (evt.client_name && evt.client_name.toLowerCase().includes(q)) ||
-                (evt.venue_address && evt.venue_address.toLowerCase().includes(q))
-            );
-        }
-
-        if (filtered.length === 0) {
+        if (eventsList.length === 0) {
             tbody.innerHTML = `<tr><td colspan="7" style="text-align: center;">No transactions found.</td></tr>`;
             renderPaginationControls("finance-pagination", 0, financePage, "loadFinanceData");
             return;
         }
 
-        const start = (financePage - 1) * PAGE_SIZE;
-        const pageItems = filtered.slice(start, start + PAGE_SIZE);
-
-        pageItems.forEach(evt => {
+        eventsList.forEach(evt => {
             const tr = document.createElement("tr");
             const pStatus = evt.payment_status || "Unpaid";
             const badgeClass = pStatus === "Fully Paid" ? "badge-completed" :
@@ -1814,15 +2241,20 @@ async function loadFinanceData(filterType = "All", page) {
             `;
             tbody.appendChild(tr);
         });
-        renderPaginationControls("finance-pagination", filtered.length, financePage, "loadFinanceData");
+        renderPaginationControls("finance-pagination", total, financePage, "loadFinanceData");
     } catch (err) {}
 }
 
 // ─── 5. Invoices Hub ────────────────────────────────────────────────────────
 let currentInvoiceFilter = "All";
 
-async function loadInvoicesData(filterType = "All") {
+async function loadInvoicesData(filterType = "All", page) {
+    if (typeof filterType === "number") {
+        page = filterType;
+        filterType = currentInvoiceFilter;
+    }
     currentInvoiceFilter = filterType;
+    if (page !== undefined) invoicePage = page;
     
     const filterBtnIds = {
         "All": "invoice-filter-btn-all",
@@ -1843,57 +2275,32 @@ async function loadInvoicesData(filterType = "All") {
     });
 
     try {
-        eventsList = await apiFetch("/api/events");
+        let backendPaymentStatus = "All";
+        if (filterType === "Paid") backendPaymentStatus = "Fully Paid";
+        else if (filterType === "Remaining") backendPaymentStatus = "Partially Paid";
+        else if (filterType === "Unpaid") backendPaymentStatus = "Unpaid";
+
+        const query = `?page=${invoicePage}&limit=${PAGE_SIZE}&search=${encodeURIComponent(invoiceSearchQuery)}&payment_status=${encodeURIComponent(backendPaymentStatus)}`;
+        const res = await apiFetch(`/api/events${query}`);
         
-        let totalInvoiced = 0.0;
-        let totalCollected = 0.0;
-        let totalRemaining = 0.0;
+        eventsList = res.items || [];
+        const total = res.total || 0;
+        const stats = res.stats || { totalInvoiced: 0, totalCollected: 0, totalRemaining: 0 };
         
-        eventsList.forEach(evt => {
-            totalInvoiced += evt.total_invoice_amount || 0.0;
-            totalCollected += evt.amount_paid || 0.0;
-            totalRemaining += evt.remaining_balance || 0.0;
-        });
-        
-        document.getElementById("invoice-stat-total").innerText = `₹${totalInvoiced.toFixed(2)}`;
-        document.getElementById("invoice-stat-collected").innerText = `₹${totalCollected.toFixed(2)}`;
-        document.getElementById("invoice-stat-remaining").innerText = `₹${totalRemaining.toFixed(2)}`;
+        document.getElementById("invoice-stat-total").innerText = `₹${stats.totalInvoiced.toFixed(2)}`;
+        document.getElementById("invoice-stat-collected").innerText = `₹${stats.totalCollected.toFixed(2)}`;
+        document.getElementById("invoice-stat-remaining").innerText = `₹${stats.totalRemaining.toFixed(2)}`;
         
         const tbody = document.getElementById("invoices-table-body");
         tbody.innerHTML = "";
         
-        let filtered = eventsList;
-        
-        if (filterType !== "All") {
-            filtered = filtered.filter(evt => {
-                const balance = evt.remaining_balance || 0.0;
-                const paid = evt.amount_paid || 0.0;
-                
-                if (filterType === "Paid") {
-                    return balance <= 0;
-                } else if (filterType === "Remaining") {
-                    return balance > 0 && paid > 0;
-                } else if (filterType === "Unpaid") {
-                    return paid <= 0;
-                }
-                return true;
-            });
-        }
-        
-        if (invoiceSearchQuery.trim() !== "") {
-            const query = invoiceSearchQuery.toLowerCase();
-            filtered = filtered.filter(evt => 
-                (evt.client_name && evt.client_name.toLowerCase().includes(query)) ||
-                (evt.venue_address && evt.venue_address.toLowerCase().includes(query))
-            );
-        }
-        
-        if (filtered.length === 0) {
+        if (eventsList.length === 0) {
             tbody.innerHTML = `<tr><td colspan="7" style="text-align: center;">No invoices found.</td></tr>`;
+            renderPaginationControls("invoice-pagination", 0, invoicePage, "loadInvoicesData");
             return;
         }
         
-        filtered.forEach(evt => {
+        eventsList.forEach(evt => {
             const balance = evt.remaining_balance || 0.0;
             const paid = evt.amount_paid || 0.0;
             
@@ -1927,6 +2334,7 @@ async function loadInvoicesData(filterType = "All") {
             `;
             tbody.appendChild(tr);
         });
+        renderPaginationControls("invoice-pagination", total, invoicePage, "loadInvoicesData");
     } catch (err) {
         console.error("Failed to load invoices data:", err);
     }
@@ -1953,9 +2361,24 @@ async function exportInvoiceToPDF(eventId) {
         
         const printArea = template.cloneNode(true);
         printArea.style.display = "block";
+        translateDOMNode(printArea);
+
+        const compName = localStorage.getItem("settings_company_name") || "Bhoomi Decoration";
+        const compEmail = localStorage.getItem("settings_company_email") || "hello@bhoomidecoration.com";
+        const compPhone = localStorage.getItem("settings_company_phone") || "+91 99999 99999";
+        const compWebsite = localStorage.getItem("settings_company_website") || "www.bhoomidecoration.com";
+        const compAddress = localStorage.getItem("settings_company_address") || "Mumbai, Maharashtra, India";
+
+        const nameEl = printArea.querySelector("#pdf-invoice-comp-name");
+        if (nameEl) nameEl.innerText = compName.toUpperCase();
+        
+        const detailsEl = printArea.querySelector("#pdf-invoice-comp-details");
+        if (detailsEl) {
+            detailsEl.innerHTML = `${compAddress}<br>Email: ${compEmail} | Web: ${compWebsite}`;
+        }
         
         printArea.querySelector("#pdf-invoice-id").innerText = `#${evt.id}`;
-        printArea.querySelector("#pdf-invoice-date").innerText = new Date().toLocaleDateString('en-IN', {
+        printArea.querySelector("#pdf-invoice-date").innerText = new Date().toLocaleDateString(currentLanguage === 'gu' ? 'gu-IN' : 'en-IN', {
             year: 'numeric',
             month: 'long',
             day: 'numeric'
@@ -2011,7 +2434,7 @@ async function exportInvoiceToPDF(eventId) {
         });
         
         if (itemIndex === 0) {
-            itemsBody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px; color: #888;">No reserved catalog items found.</td></tr>`;
+            itemsBody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px; color: #888;">${t('pdf_no_items')}</td></tr>`;
         }
         
         const discount = evt.discount || 0.0;
@@ -2096,6 +2519,8 @@ function openManualInvoiceModal() {
     manualInvoiceItems = [];
     document.getElementById("manual-invoice-form").reset();
     document.getElementById("manual-invoice-id").value = "";
+    document.getElementById("manual-invoice-discount").value = localStorage.getItem("settings_default_discount") || 0;
+    document.getElementById("manual-invoice-tax-rate").value = localStorage.getItem("settings_default_tax_rate") || 18;
     renderManualInvoiceItemsList();
     recalculateManualInvoiceTotal();
 
@@ -2229,9 +2654,24 @@ async function exportManualInvoiceToPDF(eventId, data) {
 
     const printArea = template.cloneNode(true);
     printArea.style.display = "block";
+    translateDOMNode(printArea);
+    
+    const compName = localStorage.getItem("settings_company_name") || "Bhoomi Decoration";
+    const compEmail = localStorage.getItem("settings_company_email") || "hello@bhoomidecoration.com";
+    const compPhone = localStorage.getItem("settings_company_phone") || "+91 99999 99999";
+    const compWebsite = localStorage.getItem("settings_company_website") || "www.bhoomidecoration.com";
+    const compAddress = localStorage.getItem("settings_company_address") || "Mumbai, Maharashtra, India";
+
+    const nameEl = printArea.querySelector("#pdf-invoice-comp-name");
+    if (nameEl) nameEl.innerText = compName.toUpperCase();
+    
+    const detailsEl = printArea.querySelector("#pdf-invoice-comp-details");
+    if (detailsEl) {
+        detailsEl.innerHTML = `${compAddress}<br>Email: ${compEmail} | Web: ${compWebsite}`;
+    }
 
     printArea.querySelector("#pdf-invoice-id").innerText = `#${eventId}`;
-    printArea.querySelector("#pdf-invoice-date").innerText = new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
+    printArea.querySelector("#pdf-invoice-date").innerText = new Date().toLocaleDateString(currentLanguage === 'gu' ? 'gu-IN' : 'en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
     printArea.querySelector("#pdf-client-name").innerText = data.client_name || "N/A";
     printArea.querySelector("#pdf-client-email").innerText = data.client_email || "N/A";
     printArea.querySelector("#pdf-client-phone").innerText = data.client_phone || "N/A";
@@ -2251,7 +2691,7 @@ async function exportManualInvoiceToPDF(eventId, data) {
         tr.style.backgroundColor = idx % 2 === 0 ? "#ffffff" : "#fdfaf7";
         tr.innerHTML = `
             <td style="padding: 10px 12px; border-bottom: 1px solid #eee;"><strong>${item.desc}</strong></td>
-            <td style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center; color: #666;">Custom</td>
+            <td style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center; color: #666;">${t('pdf_custom_category')}</td>
             <td style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center; font-weight: 600;">${item.qty}</td>
             <td style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: right; color: #666;">₹${item.rate.toFixed(2)}</td>
             <td style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: right; font-weight: 600; color: #6b1623;">₹${cost.toFixed(2)}</td>
@@ -2292,6 +2732,8 @@ async function exportManualInvoiceToPDF(eventId, data) {
 
 // ─── Bind Event Listeners ────────────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
+    applyTheme();
+
     // 1. Navigation Button Actions
     document.getElementById("nav-btn-dashboard").addEventListener("click", () => switchView("dashboard-view"));
     document.getElementById("nav-btn-events").addEventListener("click", () => switchView("events-view"));
@@ -2301,6 +2743,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("nav-btn-crew").addEventListener("click", () => switchView("crew-view"));
     document.getElementById("nav-btn-finance").addEventListener("click", () => switchView("finance-view"));
     document.getElementById("nav-btn-invoice").addEventListener("click", () => switchView("invoice-view"));
+    document.getElementById("nav-btn-settings").addEventListener("click", () => switchView("settings-view"));
 
     // 2. Form submission bindings
     document.getElementById("inventory-form").addEventListener("submit", handleInventorySubmit);
@@ -2312,6 +2755,15 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("crew-form").addEventListener("submit", handleCrewSubmit);
     document.getElementById("crew-payment-form").addEventListener("submit", handleCrewPaymentSubmit);
     document.getElementById("manual-invoice-form").addEventListener("submit", handleManualInvoiceSubmit);
+    document.getElementById("settings-form").addEventListener("submit", handleSettingsSubmit);
+
+    // CSV Exports
+    document.getElementById("btn-export-warehouse").addEventListener("click", exportWarehouseCSV);
+    document.getElementById("btn-export-events").addEventListener("click", exportEventsCSV);
+    document.getElementById("btn-export-clients").addEventListener("click", exportClientsCSV);
+    document.getElementById("btn-export-crew").addEventListener("click", exportCrewCSV);
+    document.getElementById("btn-export-finance").addEventListener("click", exportFinanceCSV);
+    document.getElementById("btn-export-invoices").addEventListener("click", exportInvoicesCSV);
 
     // 4. Attendance system listeners
     const btnManageAttendance = document.getElementById("btn-manage-attendance");
@@ -2342,8 +2794,8 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("booking-modal-title").innerText = "Book New Event Project";
         document.getElementById("booking-id").value = "";
         document.getElementById("booking-form").reset();
-        document.getElementById("booking-discount").value = 0;
-        document.getElementById("booking-tax-rate").value = 0;
+        document.getElementById("booking-discount").value = localStorage.getItem("settings_default_discount") || 0;
+        document.getElementById("booking-tax-rate").value = localStorage.getItem("settings_default_tax_rate") || 18;
         activeCrewAssignments = [];
         await renderBookingInventoryItems();
         openModal("modal-booking");
@@ -2356,8 +2808,8 @@ document.addEventListener("DOMContentLoaded", () => {
             document.getElementById("booking-modal-title").innerText = "Book New Event Project";
             document.getElementById("booking-id").value = "";
             document.getElementById("booking-form").reset();
-            document.getElementById("booking-discount").value = 0;
-            document.getElementById("booking-tax-rate").value = 0;
+            document.getElementById("booking-discount").value = localStorage.getItem("settings_default_discount") || 0;
+            document.getElementById("booking-tax-rate").value = localStorage.getItem("settings_default_tax_rate") || 18;
             activeCrewAssignments = [];
             await renderBookingInventoryItems();
             openModal("modal-booking");
@@ -2538,6 +2990,24 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    // Language Selector change listener
+    const langSelector = document.getElementById("lang-selector");
+    if (langSelector) {
+        langSelector.value = currentLanguage;
+        langSelector.addEventListener("change", (e) => {
+            currentLanguage = e.target.value;
+            localStorage.setItem("admin_lang", currentLanguage);
+            translatePage();
+            
+            // Reload the active subview dynamically
+            const activeNav = document.querySelector(".nav-item.active");
+            if (activeNav) {
+                const target = activeNav.getAttribute("data-target");
+                switchView(target);
+            }
+        });
+    }
+
     // Initialize session
     initializeSession();
 });
@@ -2653,6 +3123,383 @@ async function handleAttendanceSubmit(e) {
         saveBtn.innerText = "Save Attendance Register";
     }
 }
+
+// Settings View Controllers
+function loadSettingsData() {
+    document.getElementById("settings-default-tax-rate").value = localStorage.getItem("settings_default_tax_rate") || "18";
+    document.getElementById("settings-default-discount").value = localStorage.getItem("settings_default_discount") || "0";
+    
+    document.getElementById("settings-company-name").value = localStorage.getItem("settings_company_name") || "Bhoomi Decoration";
+    document.getElementById("settings-company-address").value = localStorage.getItem("settings_company_address") || "Mumbai, Maharashtra, India";
+    document.getElementById("settings-company-email").value = localStorage.getItem("settings_company_email") || "hello@bhoomidecoration.com";
+    document.getElementById("settings-company-phone").value = localStorage.getItem("settings_company_phone") || "+91 99999 99999";
+    document.getElementById("settings-company-website").value = localStorage.getItem("settings_company_website") || "www.bhoomidecoration.com";
+    
+    document.getElementById("settings-theme").value = localStorage.getItem("settings_theme") || "crimson_red";
+}
+
+function handleSettingsSubmit(e) {
+    e.preventDefault();
+    
+    localStorage.setItem("settings_default_tax_rate", document.getElementById("settings-default-tax-rate").value);
+    localStorage.setItem("settings_default_discount", document.getElementById("settings-default-discount").value);
+    
+    localStorage.setItem("settings_company_name", document.getElementById("settings-company-name").value);
+    localStorage.setItem("settings_company_address", document.getElementById("settings-company-address").value);
+    localStorage.setItem("settings_company_email", document.getElementById("settings-company-email").value);
+    localStorage.setItem("settings_company_phone", document.getElementById("settings-company-phone").value);
+    localStorage.setItem("settings_company_website", document.getElementById("settings-company-website").value);
+    
+    const selectedTheme = document.getElementById("settings-theme").value;
+    localStorage.setItem("settings_theme", selectedTheme);
+    
+    applyTheme();
+    showToast("System settings saved successfully.");
+}
+
+function applyTheme() {
+    const theme = localStorage.getItem("settings_theme") || "crimson_red";
+    const root = document.documentElement;
+    if (theme === "emerald_green") {
+        root.style.setProperty("--maroon", "#1F4B43");
+        root.style.setProperty("--maroon-deep", "#0B291E");
+        root.style.setProperty("--border-glass", "rgba(31, 75, 67, 0.15)");
+    } else if (theme === "midnight_blue") {
+        root.style.setProperty("--maroon", "#1b365d");
+        root.style.setProperty("--maroon-deep", "#0f2038");
+        root.style.setProperty("--border-glass", "rgba(27, 54, 93, 0.15)");
+    } else { // crimson_red
+        root.style.setProperty("--maroon", "#6B1623");
+        root.style.setProperty("--maroon-deep", "#4A0F18");
+        root.style.setProperty("--border-glass", "rgba(107, 22, 35, 0.15)");
+    }
+}
+
+// CSV Export Utility
+function exportToCSV(data, filename, headers, fieldMapper) {
+    if (!data || data.length === 0) {
+        showToast("No data available to export.", "warning");
+        return;
+    }
+
+    let csvContent = "";
+    csvContent += headers.map(h => `"${h.replace(/"/g, '""')}"`).join(",") + "\n";
+    
+    data.forEach(item => {
+        const row = fieldMapper(item);
+        csvContent += row.map(val => {
+            if (val === null || val === undefined) return '""';
+            const str = String(val);
+            return `"${str.replace(/"/g, '""')}"`;
+        }).join(",") + "\n";
+    });
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", filename);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showToast(`Successfully exported ${data.length} records.`);
+    } else {
+        showToast("Browser download not supported.", "error");
+    }
+}
+
+async function exportWarehouseCSV() {
+    try {
+        showToast("Fetching full warehouse catalog for export...");
+        const items = await apiFetch(`/api/inventory?search=${encodeURIComponent(warehouseSearchQuery)}`);
+        const data = items || [];
+        
+        const headers = ["Item ID", "Name", "Category", "Quantity Owned", "Available Stock", "Rental Price Per Day", "Condition Status"];
+        const fieldMapper = (item) => [
+            item.id,
+            item.name,
+            item.category,
+            item.quantity_owned,
+            item.available_stock !== null ? item.available_stock : item.quantity_owned,
+            item.rental_price_per_day,
+            item.condition_status
+        ];
+        
+        exportToCSV(data, `Warehouse_Catalog_Export.csv`, headers, fieldMapper);
+    } catch (err) {
+        showToast("Failed to export warehouse CSV.", "error");
+    }
+}
+
+async function exportEventsCSV() {
+    try {
+        showToast("Fetching full events ledger for export...");
+        const events = await apiFetch(`/api/events?search=${encodeURIComponent(eventsSearchQuery)}&status=${encodeURIComponent(currentEventsStatusFilter)}`);
+        const data = events || [];
+        
+        const headers = ["Event ID", "Client Name", "Venue Address", "Start Date", "End Date", "Status", "Total Invoice Amount", "Amount Paid", "Remaining Balance", "Max Workforce Capacity"];
+        const fieldMapper = (item) => [
+            item.id,
+            item.client_name,
+            item.venue_address,
+            item.start_date,
+            item.end_date,
+            item.status,
+            item.total_invoice_amount,
+            item.amount_paid,
+            item.remaining_balance,
+            item.max_workforce_capacity
+        ];
+        
+        exportToCSV(data, `Events_Projects_Export.csv`, headers, fieldMapper);
+    } catch (err) {
+        showToast("Failed to export events CSV.", "error");
+    }
+}
+
+async function exportClientsCSV() {
+    try {
+        showToast("Fetching full client directory for export...");
+        const clients = await apiFetch(`/api/clients?search=${encodeURIComponent(clientsSearchQuery)}`);
+        const data = clients || [];
+        
+        const headers = ["Client ID", "Name", "Email", "Phone", "Address"];
+        const fieldMapper = (item) => [
+            item.id,
+            item.name,
+            item.email,
+            item.phone,
+            item.address
+        ];
+        
+        exportToCSV(data, `Clients_CRM_Export.csv`, headers, fieldMapper);
+    } catch (err) {
+        showToast("Failed to export clients CSV.", "error");
+    }
+}
+
+async function exportCrewCSV() {
+    try {
+        showToast("Fetching full crew roster for export...");
+        const crew = await apiFetch(`/api/crew?search=${encodeURIComponent(crewSearchQuery)}`);
+        const data = crew || [];
+        
+        const headers = ["Crew ID", "Name", "Role", "Contact", "Base Rate", "Half Day Rate", "Night Rate", "Amount Owed", "Days Worked"];
+        const fieldMapper = (item) => [
+            item.id,
+            item.name,
+            item.role,
+            item.contact,
+            item.base_rate,
+            item.half_day_rate,
+            item.night_rate,
+            item.amount_owed,
+            item.days_worked
+        ];
+        
+        exportToCSV(data, `Crew_Ledger_Export.csv`, headers, fieldMapper);
+    } catch (err) {
+        showToast("Failed to export crew CSV.", "error");
+    }
+}
+
+async function exportFinanceCSV() {
+    try {
+        showToast("Fetching full financial transactions for export...");
+        let backendPaymentStatus = "All";
+        if (currentFinanceFilter === "Fully Paid") backendPaymentStatus = "Fully Paid";
+        else if (currentFinanceFilter === "Partially Paid") backendPaymentStatus = "Partially Paid";
+        else if (currentFinanceFilter === "Unpaid") backendPaymentStatus = "Unpaid";
+
+        const events = await apiFetch(`/api/events?search=${encodeURIComponent(financeSearchQuery)}&payment_status=${encodeURIComponent(backendPaymentStatus)}`);
+        const data = events || [];
+        
+        const headers = ["Client / Venue", "Event Date", "Invoice Total", "Amount Paid", "Remaining Balance", "Payment Status"];
+        const fieldMapper = (item) => [
+            `${item.client_name} - ${item.venue_address}`,
+            item.start_date,
+            item.total_invoice_amount,
+            item.amount_paid,
+            item.remaining_balance,
+            item.payment_status
+        ];
+        
+        exportToCSV(data, `Finance_Hub_Transactions.csv`, headers, fieldMapper);
+    } catch (err) {
+        showToast("Failed to export finance CSV.", "error");
+    }
+}
+
+async function exportInvoicesCSV() {
+    try {
+        showToast("Fetching full invoices directory for export...");
+        let backendPaymentStatus = "All";
+        if (currentInvoiceFilter === "Paid") backendPaymentStatus = "Fully Paid";
+        else if (currentInvoiceFilter === "Remaining") backendPaymentStatus = "Partially Paid";
+        else if (currentInvoiceFilter === "Unpaid") backendPaymentStatus = "Unpaid";
+
+        const events = await apiFetch(`/api/events?search=${encodeURIComponent(invoiceSearchQuery)}&payment_status=${encodeURIComponent(backendPaymentStatus)}`);
+        const data = events || [];
+        
+        const headers = ["Client Name", "Venue Address", "Invoice Date", "Payment Status", "Invoice Total", "Amount Paid", "Remaining Balance"];
+        const fieldMapper = (item) => [
+            item.client_name,
+            item.venue_address,
+            item.start_date,
+            item.payment_status,
+            item.total_invoice_amount,
+            item.amount_paid,
+            item.remaining_balance
+        ];
+        
+        exportToCSV(data, `Invoices_Export.csv`, headers, fieldMapper);
+    } catch (err) {
+        showToast("Failed to export invoices CSV.", "error");
+    }
+}
+
+// Event Details Overview Modal Controller
+async function openEventDetailsViewModal(eventId) {
+    try {
+        let evt = eventsList.find(e => e.id === eventId);
+        const freshEvt = await apiFetch(`/api/events/${eventId}`);
+        if (freshEvt) evt = freshEvt;
+        
+        if (!evt) {
+            showToast("Failed to fetch event details.", "error");
+            return;
+        }
+
+        if (clientsList.length === 0) {
+            clientsList = await apiFetch("/api/clients") || [];
+        }
+        if (inventoryList.length === 0) {
+            inventoryList = await apiFetch("/api/inventory") || [];
+        }
+
+        const client = clientsList.find(c => c.id === evt.client_id) || {};
+        
+        let booked = {};
+        try {
+            booked = JSON.parse(evt.items_booked || "{}");
+        } catch (e) {}
+
+        const sDate = new Date(evt.start_date);
+        const eDate = new Date(evt.end_date);
+        const days = Math.max(1, Math.round((eDate - sDate) / (1000 * 60 * 60 * 24)) + 1);
+
+        let itemsHtml = "";
+        let itemsCount = 0;
+        let subtotal = 0;
+        Object.keys(booked).forEach(itemId => {
+            const item = inventoryList.find(i => i.id === itemId);
+            if (item) {
+                const qty = booked[itemId];
+                const total = item.rental_price_per_day * qty * days;
+                subtotal += total;
+                itemsCount += qty;
+                itemsHtml += `
+                    <tr>
+                        <td><strong>${item.name}</strong><br><small style="color:var(--text-muted);">${item.category}</small></td>
+                        <td>${qty}</td>
+                        <td>₹${item.rental_price_per_day.toFixed(2)}</td>
+                        <td style="text-align:right;">₹${total.toFixed(2)}</td>
+                    </tr>
+                `;
+            }
+        });
+
+        if (itemsHtml === "") {
+            itemsHtml = `<tr><td colspan="4" style="text-align:center;color:var(--text-muted);">No catalog items reserved.</td></tr>`;
+        }
+
+        let layoutHtml = "";
+        if (evt.design_layout_url) {
+            layoutHtml = `
+                <div style="margin-top:1rem;border:1px solid var(--border-glass);padding:0.5rem;border-radius:4px;background:rgba(255,255,255,0.3);text-align:center;">
+                    <img src="${evt.design_layout_url}" alt="Event Layout Design" style="max-width:100%;max-height:350px;object-fit:contain;border-radius:2px;box-shadow:var(--shadow-premium);">
+                </div>
+            `;
+        } else {
+            layoutHtml = `
+                <div style="margin-top:1rem;border:1px dashed var(--maroon);padding:1.5rem;border-radius:4px;text-align:center;color:var(--text-secondary);">
+                    <span>No blueprint or layout design sketch has been uploaded for this event.</span>
+                </div>
+            `;
+        }
+
+        const detailsContent = document.getElementById("event-details-content");
+        if (detailsContent) {
+            detailsContent.innerHTML = `
+                <div style="display:flex;justify-content:space-between;align-items:center;background:rgba(107,22,35,0.05);padding:1rem;border-radius:4px;">
+                    <div>
+                        <span style="font-size:0.75rem;text-transform:uppercase;color:var(--gold);font-weight:600;">Status Timeline</span>
+                        <div style="font-size:1.1rem;font-weight:600;color:var(--maroon-deep);">${evt.start_date} to ${evt.end_date}</div>
+                        <div style="font-size:0.85rem;color:var(--text-secondary);margin-top:0.25rem;">Duration: ${days} Day${days !== 1 ? 's' : ''} rental</div>
+                    </div>
+                    <div style="text-align:right;">
+                        <span class="badge ${evt.status === 'Completed' ? 'badge-completed' : evt.status === 'Confirmed' ? 'badge-confirmed' : 'badge-draft'}">${evt.status}</span>
+                    </div>
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:1rem;">
+                    <div class="glass-panel" style="padding:1rem;">
+                        <h4 style="font-family:'Marcellus',serif;color:var(--maroon);margin:0 0 0.5rem 0;">Client Profile</h4>
+                        <p style="margin:0 0 0.25rem 0;font-weight:600;">${client.name || evt.client_name || 'N/A'}</p>
+                        <p style="margin:0 0 0.25rem 0;font-size:0.85rem;color:var(--text-secondary);">${client.email || 'N/A'}</p>
+                        <p style="margin:0 0 0.25rem 0;font-size:0.85rem;color:var(--text-secondary);">${client.phone || 'N/A'}</p>
+                        <p style="margin:0;font-size:0.85rem;color:var(--text-secondary);">${client.address || 'N/A'}</p>
+                    </div>
+                    <div class="glass-panel" style="padding:1rem;">
+                        <h4 style="font-family:'Marcellus',serif;color:var(--maroon);margin:0 0 0.5rem 0;">Event Setup Address</h4>
+                        <p style="margin:0;line-height:1.4;">${evt.venue_address || 'N/A'}</p>
+                    </div>
+                </div>
+
+                <div class="glass-panel" style="padding:1rem;margin-top:1rem;">
+                    <h4 style="font-family:'Marcellus',serif;color:var(--maroon);margin:0 0 0.75rem 0;">Reserved Decor Assets (${itemsCount} items)</h4>
+                    <div class="table-wrapper" style="margin-top:0;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Qty</th>
+                                    <th>Day Rate</th>
+                                    <th style="text-align:right;">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${itemsHtml}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div style="margin-top:1rem;border-top:1px solid rgba(107,22,35,0.1);padding-top:0.75rem;display:flex;flex-direction:column;align-items:flex-end;gap:0.35rem;font-size:0.9rem;">
+                        <div>Subtotal: <strong>₹${subtotal.toFixed(2)}</strong></div>
+                        ${evt.discount > 0 ? `<div style="color:var(--maroon);">Discount: <strong>-₹${evt.discount.toFixed(2)}</strong></div>` : ''}
+                        ${evt.tax_rate > 0 ? `<div>Tax (${evt.tax_rate.toFixed(1)}%): <strong>₹${((subtotal - evt.discount) * (evt.tax_rate/100)).toFixed(2)}</strong></div>` : ''}
+                        <div style="font-size:1.05rem;color:var(--maroon-deep);margin-top:0.25rem;">Invoice Total: <strong>₹${evt.total_invoice_amount.toFixed(2)}</strong></div>
+                        <div style="color:var(--status-success);">Paid to Date: <strong>₹${evt.amount_paid.toFixed(2)}</strong></div>
+                        <div style="color:${evt.remaining_balance > 0 ? 'var(--maroon)' : 'var(--status-success)'};font-weight:600;">Remaining Balance: <strong>₹${evt.remaining_balance.toFixed(2)}</strong></div>
+                    </div>
+                </div>
+
+                <div class="glass-panel" style="padding:1rem;margin-top:1rem;">
+                    <h4 style="font-family:'Marcellus',serif;color:var(--maroon);margin:0 0 0.5rem 0;">Layout Blueprint Sketch</h4>
+                    ${layoutHtml}
+                </div>
+            `;
+        }
+        
+        openModal("modal-event-details");
+    } catch (err) {
+        console.error("Failed to load event details popup:", err);
+        showToast("Error opening event details.", "error");
+    }
+}
+window.openEventDetailsViewModal = openEventDetailsViewModal;
 
 // ─── Global Window Exports ──────────────────────────────────────────────────
 window.editInventoryItem = editInventoryItem;

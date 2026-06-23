@@ -31,25 +31,49 @@ class CrewPaymentRequest(BaseModel):
     amount: float
 
 @router.get("/crew")
-async def get_crew(request: Request):
+async def get_crew(
+    request: Request,
+    page: Optional[int] = None,
+    limit: int = 10,
+    search: Optional[str] = None
+):
     await require_admin(request)
-    crew = await db_client.get_crew()
-    try:
-        all_att = await db_client.get_all_attendance()
-    except Exception:
-        all_att = []
-        
-    worked_counts = {}
-    for att in all_att:
-        c_id = att.get("crew_id")
-        status = att.get("status")
-        if c_id and status in ("Full Day", "Half Day", "Night Work"):
-            worked_counts[c_id] = worked_counts.get(c_id, 0) + 1
+    if page is not None:
+        res = await db_client.get_crew(page=page, limit=limit, search=search)
+        try:
+            all_att = await db_client.get_all_attendance()
+        except Exception:
+            all_att = []
             
-    for c in crew:
-        c["days_worked"] = worked_counts.get(c["id"], 0)
-        
-    return crew
+        worked_counts = {}
+        for att in all_att:
+            c_id = att.get("crew_id")
+            status = att.get("status")
+            if c_id and status in ("Full Day", "Half Day", "Night Work"):
+                worked_counts[c_id] = worked_counts.get(c_id, 0) + 1
+                
+        for c in res["items"]:
+            c["days_worked"] = worked_counts.get(c["id"], 0)
+            
+        return res
+    else:
+        crew = await db_client.get_crew()
+        try:
+            all_att = await db_client.get_all_attendance()
+        except Exception:
+            all_att = []
+            
+        worked_counts = {}
+        for att in all_att:
+            c_id = att.get("crew_id")
+            status = att.get("status")
+            if c_id and status in ("Full Day", "Half Day", "Night Work"):
+                worked_counts[c_id] = worked_counts.get(c_id, 0) + 1
+                
+        for c in crew:
+            c["days_worked"] = worked_counts.get(c["id"], 0)
+            
+        return crew
 
 @router.post("/crew")
 async def create_crew_member(request: Request, member: CrewMemberSchema):

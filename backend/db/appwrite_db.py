@@ -449,15 +449,63 @@ class AppwriteDB(BaseDB):
             return res.to_dict().get("documents", [])
         return []
 
+    def _get_total_count(self, res):
+        if not res:
+            return 0
+        if hasattr(res, "total"):
+            return res.total
+        if isinstance(res, dict):
+            return res.get("total", 0)
+        if hasattr(res, "to_dict"):
+            return res.to_dict().get("total", 0)
+        return 0
+
     # Inventory CRUD
-    async def get_inventory(self):
+    async def get_inventory(self, page=None, limit=10, search=None):
         res = await asyncio.to_thread(
             self.databases.list_documents,
             self.db_id, 
             config.APPWRITE_INVENTORY_COLLECTION_ID,
-            queries=[Query.limit(100)]
+            queries=[Query.limit(1000)]
         )
-        return [self._clean_doc(d) for d in self._get_documents_list(res)]
+        all_items = [self._clean_doc(d) for d in self._get_documents_list(res)]
+        
+        # Stats computation (global, before search filtering)
+        total_unique = len(all_items)
+        total_stock = sum(item.get("quantity_owned", 0) for item in all_items)
+        low_stock = 0
+        for item in all_items:
+            owned = item.get("quantity_owned", 0)
+            avail = item.get("available_stock")
+            if avail is None:
+                avail = owned
+            if owned > 0 and (avail / owned) <= 0.20:
+                low_stock += 1
+
+        if search:
+            q = search.strip().lower()
+            all_items = [
+                item for item in all_items if
+                (item.get("name") and q in item.get("name").lower()) or
+                (item.get("category") and q in item.get("category").lower())
+            ]
+            
+        total = len(all_items)
+                
+        if page is not None:
+            start = (page - 1) * limit
+            items = all_items[start : start + limit]
+            return {
+                "items": items,
+                "total": total,
+                "stats": {
+                    "totalUniqueItems": total_unique,
+                    "totalStockUnits": total_stock,
+                    "lowStockCount": low_stock
+                }
+            }
+        else:
+            return all_items
 
     async def get_inventory_item(self, item_id: str):
         try:
@@ -507,14 +555,62 @@ class AppwriteDB(BaseDB):
             return False
 
     # Clients CRUD
-    async def get_clients(self):
+    async def get_clients(self, page=None, limit=10, search=None):
         res = await asyncio.to_thread(
             self.databases.list_documents,
             self.db_id, 
             config.APPWRITE_CLIENTS_COLLECTION_ID,
-            queries=[Query.limit(100)]
+            queries=[Query.limit(1000)]
         )
-        return [self._clean_doc(d) for d in self._get_documents_list(res)]
+        all_clients = [self._clean_doc(d) for d in self._get_documents_list(res)]
+        
+        if search:
+            q = search.strip().lower()
+            all_clients = [
+                c for c in all_clients if
+                (c.get("name") and q in c.get("name").lower()) or
+                (c.get("email") and q in c.get("email").lower()) or
+                (c.get("phone") and q in c.get("phone").lower())
+            ]
+            
+        total = len(all_clients)
+        
+        # Fetch all events to compute stats
+        all_events_res = await asyncio.to_thread(
+            self.databases.list_documents,
+            self.db_id,
+            config.APPWRITE_EVENTS_COLLECTION_ID,
+            queries=[Query.limit(1000)]
+        )
+        all_events = [self._clean_doc(d) for d in self._get_documents_list(all_events_res)]
+        
+        active_client_ids = set()
+        for e in all_events:
+            if e.get("status") in ("Confirmed", "Completed"):
+                active_client_ids.add(e.get("client_id"))
+                
+        total_clients = len(all_clients)
+        active_clients = sum(1 for c in all_clients if c.get("id") in active_client_ids)
+        new_leads = 0
+        for c in all_clients:
+            client_events = [e for e in all_events if e.get("client_id") == c.get("id")]
+            if len(client_events) == 0 or all(e.get("status") == "Draft" for e in client_events):
+                new_leads += 1
+                
+        if page is not None:
+            start = (page - 1) * limit
+            items = all_clients[start : start + limit]
+            return {
+                "items": items,
+                "total": total,
+                "stats": {
+                    "totalClients": total_clients,
+                    "activeClients": active_clients,
+                    "newLeads": new_leads
+                }
+            }
+        else:
+            return all_clients
 
     async def create_client(self, client: dict):
         doc_id = "cli_" + str(uuid.uuid4())[:8]
@@ -551,14 +647,76 @@ class AppwriteDB(BaseDB):
             return False
 
     # Events CRUD
-    async def get_events(self):
+    async def get_events(self, page=None, limit=10, search=None, status=None, payment_status=None):
         res = await asyncio.to_thread(
             self.databases.list_documents,
             self.db_id, 
             config.APPWRITE_EVENTS_COLLECTION_ID,
-            queries=[Query.limit(100), Query.order_desc("$createdAt")]
+            queries=[Query.limit(1000)]
         )
-        return [self._clean_doc(d) for d in self._get_documents_list(res)]
+        all_events = [self._clean_doc(d) for d in self._get_documents_list(res)]
+        
+        # Sort descending by $createdAt (which we lift to id or check from original doc, or sorting by start_date/creation)
+        # Wait, let's sort them. Appwrite documents have createdAt, but since _clean_doc removes $ fields, let's sort by start_date descending or creation.
+        # Let's sort by start_date descending.
+        all_events.sort(key=lambda x: x.get("start_date", ""), reverse=True)
+        
+        # Compute payment_status and add to items
+        for evt in all_events:
+            amount_paid = evt.get("amount_paid") or 0.0
+            remaining_balance = evt.get("remaining_balance") or 0.0
+            if remaining_balance <= 0:
+                p_status = "Fully Paid"
+            elif amount_paid > 0:
+                p_status = "Partially Paid"
+            else:
+                p_status = "Unpaid"
+            evt["payment_status"] = p_status
+            
+        # Stats computation (global, before filtering)
+        total_events = len(all_events)
+        confirmed_events = sum(1 for e in all_events if e.get("status") == "Confirmed")
+        draft_events = sum(1 for e in all_events if e.get("status") == "Draft")
+        total_invoiced = sum(e.get("total_invoice_amount", 0.0) for e in all_events)
+        total_collected = sum(e.get("amount_paid", 0.0) for e in all_events)
+        total_remaining = sum(e.get("remaining_balance", 0.0) for e in all_events)
+
+        # Filter status
+        if status and status != "All":
+            all_events = [e for e in all_events if e.get("status") == status]
+            
+        # Filter payment_status
+        if payment_status and payment_status != "All":
+            all_events = [e for e in all_events if e.get("payment_status") == payment_status]
+            
+        # Filter search
+        if search:
+            q = search.strip().lower()
+            all_events = [
+                e for e in all_events if
+                (e.get("client_name") and q in e.get("client_name").lower()) or
+                (e.get("venue_address") and q in e.get("venue_address").lower())
+            ]
+            
+        total = len(all_events)
+        
+        if page is not None:
+            start = (page - 1) * limit
+            items = all_events[start : start + limit]
+            return {
+                "items": items,
+                "total": total,
+                "stats": {
+                    "totalEvents": total_events,
+                    "confirmedEvents": confirmed_events,
+                    "draftEvents": draft_events,
+                    "totalInvoiced": total_invoiced,
+                    "totalCollected": total_collected,
+                    "totalRemaining": total_remaining
+                }
+            }
+        else:
+            return all_events
 
     async def get_event(self, event_id: str):
         try:
@@ -713,14 +871,39 @@ class AppwriteDB(BaseDB):
         return self._clean_doc(doc)
 
     # Gallery CRUD
-    async def get_gallery(self):
-        res = await asyncio.to_thread(
-            self.databases.list_documents,
-            self.db_id, 
-            config.APPWRITE_GALLERY_COLLECTION_ID,
-            queries=[Query.limit(100)]
-        )
-        return [self._clean_doc(d) for d in self._get_documents_list(res)]
+    async def get_gallery(self, page=None, limit=10, search=None):
+        queries = []
+        if search:
+            search_str = search.strip()
+            queries.append(Query.or_([
+                Query.contains("title", search_str),
+                Query.contains("category", search_str)
+            ]))
+            
+        if page is not None:
+            queries.append(Query.limit(limit))
+            queries.append(Query.offset((page - 1) * limit))
+            
+            res = await asyncio.to_thread(
+                self.databases.list_documents,
+                self.db_id, 
+                config.APPWRITE_GALLERY_COLLECTION_ID,
+                queries=queries
+            )
+            items = [self._clean_doc(d) for d in self._get_documents_list(res)]
+            total = self._get_total_count(res)
+            return {
+                "items": items,
+                "total": total
+            }
+        else:
+            res = await asyncio.to_thread(
+                self.databases.list_documents,
+                self.db_id, 
+                config.APPWRITE_GALLERY_COLLECTION_ID,
+                queries=[Query.limit(1000)]
+            )
+            return [self._clean_doc(d) for d in self._get_documents_list(res)]
 
     async def get_gallery_item(self, photo_id: str):
         try:
@@ -769,14 +952,86 @@ class AppwriteDB(BaseDB):
             return False
 
     # Crew CRUD
-    async def get_crew(self):
-        res = await asyncio.to_thread(
-            self.databases.list_documents,
-            self.db_id, 
-            config.APPWRITE_CREW_COLLECTION_ID,
-            queries=[Query.limit(100)]
-        )
-        return [self._clean_doc(d) for d in self._get_documents_list(res)]
+    async def get_crew(self, page=None, limit=10, search=None):
+        queries = []
+        if search:
+            search_str = search.strip()
+            queries.append(Query.or_([
+                Query.contains("name", search_str),
+                Query.contains("role", search_str)
+            ]))
+            
+        if page is not None:
+            queries.append(Query.limit(limit))
+            queries.append(Query.offset((page - 1) * limit))
+            
+            res = await asyncio.to_thread(
+                self.databases.list_documents,
+                self.db_id, 
+                config.APPWRITE_CREW_COLLECTION_ID,
+                queries=queries
+            )
+            items = [self._clean_doc(d) for d in self._get_documents_list(res)]
+            total = self._get_total_count(res)
+            
+            # Fetch all crew to compute stats
+            all_crew_res = await asyncio.to_thread(
+                self.databases.list_documents,
+                self.db_id,
+                config.APPWRITE_CREW_COLLECTION_ID,
+                queries=[Query.limit(1000)]
+            )
+            all_crew = [self._clean_doc(d) for d in self._get_documents_list(all_crew_res)]
+            
+            total_crew = len(all_crew)
+            owed_wages = sum(c.get("amount_owed", 0.0) for c in all_crew)
+            
+            # Active assignments
+            all_events_res = await asyncio.to_thread(
+                self.databases.list_documents,
+                self.db_id,
+                config.APPWRITE_EVENTS_COLLECTION_ID,
+                queries=[Query.limit(1000)]
+            )
+            all_events = [self._clean_doc(d) for d in self._get_documents_list(all_events_res)]
+            
+            crew_on_duty_set = set()
+            for e in all_events:
+                if e.get("status") in ("Confirmed", "Draft"):
+                    try:
+                        assignments = json.loads(e.get("crew_assignments") or "[]")
+                        for worker in assignments:
+                            w_id = worker.get("worker_id")
+                            if w_id:
+                                crew_on_duty_set.add(w_id)
+                    except Exception:
+                        pass
+            active_assignments = len(crew_on_duty_set)
+            
+            return {
+                "items": items,
+                "total": total,
+                "stats": {
+                    "totalCrew": total_crew,
+                    "owedWages": owed_wages,
+                    "activeAssignments": active_assignments
+                }
+            }
+        else:
+            queries = [Query.limit(1000)]
+            if search:
+                search_str = search.strip()
+                queries.append(Query.or_([
+                    Query.contains("name", search_str),
+                    Query.contains("role", search_str)
+                ]))
+            res = await asyncio.to_thread(
+                self.databases.list_documents,
+                self.db_id, 
+                config.APPWRITE_CREW_COLLECTION_ID,
+                queries=queries
+            )
+            return [self._clean_doc(d) for d in self._get_documents_list(res)]
 
     async def create_crew_member(self, member: dict):
         doc_id = "crw_" + str(uuid.uuid4())[:8]
