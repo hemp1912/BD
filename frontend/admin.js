@@ -267,7 +267,7 @@ const TRANSLATIONS = {
         "settings_theme_midnight": "Midnight Blue",
         "settings_btn_save": "Save Settings",
         "nav_settings": "System Settings",
-        "export_csv": "Export CSV",
+        "export_pdf": "Export PDF",
         "details_btn": "Details"
     },
     gu: {
@@ -501,7 +501,7 @@ const TRANSLATIONS = {
         "settings_theme_midnight": "મિડનાઇટ બ્લુ",
         "settings_btn_save": "સેટિંગ્સ સાચવો",
         "nav_settings": "સિસ્ટમ સેટિંગ્સ",
-        "export_csv": "સીએસવી નિકાસ",
+        "export_pdf": "PDF નિકાસ",
         "details_btn": "વિગતો"
     }
 };
@@ -951,7 +951,7 @@ function renderDashboardTable(tbody, alertsBox) {
             <td>${balHtml}</td>
             <td>
                 <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
-                    <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem; border: 1px solid var(--gold);" onclick="openEventDetailsViewModal('${evt.id}')">${t('details_btn')}</button>
+                    <button style="padding: 0.35rem 0.65rem; font-size: 0.75rem; border-radius: 6px; background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: #2A1F1A; font-weight: 700; border: none; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform=''" onclick="openEventDetailsViewModal('${evt.id}')">📋 ${t('details_btn')}</button>
                     <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem;" onclick="openInvoiceModal('${evt.id}')">Invoice/Receipt</button>
                     <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem;" onclick="openLayoutUploadModal('${evt.id}')">Upload Layout</button>
                     <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem;" onclick="editEventBooking('${evt.id}')">Edit</button>
@@ -2363,6 +2363,14 @@ async function exportInvoiceToPDF(eventId) {
         printArea.style.display = "block";
         translateDOMNode(printArea);
 
+        // Explicitly overwrite any data-i18n label spans that may not render correctly in cloned nodes
+        const invoiceNoLabelEl = printArea.querySelector("[data-i18n='pdf_invoice_no']");
+        if (invoiceNoLabelEl) invoiceNoLabelEl.innerText = t('pdf_invoice_no');
+        const dateLabelEl = printArea.querySelector("[data-i18n='pdf_date_label']");
+        if (dateLabelEl) dateLabelEl.innerText = t('pdf_date_label');
+        const titleEl = printArea.querySelector("[data-i18n='pdf_invoice_title']");
+        if (titleEl) titleEl.innerText = t('pdf_invoice_title');
+
         const compName = localStorage.getItem("settings_company_name") || "Bhoomi Decoration";
         const compEmail = localStorage.getItem("settings_company_email") || "hello@bhoomidecoration.com";
         const compPhone = localStorage.getItem("settings_company_phone") || "+91 99999 99999";
@@ -2757,13 +2765,13 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("manual-invoice-form").addEventListener("submit", handleManualInvoiceSubmit);
     document.getElementById("settings-form").addEventListener("submit", handleSettingsSubmit);
 
-    // CSV Exports
-    document.getElementById("btn-export-warehouse").addEventListener("click", exportWarehouseCSV);
-    document.getElementById("btn-export-events").addEventListener("click", exportEventsCSV);
-    document.getElementById("btn-export-clients").addEventListener("click", exportClientsCSV);
-    document.getElementById("btn-export-crew").addEventListener("click", exportCrewCSV);
-    document.getElementById("btn-export-finance").addEventListener("click", exportFinanceCSV);
-    document.getElementById("btn-export-invoices").addEventListener("click", exportInvoicesCSV);
+    // PDF Section Exports
+    document.getElementById("btn-export-warehouse").addEventListener("click", exportWarehousePDF);
+    document.getElementById("btn-export-events").addEventListener("click", exportEventsPDF);
+    document.getElementById("btn-export-clients").addEventListener("click", exportClientsPDF);
+    document.getElementById("btn-export-crew").addEventListener("click", exportCrewPDF);
+    document.getElementById("btn-export-finance").addEventListener("click", exportFinancePDF);
+    document.getElementById("btn-export-invoices").addEventListener("click", exportInvoicesPDF);
 
     // 4. Attendance system listeners
     const btnManageAttendance = document.getElementById("btn-manage-attendance");
@@ -3175,188 +3183,212 @@ function applyTheme() {
     }
 }
 
-// CSV Export Utility
-function exportToCSV(data, filename, headers, fieldMapper) {
-    if (!data || data.length === 0) {
+// ─── PDF Section Export Utility ─────────────────────────────────────────────
+function exportSectionToPDF(title, subtitle, headers, rows, filename) {
+    if (!rows || rows.length === 0) {
         showToast("No data available to export.", "warning");
         return;
     }
 
-    let csvContent = "";
-    csvContent += headers.map(h => `"${h.replace(/"/g, '""')}"`).join(",") + "\n";
-    
-    data.forEach(item => {
-        const row = fieldMapper(item);
-        csvContent += row.map(val => {
-            if (val === null || val === undefined) return '""';
-            const str = String(val);
-            return `"${str.replace(/"/g, '""')}"`;
-        }).join(",") + "\n";
-    });
+    const compName = localStorage.getItem("settings_company_name") || "Bhoomi Decoration";
+    const compAddress = localStorage.getItem("settings_company_address") || "Mumbai, Maharashtra, India";
+    const compEmail = localStorage.getItem("settings_company_email") || "hello@bhoomidecoration.com";
+    const exportDate = new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
 
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    if (link.download !== undefined) {
-        const url = URL.createObjectURL(blob);
-        link.setAttribute("href", url);
-        link.setAttribute("download", filename);
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        showToast(`Successfully exported ${data.length} records.`);
-    } else {
-        showToast("Browser download not supported.", "error");
-    }
+    const rowsHTML = rows.map((row, i) => {
+        const bg = i % 2 === 0 ? '#ffffff' : '#fdfaf7';
+        const cells = row.map(val => {
+            const display = (val === null || val === undefined) ? '—' : String(val);
+            return `<td style="padding:8px 10px;border-bottom:1px solid #eee;font-size:0.8rem;">${display}</td>`;
+        }).join('');
+        return `<tr style="background:${bg};">${cells}</tr>`;
+    }).join('');
+
+    const headersHTML = headers.map(h =>
+        `<th style="padding:10px 10px;background:#6b1623;color:#fff;font-size:0.75rem;font-weight:600;text-align:left;letter-spacing:0.05em;">${h}</th>`
+    ).join('');
+
+    const pdfHTML = `
+        <div style="font-family:'Poppins',sans-serif;color:#333;background:#fff;padding:30px;max-width:800px;margin:0 auto;box-sizing:border-box;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #6b1623;padding-bottom:18px;margin-bottom:24px;">
+                <div>
+                    <h1 style="font-family:'Marcellus',serif;color:#6b1623;font-size:1.8rem;margin:0 0 4px 0;letter-spacing:1px;">${compName.toUpperCase()}</h1>
+                    <p style="margin:0;font-size:0.8rem;color:#666;font-style:italic;">Luxury Event &amp; Wedding Decorators</p>
+                    <p style="margin:4px 0 0 0;font-size:0.75rem;color:#888;">${compAddress} · ${compEmail}</p>
+                </div>
+                <div style="text-align:right;">
+                    <h2 style="font-family:'Marcellus',serif;color:#333;font-size:1.4rem;margin:0 0 6px 0;">${title}</h2>
+                    <p style="margin:0;font-size:0.8rem;color:#888;">${subtitle}</p>
+                    <p style="margin:4px 0 0 0;font-size:0.78rem;color:#aaa;">Exported: ${exportDate}</p>
+                    <p style="margin:2px 0 0 0;font-size:0.78rem;color:#aaa;">${rows.length} record${rows.length !== 1 ? 's' : ''}</p>
+                </div>
+            </div>
+            <table style="width:100%;border-collapse:collapse;">
+                <thead><tr>${headersHTML}</tr></thead>
+                <tbody>${rowsHTML}</tbody>
+            </table>
+            <div style="margin-top:30px;border-top:1px solid #eee;padding-top:14px;display:flex;justify-content:space-between;align-items:center;">
+                <span style="font-size:0.7rem;color:#aaa;">Generated by ${compName} Admin Portal · ${exportDate}</span>
+                <span style="font-size:0.7rem;color:#aaa;">© ${new Date().getFullYear()} ${compName}</span>
+            </div>
+        </div>
+    `;
+
+    const container = document.createElement('div');
+    container.innerHTML = pdfHTML;
+    container.style.position = 'absolute';
+    container.style.left = '-9999px';
+    container.style.top = '0';
+    document.body.appendChild(container);
+
+    const opt = {
+        margin: [8, 8, 8, 8],
+        filename: filename,
+        image: { type: 'jpeg', quality: 0.97 },
+        html2canvas: { scale: 2, useCORS: true, letterRendering: true, scrollY: 0 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+    };
+
+    showToast("Generating PDF export...");
+    html2pdf().from(container).set(opt).save().then(() => {
+        document.body.removeChild(container);
+        showToast(`PDF exported successfully — ${rows.length} records.`);
+    }).catch(err => {
+        document.body.removeChild(container);
+        console.error("PDF export failed:", err);
+        showToast("Failed to generate PDF export.", "error");
+    });
 }
 
-async function exportWarehouseCSV() {
+async function exportWarehousePDF() {
     try {
-        showToast("Fetching full warehouse catalog for export...");
+        showToast("Fetching warehouse catalog...");
         const items = await apiFetch(`/api/inventory?search=${encodeURIComponent(warehouseSearchQuery)}`);
-        const data = items || [];
-        
-        const headers = ["Item ID", "Name", "Category", "Quantity Owned", "Available Stock", "Rental Price Per Day", "Condition Status"];
-        const fieldMapper = (item) => [
+        const data = Array.isArray(items) ? items : (items || []);
+        const headers = ["Item ID", "Name", "Category", "Qty Owned", "Available", "Rate/Day (₹)", "Condition"];
+        const rows = data.map(item => [
             item.id,
             item.name,
             item.category,
             item.quantity_owned,
             item.available_stock !== null ? item.available_stock : item.quantity_owned,
-            item.rental_price_per_day,
+            `₹${(item.rental_price_per_day || 0).toFixed(2)}`,
             item.condition_status
-        ];
-        
-        exportToCSV(data, `Warehouse_Catalog_Export.csv`, headers, fieldMapper);
+        ]);
+        exportSectionToPDF("Warehouse Catalog", "Stock & Catalog Assets Report", headers, rows, `Bhoomi_Warehouse_${new Date().toISOString().slice(0,10)}.pdf`);
     } catch (err) {
-        showToast("Failed to export warehouse CSV.", "error");
+        showToast("Failed to export warehouse PDF.", "error");
     }
 }
 
-async function exportEventsCSV() {
+async function exportEventsPDF() {
     try {
-        showToast("Fetching full events ledger for export...");
-        const events = await apiFetch(`/api/events?search=${encodeURIComponent(eventsSearchQuery)}&status=${encodeURIComponent(currentEventsStatusFilter)}`);
-        const data = events || [];
-        
-        const headers = ["Event ID", "Client Name", "Venue Address", "Start Date", "End Date", "Status", "Total Invoice Amount", "Amount Paid", "Remaining Balance", "Max Workforce Capacity"];
-        const fieldMapper = (item) => [
-            item.id,
+        showToast("Fetching events ledger...");
+        const res = await apiFetch(`/api/events?search=${encodeURIComponent(eventsSearchQuery)}&status=${encodeURIComponent(currentEventsStatusFilter)}`);
+        const data = res.items || res || [];
+        const headers = ["Client Name", "Venue", "Start Date", "End Date", "Status", "Invoice Total", "Paid", "Balance"];
+        const rows = data.map(item => [
             item.client_name,
             item.venue_address,
             item.start_date,
             item.end_date,
             item.status,
-            item.total_invoice_amount,
-            item.amount_paid,
-            item.remaining_balance,
-            item.max_workforce_capacity
-        ];
-        
-        exportToCSV(data, `Events_Projects_Export.csv`, headers, fieldMapper);
+            `₹${(item.total_invoice_amount || 0).toFixed(2)}`,
+            `₹${(item.amount_paid || 0).toFixed(2)}`,
+            `₹${(item.remaining_balance || 0).toFixed(2)}`
+        ]);
+        exportSectionToPDF("Event Projects", `Filter: ${currentEventsStatusFilter}`, headers, rows, `Bhoomi_Events_${new Date().toISOString().slice(0,10)}.pdf`);
     } catch (err) {
-        showToast("Failed to export events CSV.", "error");
+        showToast("Failed to export events PDF.", "error");
     }
 }
 
-async function exportClientsCSV() {
+async function exportClientsPDF() {
     try {
-        showToast("Fetching full client directory for export...");
-        const clients = await apiFetch(`/api/clients?search=${encodeURIComponent(clientsSearchQuery)}`);
-        const data = clients || [];
-        
+        showToast("Fetching client directory...");
+        const res = await apiFetch(`/api/clients?search=${encodeURIComponent(clientsSearchQuery)}`);
+        const data = res.items || res || [];
         const headers = ["Client ID", "Name", "Email", "Phone", "Address"];
-        const fieldMapper = (item) => [
+        const rows = data.map(item => [
             item.id,
             item.name,
             item.email,
             item.phone,
             item.address
-        ];
-        
-        exportToCSV(data, `Clients_CRM_Export.csv`, headers, fieldMapper);
+        ]);
+        exportSectionToPDF("Clients CRM", "Customer Directory Report", headers, rows, `Bhoomi_Clients_${new Date().toISOString().slice(0,10)}.pdf`);
     } catch (err) {
-        showToast("Failed to export clients CSV.", "error");
+        showToast("Failed to export clients PDF.", "error");
     }
 }
 
-async function exportCrewCSV() {
+async function exportCrewPDF() {
     try {
-        showToast("Fetching full crew roster for export...");
-        const crew = await apiFetch(`/api/crew?search=${encodeURIComponent(crewSearchQuery)}`);
-        const data = crew || [];
-        
-        const headers = ["Crew ID", "Name", "Role", "Contact", "Base Rate", "Half Day Rate", "Night Rate", "Amount Owed", "Days Worked"];
-        const fieldMapper = (item) => [
+        showToast("Fetching crew roster...");
+        const res = await apiFetch(`/api/crew?search=${encodeURIComponent(crewSearchQuery)}`);
+        const data = res.items || res || [];
+        const headers = ["Crew ID", "Name", "Role", "Contact", "Base Rate (₹)", "Amount Owed (₹)", "Days Worked"];
+        const rows = data.map(item => [
             item.id,
             item.name,
             item.role,
             item.contact,
-            item.base_rate,
-            item.half_day_rate,
-            item.night_rate,
-            item.amount_owed,
-            item.days_worked
-        ];
-        
-        exportToCSV(data, `Crew_Ledger_Export.csv`, headers, fieldMapper);
+            `₹${(item.base_rate || 0).toFixed(2)}`,
+            `₹${(item.amount_owed || 0).toFixed(2)}`,
+            item.days_worked || 0
+        ]);
+        exportSectionToPDF("Crew Ledger", "Team Wages & Roster Report", headers, rows, `Bhoomi_Crew_${new Date().toISOString().slice(0,10)}.pdf`);
     } catch (err) {
-        showToast("Failed to export crew CSV.", "error");
+        showToast("Failed to export crew PDF.", "error");
     }
 }
 
-async function exportFinanceCSV() {
+async function exportFinancePDF() {
     try {
-        showToast("Fetching full financial transactions for export...");
+        showToast("Fetching financial transactions...");
         let backendPaymentStatus = "All";
         if (currentFinanceFilter === "Fully Paid") backendPaymentStatus = "Fully Paid";
         else if (currentFinanceFilter === "Partially Paid") backendPaymentStatus = "Partially Paid";
         else if (currentFinanceFilter === "Unpaid") backendPaymentStatus = "Unpaid";
-
-        const events = await apiFetch(`/api/events?search=${encodeURIComponent(financeSearchQuery)}&payment_status=${encodeURIComponent(backendPaymentStatus)}`);
-        const data = events || [];
-        
-        const headers = ["Client / Venue", "Event Date", "Invoice Total", "Amount Paid", "Remaining Balance", "Payment Status"];
-        const fieldMapper = (item) => [
-            `${item.client_name} - ${item.venue_address}`,
+        const res = await apiFetch(`/api/events?search=${encodeURIComponent(financeSearchQuery)}&payment_status=${encodeURIComponent(backendPaymentStatus)}`);
+        const data = res.items || res || [];
+        const headers = ["Client / Venue", "Event Date", "Invoice Total", "Amount Paid", "Balance", "Payment Status"];
+        const rows = data.map(item => [
+            `${item.client_name} · ${item.venue_address}`,
             item.start_date,
-            item.total_invoice_amount,
-            item.amount_paid,
-            item.remaining_balance,
-            item.payment_status
-        ];
-        
-        exportToCSV(data, `Finance_Hub_Transactions.csv`, headers, fieldMapper);
+            `₹${(item.total_invoice_amount || 0).toFixed(2)}`,
+            `₹${(item.amount_paid || 0).toFixed(2)}`,
+            `₹${(item.remaining_balance || 0).toFixed(2)}`,
+            item.payment_status || 'Unpaid'
+        ]);
+        exportSectionToPDF("Finance Hub", `Filter: ${currentFinanceFilter}`, headers, rows, `Bhoomi_Finance_${new Date().toISOString().slice(0,10)}.pdf`);
     } catch (err) {
-        showToast("Failed to export finance CSV.", "error");
+        showToast("Failed to export finance PDF.", "error");
     }
 }
 
-async function exportInvoicesCSV() {
+async function exportInvoicesPDF() {
     try {
-        showToast("Fetching full invoices directory for export...");
+        showToast("Fetching invoices directory...");
         let backendPaymentStatus = "All";
         if (currentInvoiceFilter === "Paid") backendPaymentStatus = "Fully Paid";
         else if (currentInvoiceFilter === "Remaining") backendPaymentStatus = "Partially Paid";
         else if (currentInvoiceFilter === "Unpaid") backendPaymentStatus = "Unpaid";
-
-        const events = await apiFetch(`/api/events?search=${encodeURIComponent(invoiceSearchQuery)}&payment_status=${encodeURIComponent(backendPaymentStatus)}`);
-        const data = events || [];
-        
-        const headers = ["Client Name", "Venue Address", "Invoice Date", "Payment Status", "Invoice Total", "Amount Paid", "Remaining Balance"];
-        const fieldMapper = (item) => [
+        const res = await apiFetch(`/api/events?search=${encodeURIComponent(invoiceSearchQuery)}&payment_status=${encodeURIComponent(backendPaymentStatus)}`);
+        const data = res.items || res || [];
+        const headers = ["Client Name", "Venue", "Date", "Status", "Invoice Total", "Paid", "Balance"];
+        const rows = data.map(item => [
             item.client_name,
             item.venue_address,
             item.start_date,
-            item.payment_status,
-            item.total_invoice_amount,
-            item.amount_paid,
-            item.remaining_balance
-        ];
-        
-        exportToCSV(data, `Invoices_Export.csv`, headers, fieldMapper);
+            item.payment_status || 'Unpaid',
+            `₹${(item.total_invoice_amount || 0).toFixed(2)}`,
+            `₹${(item.amount_paid || 0).toFixed(2)}`,
+            `₹${(item.remaining_balance || 0).toFixed(2)}`
+        ]);
+        exportSectionToPDF("Invoices Hub", `Filter: ${currentInvoiceFilter}`, headers, rows, `Bhoomi_Invoices_${new Date().toISOString().slice(0,10)}.pdf`);
     } catch (err) {
-        showToast("Failed to export invoices CSV.", "error");
+        showToast("Failed to export invoices PDF.", "error");
     }
 }
 

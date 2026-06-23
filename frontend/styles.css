@@ -698,79 +698,120 @@ section {
     max-width: 560px;
 }
 
-/* Gallery Section */
+/* ==================== PORTFOLIO GALLERY MOSAIC GRID ==================== */
 .gallery-grid {
-    column-count: 4;
-    column-gap: 15px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: 220px;
+    gap: 10px;
     width: 100%;
 }
 
-.gallery-grid div {
-    display: inline-block;
-    width: 100%;
-    margin-bottom: 15px;
-    break-inside: avoid;
-    border-radius: 4px;
-    overflow: hidden;
+/* Base card styles */
+.gallery-grid div,
+.gallery-card {
     position: relative;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    color: var(--ivory);
-    font-family: 'Cormorant Garamond', serif;
-    font-style: italic;
+    overflow: hidden;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+    transition: transform 0.32s ease, box-shadow 0.32s ease;
+    background: #2A1F1A;   /* fallback while image loads */
 }
 
-.gallery-grid div:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(107, 22, 35, 0.15);
+.gallery-grid div:hover,
+.gallery-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 10px 28px rgba(107, 22, 35, 0.22);
+    z-index: 2;
 }
 
-.gallery-grid img {
+/* All images — cover the cell fully, maintain aspect, no distortion */
+.gallery-grid img,
+.gallery-card img {
     width: 100%;
-    height: auto;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
     display: block;
-    transition: transform 0.5s ease;
+    transition: transform 0.55s ease;
 }
 
-.gallery-grid div:hover img {
-    transform: scale(1.05);
+.gallery-grid div:hover img,
+.gallery-card:hover img {
+    transform: scale(1.07);
 }
 
+/* Gradient overlay — appears on hover */
 .gallery-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.2) 60%, transparent 100%);
+    background: linear-gradient(
+        to top,
+        rgba(74, 15, 24, 0.88) 0%,
+        rgba(74, 15, 24, 0.3) 45%,
+        transparent 100%
+    );
     opacity: 0;
     transition: opacity 0.3s ease;
     display: flex;
     align-items: flex-end;
-    padding: 16px;
+    padding: 18px 16px;
     box-sizing: border-box;
 }
 
-.gallery-grid div:hover .gallery-overlay {
+.gallery-grid div:hover .gallery-overlay,
+.gallery-card:hover .gallery-overlay {
     opacity: 1;
 }
 
-.gallery-grid div:not(.gallery-card) {
-    display: inline-flex;
-    align-items: flex-end;
-    padding: 16px;
-    box-sizing: border-box;
+/* Title & category inside overlay */
+.gallery-text h4 {
+    margin: 0 0 3px 0;
+    font-family: 'Marcellus', serif;
+    font-size: 1rem;
+    color: #ffffff;
+    line-height: 1.2;
 }
 
-.gallery-card {
-    cursor: pointer;
-    box-sizing: border-box;
+.gallery-text .category-badge {
+    font-size: 0.68rem;
+    font-family: 'Poppins', sans-serif;
+    font-style: normal;
+    font-weight: 600;
+    color: var(--gold-light);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
 }
 
-.g1 { height: 320px; background: linear-gradient(160deg, #6B1623, #3a0c12); }
-.g2 { height: 160px; background: linear-gradient(160deg, #C9941F, #8a6510); }
-.g3 { height: 160px; background: linear-gradient(160deg, #1F4B43, #102923); }
-.g4 { height: 320px; background: linear-gradient(160deg, #8a2d3a, #4A0F18); }
-.g5 { height: 160px; background: linear-gradient(160deg, #E8C468, #a9802f); }
-.g6 { height: 160px; background: linear-gradient(160deg, #2A1F1A, #1F4B43); }
-.g7 { height: 240px; background: linear-gradient(160deg, #6B1623, #C9941F); }
+/* ── Mosaic span modifiers ─────────────────────────────── */
+/* Tall card: spans 2 rows */
+.gallery-card.gc-tall,
+.gallery-grid div.gc-tall {
+    grid-row: span 2;
+}
+
+/* Wide card: spans 2 columns */
+.gallery-card.gc-wide,
+.gallery-grid div.gc-wide {
+    grid-column: span 2;
+}
+
+/* Large card: 2 cols × 2 rows */
+.gallery-card.gc-large,
+.gallery-grid div.gc-large {
+    grid-column: span 2;
+    grid-row: span 2;
+}
+
+/* Static placeholder cells (shown before photos load) */
+.g1 { grid-row: span 2; background: linear-gradient(160deg, #6B1623, #3a0c12); display: flex; align-items: flex-end; padding: 16px; color: var(--ivory); font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 0.9rem; }
+.g2 { background: linear-gradient(160deg, #C9941F, #8a6510); display: flex; align-items: flex-end; padding: 16px; color: var(--ivory); font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 0.9rem; }
+.g3 { background: linear-gradient(160deg, #1F4B43, #102923); display: flex; align-items: flex-end; padding: 16px; color: var(--ivory); font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 0.9rem; }
+.g4 { grid-row: span 2; background: linear-gradient(160deg, #8a2d3a, #4A0F18); display: flex; align-items: flex-end; padding: 16px; color: var(--ivory); font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 0.9rem; }
+.g5 { background: linear-gradient(160deg, #E8C468, #a9802f); display: flex; align-items: flex-end; padding: 16px; color: var(--ivory); font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 0.9rem; }
+.g6 { background: linear-gradient(160deg, #2A1F1A, #1F4B43); display: flex; align-items: flex-end; padding: 16px; color: var(--ivory); font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 0.9rem; }
+.g7 { grid-column: span 2; background: linear-gradient(160deg, #6B1623, #C9941F); display: flex; align-items: flex-end; padding: 16px; color: var(--ivory); font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 0.9rem; }
 
 /* Testimonials */
 .testi-grid {
@@ -1415,8 +1456,18 @@ body.labor-mode tr:hover td {
         grid-template-columns: 1fr 1fr;
     }
     .gallery-grid {
-        column-count: 2;
+        grid-template-columns: repeat(2, 1fr);
+        grid-auto-rows: 180px;
     }
+    /* Reset all span overrides on small screens so no cell overflows */
+    .gallery-card.gc-tall, .gallery-grid div.gc-tall,
+    .gallery-card.gc-wide, .gallery-grid div.gc-wide,
+    .gallery-card.gc-large, .gallery-grid div.gc-large {
+        grid-column: span 1;
+        grid-row: span 1;
+    }
+    .g1, .g4 { grid-row: span 1; }
+    .g7 { grid-column: span 1; }
     .testi-grid {
         grid-template-columns: 1fr;
     }

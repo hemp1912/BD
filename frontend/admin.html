@@ -184,7 +184,7 @@
                         <button class="btn btn-ghost" id="btn-quick-quote">
                             <span data-i18n="dash_btn_quote">On-Walk Quote Builder</span>
                         </button>
-                        <button class="btn btn-ghost" id="btn-onboard-crew-trigger">
+                        <button class="btn btn-ghost" id="btn-onboard-crew-trigger" disabled>
                             <span data-i18n="dash_btn_onboard">Onboard Crew</span>
                         </button>
                         <button class="btn btn-primary" id="btn-create-booking">
@@ -263,7 +263,7 @@
                     </div>
                     <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
                         <button class="btn btn-ghost" id="btn-export-warehouse">
-                            <span data-i18n="export_csv">Export CSV</span>
+                            <span data-i18n="export_pdf">📄 Export PDF</span>
                         </button>
                         <button class="btn btn-primary" id="btn-add-inventory">
                             <span>Register Catalog Asset</span>
@@ -326,7 +326,7 @@
                     </div>
                     <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
                         <button class="btn btn-ghost" id="btn-export-clients">
-                            <span data-i18n="export_csv">Export CSV</span>
+                            <span data-i18n="export_pdf">📄 Export PDF</span>
                         </button>
                         <button class="btn btn-primary" id="btn-add-client-tab">
                             <span>Intake New Client</span>
@@ -430,7 +430,7 @@
                     </div>
                     <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
                         <button class="btn btn-ghost" id="btn-export-crew">
-                            <span data-i18n="export_csv">Export CSV</span>
+                            <span data-i18n="export_pdf">📄 Export PDF</span>
                         </button>
                         <button class="btn btn-secondary" id="btn-manage-attendance" style="border: 2px solid var(--gold); border-radius: 4px; padding: 10px 20px;">
                             <span>Daily Attendance Register</span>
@@ -497,7 +497,7 @@
                         </p>
                     </div>
                     <button class="btn btn-ghost" id="btn-export-finance">
-                        <span data-i18n="export_csv">Export CSV</span>
+                        <span data-i18n="export_pdf">📄 Export PDF</span>
                     </button>
                 </div>
 
@@ -568,7 +568,7 @@
                     </div>
                     <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
                         <button class="btn btn-ghost" id="btn-export-invoices">
-                            <span data-i18n="export_csv">Export CSV</span>
+                            <span data-i18n="export_pdf">📄 Export PDF</span>
                         </button>
                         <button class="btn btn-primary" id="btn-create-manual-invoice">
                             <span>Create Manual Invoice</span>
@@ -643,7 +643,7 @@
                     </div>
                     <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
                         <button class="btn btn-ghost" id="btn-export-events">
-                            <span data-i18n="export_csv">Export CSV</span>
+                            <span data-i18n="export_pdf">📄 Export PDF</span>
                         </button>
                         <button class="btn btn-primary" id="btn-events-create-booking">
                             <span>Book New Event Project</span>
@@ -1645,7 +1645,7 @@
     <!-- Shared Utilities Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="common.js"></script>
-    <script src="admin.js?v=invoice-hub-v3"></script>
+    <script src="admin.js?v=pdf-export-v4"></script>
 </body>
 
 </html>
