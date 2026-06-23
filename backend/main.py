@@ -7,7 +7,10 @@ from backend import auth, inventory, finance, alerts, gallery, crew
 app = FastAPI(
     title="Event Decoration & Logistics Management API",
     version="1.5",
-    description="Backend services for tracking warehouse stocks, event crew scheduling, and client invoices."
+    description="Backend services for tracking warehouse stocks, event crew scheduling, and client invoices.",
+    docs_url=None,
+    redoc_url=None,
+    openapi_url=None
 )
 
 # Enable CORS for development
