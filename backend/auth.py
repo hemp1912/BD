@@ -8,6 +8,7 @@ from appwrite.client import Client
 from appwrite.services.account import Account
 from backend import config
 from backend.db_client import db_client
+import time
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
@@ -202,100 +203,241 @@ async def require_admin(request: Request, token: Optional[str] = None):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin privileges required.")
     return session
 
+# @router.post("/login")
+# async def login(req: LoginRequest):
+#     # fallback_users = {
+#     #     "hello@bhoomidecoration.com": {"password": "admin123", "role": "admin", "full_name": "Admin Manager", "id": "usr_admin"}
+#     # }
+#     
+#     email = req.email.strip().lower()
+#     password = req.password
+#     
+#     if config.DB_TYPE == "APPWRITE":
+#         try:
+#             client = Client()
+#             client.set_endpoint(config.APPWRITE_ENDPOINT)
+#             client.set_project(config.APPWRITE_PROJECT_ID)
+#             
+#             account = Account(client)
+#             session = account.create_email_password_session(email, password)
+#             print(session)
+#             print(dir(session))
+#             session_secret = session.get("secret", session.get("key", ""))
+#             if not session_secret:
+#                 session_secret = session.get("$id", "")
+#                 
+#             user_details = account.get()
+#             user_id = user_details.get("$id", user_details.get("id", ""))
+#             
+#             db_user = await db_client.get_user_by_email(email)
+#             if not db_user or db_user.get("role") != "admin":
+#                 try:
+#                     account.delete_session("current")
+#                 except Exception:
+#                     pass
+#                 raise HTTPException(status_code=403, detail="Access denied. Admin role required.")
+#                 
+#             role = "admin"
+#             name = db_user.get("full_name", user_details.get("name", "Admin"))
+#                 
+#             session_token = session_secret
+#             session_expire = session.get("expire", "")
+#             import time
+#             session_data = {
+#                 "email": email,
+#                 "role": role,
+#                 "name": name,
+#                 "id": user_id,
+#                 "token": session_token,
+#                 "expire": session_expire,
+#                 "verified_at": time.time()
+#             }
+#             MOCK_SESSIONS[session_token] = session_data
+#             return session_data
+#         except HTTPException:
+#             raise
+#         except Exception as e:
+#             # Fallback to local default logins for verify_apis.py compatibility
+#             # if email in fallback_users and fallback_users[email]["role"] == "admin" and fallback_users[email]["password"] == password:
+#             #     user_info = fallback_users[email]
+#             #     session_token = "sess_" + str(uuid.uuid4())[:12]
+#             #     import time
+#             #     session_data = {
+#             #         "email": email,
+#             #         "role": user_info["role"],
+#             #         "name": user_info.get("full_name", user_info.get("name", "Unknown")),
+#             #         "id": user_info.get("id", "usr_admin"),
+#             #         "token": session_token,
+#             #         "expire": "",
+#             #         "verified_at": time.time()
+#             #     }
+#             #     MOCK_SESSIONS[session_token] = session_data
+#             #     return session_data
+#             raise HTTPException(status_code=401, detail=f"Invalid email or password: {str(e)}")
+#             
+#     user_info = None
+#     db_user = await db_client.get_user_by_email(email)
+#     if db_user and db_user.get("password") == password and db_user.get("role") == "admin":
+#         user_info = db_user
+#     elif email in fallback_users and fallback_users[email]["role"] == "admin" and fallback_users[email]["password"] == password:
+#         user_info = fallback_users[email]
+#         
+#     if user_info:
+#         session_token = "sess_" + str(uuid.uuid4())[:12]
+#         import time
+#         session_data = {
+#             "email": email,
+#             "role": user_info["role"],
+#             "name": user_info.get("full_name", user_info.get("name", "Unknown")),
+#             "id": user_info.get("id", "usr_admin"),
+#             "token": session_token,
+#             "expire": "",
+#             "verified_at": time.time()
+#         }
+#         MOCK_SESSIONS[session_token] = session_data
+#         return session_data
+#     else:
+#         raise HTTPException(status_code=401, detail="Invalid email or password, or user is not an Admin.")
+
+
 @router.post("/login")
 async def login(req: LoginRequest):
     fallback_users = {
-        "hello@bhoomidecoration.com": {"password": "admin123", "role": "admin", "full_name": "Admin Manager", "id": "usr_admin"}
-    }
-    
+            "hello@bhoomidecoration.com": {"password": "admin123", "role": "admin", "full_name": "Admin Manager", "id": "usr_admin"}
+         }
+
     email = req.email.strip().lower()
     password = req.password
-    
+
+    # ------------------------------
+    # APPWRITE AUTHENTICATION
+    # ------------------------------
     if config.DB_TYPE == "APPWRITE":
         try:
             client = Client()
             client.set_endpoint(config.APPWRITE_ENDPOINT)
             client.set_project(config.APPWRITE_PROJECT_ID)
-            
+
             account = Account(client)
-            session = account.create_email_password_session(email, password)
-            session_secret = session.get("secret", session.get("key", ""))
-            if not session_secret:
-                session_secret = session.get("$id", "")
-                
-            user_details = account.get()
-            user_id = user_details.get("$id", user_details.get("id", ""))
-            
+
+            # Authenticate user
+            session = account.create_email_password_session(
+                email=email,
+                password=password
+            )
+
+            # Get logged-in user
+            # user_details = account.get()
+            #
+            # user_id = user_details.id
+            user_id = session.userid
+
+            # Find admin in database
             db_user = await db_client.get_user_by_email(email)
-            if not db_user or db_user.get("role") != "admin":
+
+            if not db_user:
                 try:
                     account.delete_session("current")
-                except Exception:
+                except:
                     pass
-                raise HTTPException(status_code=403, detail="Access denied. Admin role required.")
-                
+
+                raise HTTPException(
+                    status_code=403,
+                    detail="User not found in database."
+                )
+
+            if db_user.get("role") != "admin":
+                try:
+                    account.delete_session("current")
+                except:
+                    pass
+
+                raise HTTPException(
+                    status_code=403,
+                    detail="Access denied. Admin role required."
+                )
+
             role = "admin"
-            name = db_user.get("full_name", user_details.get("name", "Admin"))
-                
-            session_token = session_secret
-            session_expire = session.get("expire", "")
-            import time
+
+            # name = (
+            #     db_user.get("full_name")
+            #     or getattr(user_details, "name", None)
+            #     or "Admin"
+            # )
+
+            name = db_user.get("full_name", "Admin")
+
+            # secret is empty in Appwrite Python SDK
+            session_token = session.id
+
             session_data = {
                 "email": email,
                 "role": role,
                 "name": name,
                 "id": user_id,
                 "token": session_token,
-                "expire": session_expire,
+                "expire": session.expire,
                 "verified_at": time.time()
             }
+
             MOCK_SESSIONS[session_token] = session_data
+
             return session_data
+
         except HTTPException:
             raise
+
         except Exception as e:
-            # Fallback to local default logins for verify_apis.py compatibility
-            if email in fallback_users and fallback_users[email]["role"] == "admin" and fallback_users[email]["password"] == password:
-                user_info = fallback_users[email]
-                session_token = "sess_" + str(uuid.uuid4())[:12]
-                import time
-                session_data = {
-                    "email": email,
-                    "role": user_info["role"],
-                    "name": user_info.get("full_name", user_info.get("name", "Unknown")),
-                    "id": user_info.get("id", "usr_admin"),
-                    "token": session_token,
-                    "expire": "",
-                    "verified_at": time.time()
-                }
-                MOCK_SESSIONS[session_token] = session_data
-                return session_data
-            raise HTTPException(status_code=401, detail=f"Invalid email or password: {str(e)}")
-            
+            raise HTTPException(
+                status_code=401,
+                detail=f"Invalid email or password: {str(e)}"
+            )
+
+    # ------------------------------
+    # LOCAL LOGIN
+    # ------------------------------
     user_info = None
+
     db_user = await db_client.get_user_by_email(email)
-    if db_user and db_user.get("password") == password and db_user.get("role") == "admin":
+
+    if (
+        db_user
+        and db_user.get("password") == password
+        and db_user.get("role") == "admin"
+    ):
         user_info = db_user
-    elif email in fallback_users and fallback_users[email]["role"] == "admin" and fallback_users[email]["password"] == password:
+
+    elif (
+        email in fallback_users
+        and fallback_users[email]["password"] == password
+        and fallback_users[email]["role"] == "admin"
+    ):
         user_info = fallback_users[email]
-        
+
     if user_info:
         session_token = "sess_" + str(uuid.uuid4())[:12]
-        import time
+
         session_data = {
             "email": email,
             "role": user_info["role"],
-            "name": user_info.get("full_name", user_info.get("name", "Unknown")),
+            "name": user_info.get(
+                "full_name",
+                user_info.get("name", "Unknown")
+            ),
             "id": user_info.get("id", "usr_admin"),
             "token": session_token,
             "expire": "",
             "verified_at": time.time()
         }
-        MOCK_SESSIONS[session_token] = session_data
-        return session_data
-    else:
-        raise HTTPException(status_code=401, detail="Invalid email or password, or user is not an Admin.")
 
+        MOCK_SESSIONS[session_token] = session_data
+
+        return session_data
+
+    raise HTTPException(
+        status_code=401,
+        detail="Invalid email or password, or user is not an Admin."
+    )
 @router.post("/logout")
 async def logout(token: str):
     if config.DB_TYPE == "APPWRITE":
