@@ -7,13 +7,15 @@
     <title>Bhoomi Decoration</title>
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Poppins:wght@300;400;500;600&family=Noto+Sans+Gujarati:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Marcellus&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Poppins:wght@300;400;500;600&family=Noto+Sans+Gujarati:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <!-- CSS Link -->
     <link rel="stylesheet" href="styles.css">
-    
+
     <!-- Instant Redirect Protection -->
     <script>
-        (function() {
+        (function () {
             // Theme check
             const theme = localStorage.getItem("settings_theme") || "crimson_red";
             const root = document.documentElement;
@@ -47,8 +49,10 @@
     <div id="loading-skeleton">
         <div class="skeleton-container">
             <svg class="skeleton-logo" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-                <path d="M20 100 V50 C20 20 50 10 60 10 C70 10 100 20 100 50 V100" fill="none" stroke="#C9941F" stroke-width="4" />
-                <path d="M35 100 V55 C35 30 50 20 60 20 C70 20 85 30 85 55 V100" fill="none" stroke="#6B1623" stroke-width="3" />
+                <path d="M20 100 V50 C20 20 50 10 60 10 C70 10 100 20 100 50 V100" fill="none" stroke="#C9941F"
+                    stroke-width="4" />
+                <path d="M35 100 V55 C35 30 50 20 60 20 C70 20 85 30 85 55 V100" fill="none" stroke="#6B1623"
+                    stroke-width="3" />
                 <circle cx="60" cy="20" r="4" fill="#C9941F" />
             </svg>
             <div class="skeleton-title">Bhoomi Decoration</div>
@@ -69,14 +73,16 @@
         <div class="gateway-container sticker-card">
             <div class="app-title-banner" style="text-align: center; margin-bottom: 1.5rem;">
                 <h1 style="font-family: 'Marcellus', serif; color: var(--maroon); margin-bottom: 0.25rem;">Bhoomi</h1>
-                <p class="accent-script" style="color: var(--gold); font-size: 1.1rem; margin-bottom: 0.5rem;">Logistics & Operations Portal</p>
+                <p class="accent-script" style="color: var(--gold); font-size: 1.1rem; margin-bottom: 0.5rem;">Logistics
+                    & Operations Portal</p>
                 <div style="width: 60px; height: 1.5px; background: var(--gold); margin: 0.5rem auto;"></div>
             </div>
 
             <form id="login-form">
                 <div class="form-group">
                     <label for="login-email">SECURE EMAIL</label>
-                    <input type="email" id="login-email" required placeholder="hello@bhoomidecoration.com or crew1@bhoomidecoration.com">
+                    <input type="email" id="login-email" required
+                        placeholder="hello@bhoomidecoration.com or crew1@bhoomidecoration.com">
                 </div>
                 <div class="form-group">
                     <label for="login-password">SECURE PASSWORD</label>
@@ -90,12 +96,8 @@
                 </div>
             </form>
 
-            <div style="text-align: center; font-size: 0.8rem; color: var(--text-muted); margin-top: 1rem; border-top: 1px dashed rgba(107,22,35,0.15); padding-top: 1rem;">
-                <strong>Admin:</strong> hello@bhoomidecoration.com (admin123)<br>
-                <strong>Crew:</strong> crew1@bhoomidecoration.com (crew123)
-            </div>
-
-            <button class="btn btn-ghost" style="width: 100%; margin-top: 0.75rem; font-size: 0.85rem;" onclick="closeModal('gateway-view')">
+            <button class="btn btn-ghost" style="width: 100%; margin-top: 0.75rem; font-size: 0.85rem;"
+                onclick="closeModal('gateway-view')">
                 Browse Public Portfolio
             </button>
         </div>
@@ -115,22 +117,27 @@
                     <a href="#testimonials">Reviews</a>
                 </div>
                 <div style="display: flex; gap: 0.75rem; align-items: center;">
-                    <button class="btn btn-ghost" onclick="openModal('gateway-view')" style="padding: 8px 16px; font-size: 0.8rem;">Portal</button>
+                    <button class="btn btn-ghost" onclick="openModal('gateway-view')"
+                        style="padding: 8px 16px; font-size: 0.8rem;">Portal</button>
                     <a class="nav-cta" href="#contact">Get a Quote</a>
                 </div>
-                <button class="menu-toggle" id="menuToggle" aria-label="Open menu"><span></span><span></span><span></span></button>
+                <button class="menu-toggle" id="menuToggle"
+                    aria-label="Open menu"><span></span><span></span><span></span></button>
             </nav>
         </header>
 
         <!-- mobile menu -->
-        <div id="mobileMenu" style="display:none; position:fixed; inset:90px 0 0 0; background:var(--ivory); lighten-bg: var(--ivory-deep); z-index:49; padding:30px 32px;">
-            <div style="display:flex; flex-direction:column; gap:26px; font-size:1.2rem; font-family:'Marcellus',serif;">
+        <div id="mobileMenu"
+            style="display:none; position:fixed; inset:90px 0 0 0; background:var(--ivory); lighten-bg: var(--ivory-deep); z-index:49; padding:30px 32px;">
+            <div
+                style="display:flex; flex-direction:column; gap:26px; font-size:1.2rem; font-family:'Marcellus',serif;">
                 <a href="#about">Story</a>
                 <a href="#services">Services</a>
                 <a href="#process">Process</a>
                 <a href="#gallery">Gallery</a>
                 <a href="#testimonials">Reviews</a>
-                <a href="#" onclick="event.preventDefault(); openModal('gateway-view');" style="color: var(--gold);">Logistics Portal →</a>
+                <a href="#" onclick="event.preventDefault(); openModal('gateway-view');"
+                    style="color: var(--gold);">Logistics Portal →</a>
                 <a href="#contact" style="color:var(--maroon);">Get a Quote →</a>
             </div>
         </div>
@@ -138,8 +145,10 @@
         <!-- HERO -->
         <section class="hero" id="top">
             <svg class="hero-arch" viewBox="0 0 500 600" xmlns="http://www.w3.org/2000/svg">
-                <path d="M40 600 V300 C40 140 150 30 250 30 C350 30 460 140 460 300 V600" fill="none" stroke="#C9941F" stroke-width="3" opacity="0.55" />
-                <path d="M75 600 V305 C75 165 155 65 250 65 C345 65 425 165 425 305 V600" fill="none" stroke="#6B1623" stroke-width="2" opacity="0.4" />
+                <path d="M40 600 V300 C40 140 150 30 250 30 C350 30 460 140 460 300 V600" fill="none" stroke="#C9941F"
+                    stroke-width="3" opacity="0.55" />
+                <path d="M75 600 V305 C75 165 155 65 250 65 C345 65 425 165 425 305 V600" fill="none" stroke="#6B1623"
+                    stroke-width="2" opacity="0.4" />
                 <g opacity="0.7">
                     <circle cx="250" cy="35" r="6" fill="#C9941F" />
                     <circle cx="200" cy="42" r="4" fill="#E8C468" />
@@ -148,9 +157,12 @@
             </svg>
             <div class="hero-inner">
                 <div>
-                    <div class="hero-eyebrow"><span class="line"></span><span class="eyebrow">Mumbai · Since 2012 · 500+ Weddings</span></div>
+                    <div class="hero-eyebrow"><span class="line"></span><span class="eyebrow">Bayad · Since 2010 · 500+
+                            Weddings</span></div>
                     <h1 class="hero-title">We build the mandap<em>where your story begins</em></h1>
-                    <p class="hero-sub">Bhoomi Decoration designs and builds wedding mandaps, stage decor, floral installations and lighting for Mumbai's families — every setup planned around your rituals, your palette, and your venue, down to the last marigold.</p>
+                    <p class="hero-sub">Bhoomi Decoration designs and builds wedding mandaps, stage decor, floral
+                        installations and lighting for Mumbai's families — every setup planned around your rituals, your
+                        palette, and your venue, down to the last marigold.</p>
                     <div class="hero-actions">
                         <a href="#contact" class="btn btn-primary">Plan Your Wedding Decor</a>
                         <a href="#gallery" class="btn btn-ghost">View Our Work</a>
@@ -172,8 +184,10 @@
                 </div>
                 <div class="hero-visual">
                     <svg viewBox="0 0 360 420" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M30 420 V220 C30 110 100 30 180 30 C260 30 330 110 330 220 V420" fill="none" stroke="#6B1623" stroke-width="6" />
-                        <path d="M55 420 V222 C55 130 110 60 180 60 C250 60 305 130 305 222 V420" fill="none" stroke="#C9941F" stroke-width="3" />
+                        <path d="M30 420 V220 C30 110 100 30 180 30 C260 30 330 110 330 220 V420" fill="none"
+                            stroke="#6B1623" stroke-width="6" />
+                        <path d="M55 420 V222 C55 130 110 60 180 60 C250 60 305 130 305 222 V420" fill="none"
+                            stroke="#C9941F" stroke-width="3" />
                         <g class="garland-strings">
                             <line x1="55" y1="60" x2="55" y2="100" stroke="#1F4B43" stroke-width="2" />
                             <line x1="305" y1="60" x2="305" y2="100" stroke="#1F4B43" stroke-width="2" />
@@ -247,9 +261,15 @@
                 <div class="about-text">
                     <span class="eyebrow">Our Story</span>
                     <h2>Decor that feels like home, built for the biggest day of your life</h2>
-                    <p class="lead">Started by the Deshpande family in a small Dadar workshop, now trusted across Mumbai.</p>
-                    <p>Bhoomi began in 2012 when Rajesh and Meena Deshpande started building mandaps for relatives and neighbours. Word travelled fast — by 2016 we were decorating weddings across Mumbai, Thane and Navi Mumbai, blending traditional Maharashtrian and Gujarati motifs with whatever theme a couple dreamed of.</p>
-                    <p>Today our in-house team of carpenters, florists, lighting technicians and designers handles everything from the haldi mandap to the sangeet stage — so your family can focus on the wedding, not the setup.</p>
+                    <p class="lead">Started by the Deshpande family in a small Dadar workshop, now trusted across
+                        Mumbai.</p>
+                    <p>Bhoomi began in 2012 when Rajesh and Meena Deshpande started building mandaps for relatives and
+                        neighbours. Word travelled fast — by 2016 we were decorating weddings across Mumbai, Thane and
+                        Navi Mumbai, blending traditional Maharashtrian and Gujarati motifs with whatever theme a couple
+                        dreamed of.</p>
+                    <p>Today our in-house team of carpenters, florists, lighting technicians and designers handles
+                        everything from the haldi mandap to the sangeet stage — so your family can focus on the wedding,
+                        not the setup.</p>
                     <div class="credentials">
                         <div class="credential">✦ In-house carpentry & florists</div>
                         <div class="credential">✦ Same-day setup & teardown</div>
@@ -265,7 +285,8 @@
                 <div class="section-head reveal">
                     <span class="eyebrow">What We Do</span>
                     <h2>Every element of your wedding decor, under one roof</h2>
-                    <p>From the mandap structure to the last fairy light, we plan, build and style each piece so it works together as one design — not six separate vendors.</p>
+                    <p>From the mandap structure to the last fairy light, we plan, build and style each piece so it
+                        works together as one design — not six separate vendors.</p>
                 </div>
             </div>
             <div class="wrap reveal">
@@ -273,32 +294,38 @@
                     <div class="service-card">
                         <div class="service-num">01</div>
                         <h3>Mandap Design & Build</h3>
-                        <p>Custom wooden and metal mandap structures — traditional four-pillar, floating canopy, or fusion designs — built to match your venue and theme.</p>
+                        <p>Custom wooden and metal mandap structures — traditional four-pillar, floating canopy, or
+                            fusion designs — built to match your venue and theme.</p>
                     </div>
                     <div class="service-card">
                         <div class="service-num">02</div>
                         <h3>Flower Decor</h3>
-                        <p>Fresh marigold, rose and orchid installations, or long-lasting artificial florals for outstation venues and budget-friendly options.</p>
+                        <p>Fresh marigold, rose and orchid installations, or long-lasting artificial florals for
+                            outstation venues and budget-friendly options.</p>
                     </div>
                     <div class="service-card">
                         <div class="service-num">03</div>
                         <h3>Lighting & Stage Setup</h3>
-                        <p>Warm fairy lights, uplighting, gobo projections and LED backdrops that change the mood from haldi morning to sangeet night.</p>
+                        <p>Warm fairy lights, uplighting, gobo projections and LED backdrops that change the mood from
+                            haldi morning to sangeet night.</p>
                     </div>
                     <div class="service-card">
                         <div class="service-num">04</div>
                         <h3>Theme Weddings</h3>
-                        <p>Dedicated decor concepts for haldi, mehendi, sangeet and reception — colour-coded, photo-ready, and distinct from the main mandap.</p>
+                        <p>Dedicated decor concepts for haldi, mehendi, sangeet and reception — colour-coded,
+                            photo-ready, and distinct from the main mandap.</p>
                     </div>
                     <div class="service-card">
                         <div class="service-num">05</div>
                         <h3>Catering Tie-Up</h3>
-                        <p>Trusted catering partners for vegetarian, Jain and multi-cuisine wedding menus, coordinated with your decor timeline.</p>
+                        <p>Trusted catering partners for vegetarian, Jain and multi-cuisine wedding menus, coordinated
+                            with your decor timeline.</p>
                     </div>
                     <div class="service-card">
                         <div class="service-num">06</div>
                         <h3>Full Venue Styling</h3>
-                        <p>Entrance arches, welcome decor, photo booths and seating design — so the whole venue feels considered, not just the stage.</p>
+                        <p>Entrance arches, welcome decor, photo booths and seating design — so the whole venue feels
+                            considered, not just the stage.</p>
                     </div>
                 </div>
             </div>
@@ -316,28 +343,32 @@
                         <div class="process-step">01</div>
                         <div>
                             <h3>Discovery Call</h3>
-                            <p>We learn your dates, venue, guest count, budget and the rituals you're planning for — usually a 20 minute call or visit.</p>
+                            <p>We learn your dates, venue, guest count, budget and the rituals you're planning for —
+                                usually a 20 minute call or visit.</p>
                         </div>
                     </div>
                     <div class="process-row">
                         <div class="process-step">02</div>
                         <div>
                             <h3>Design & Moodboard</h3>
-                            <p>We share a mandap design, colour palette and a quote broken down by function (mandap, flowers, lighting, etc.) so there are no surprises.</p>
+                            <p>We share a mandap design, colour palette and a quote broken down by function (mandap,
+                                flowers, lighting, etc.) so there are no surprises.</p>
                         </div>
                     </div>
                     <div class="process-row">
                         <div class="process-step">03</div>
                         <div>
                             <h3>Build & Setup</h3>
-                            <p>Our team arrives a day (or hours) before your event, builds the structure, and styles every detail before your first guest walks in.</p>
+                            <p>Our team arrives a day (or hours) before your event, builds the structure, and styles
+                                every detail before your first guest walks in.</p>
                         </div>
                     </div>
                     <div class="process-row">
                         <div class="process-step">04</div>
                         <div>
                             <h3>Event Day & Teardown</h3>
-                            <p>A coordinator stays on-site through the event for touch-ups, then we handle full teardown — you don't lift a finger.</p>
+                            <p>A coordinator stays on-site through the event for touch-ups, then we handle full teardown
+                                — you don't lift a finger.</p>
                         </div>
                     </div>
                 </div>
@@ -350,7 +381,8 @@
                 <div class="section-head reveal">
                     <span class="eyebrow">Our Work</span>
                     <h2>A glimpse of mandaps we've built</h2>
-                    <p>Replace these placeholders with real event photography — that's where this design will really come alive.</p>
+                    <p>Replace these placeholders with real event photography — that's where this design will really
+                        come alive.</p>
                 </div>
                 <div class="gallery-grid reveal">
                     <div class="g1">Haldi Mandap, Juhu</div>
@@ -373,17 +405,20 @@
                 </div>
                 <div class="testi-grid reveal">
                     <div class="testi-card">
-                        <div class="testi-quote">"They turned a banquet hall in Andheri into something that looked like a palace courtyard. Every relative asked who did our decor."</div>
+                        <div class="testi-quote">"They turned a banquet hall in Andheri into something that looked like
+                            a palace courtyard. Every relative asked who did our decor."</div>
                         <div class="testi-name">Anjali & Rohit Sharma</div>
                         <div class="testi-loc">Wedding, Andheri</div>
                     </div>
                     <div class="testi-card">
-                        <div class="testi-quote">"As the bride's father, I didn't want to manage five vendors. Bhoomi handled mandap, flowers and lighting as one team — huge relief."</div>
+                        <div class="testi-quote">"As the bride's father, I didn't want to manage five vendors. Bhoomi
+                            handled mandap, flowers and lighting as one team — huge relief."</div>
                         <div class="testi-name">Suresh Patil</div>
                         <div class="testi-loc">Daughter's Wedding, Thane</div>
                     </div>
                     <div class="testi-card">
-                        <div class="testi-quote">"Our haldi and mehendi each had a completely different look, both stunning, both ready hours before guests arrived."</div>
+                        <div class="testi-quote">"Our haldi and mehendi each had a completely different look, both
+                            stunning, both ready hours before guests arrived."</div>
                         <div class="testi-name">Priya Mehta</div>
                         <div class="testi-loc">Wedding, Bandra</div>
                     </div>
@@ -397,7 +432,8 @@
                 <div class="contact-info reveal">
                     <span class="eyebrow">Get In Touch</span>
                     <h2>Tell us about your wedding dates</h2>
-                    <p>Share a few details and our team will call you back within a day with a design idea and a rough quote — no pressure, no obligation.</p>
+                    <p>Share a few details and our team will call you back within a day with a design idea and a rough
+                        quote — no pressure, no obligation.</p>
                     <div class="contact-item">
                         <div><b>Phone</b>+91 98765 43210</div>
                     </div>
@@ -408,14 +444,18 @@
                         <div><b>Studio</b>Bayad, Gujarat — visits by appointment</div>
                     </div>
                 </div>
-                <form class="reveal" onsubmit="event.preventDefault(); alert('Thank you! We will call you back within a day.');">
+                <form class="reveal"
+                    onsubmit="event.preventDefault(); alert('Thank you! We will call you back within a day.');">
                     <div class="row2">
-                        <div class="field"><label for="name">Your Name</label><input id="name" type="text" required></div>
-                        <div class="field"><label for="phone">Phone Number</label><input id="phone" type="tel" required></div>
+                        <div class="field"><label for="name">Your Name</label><input id="name" type="text" required>
+                        </div>
+                        <div class="field"><label for="phone">Phone Number</label><input id="phone" type="tel" required>
+                        </div>
                     </div>
                     <div class="row2">
                         <div class="field"><label for="date">Wedding Date</label><input id="date" type="date"></div>
-                        <div class="field"><label for="venue">Venue / Area</label><input id="venue" type="text" placeholder="e.g. Bandra, Thane"></div>
+                        <div class="field"><label for="venue">Venue / Area</label><input id="venue" type="text"
+                                placeholder="e.g. Bandra, Thane"></div>
                     </div>
                     <div class="field">
                         <label for="service">What do you need?</label>
@@ -427,7 +467,8 @@
                             <option>Not Sure Yet</option>
                         </select>
                     </div>
-                    <div class="field"><label for="msg">Anything else we should know?</label><textarea id="msg" rows="3"></textarea></div>
+                    <div class="field"><label for="msg">Anything else we should know?</label><textarea id="msg"
+                            rows="3"></textarea></div>
                     <button class="btn btn-primary submit-btn" type="submit">Request a Callback</button>
                 </form>
             </div>
@@ -460,7 +501,7 @@
             </div>
             <div class="wrap footer-bottom">
                 <span>© 2026 Bhoomi Decoration. All rights reserved.</span>
-                <span>Design & Develop by Hem.</span>
+                <span>Design & Develop by Hem P.</span>
             </div>
         </footer>
     </div>
@@ -468,7 +509,7 @@
     <!-- Shared Utilities Scripts -->
     <script src="common.js"></script>
     <script src="login.js"></script>
-    
+
     <!-- Inline UI logic for Landing page Portfolio -->
     <script>
         document.addEventListener("DOMContentLoaded", () => {
@@ -489,7 +530,7 @@
                 });
             }, { threshold: 0.15 });
             reveals.forEach(el => revealObserver.observe(el));
-            
+
             // Hide skeleton for guest users on homepage
             const skeleton = document.getElementById("loading-skeleton");
             if (skeleton) {
@@ -498,7 +539,7 @@
                 }, 50);
             }
 
-            // Dynamically load gallery items
+            // Dynamically load gallery items — CSS Grid mosaic layout
             const galleryGrid = document.querySelector(".gallery-grid");
             if (galleryGrid) {
                 fetch("/api/gallery")
@@ -506,40 +547,54 @@
                     .then(data => {
                         if (data && data.length > 0) {
                             galleryGrid.innerHTML = "";
+
+                            // Repeating mosaic pattern (matches reference design):
+                            // 0=tall(2rows), 1=normal, 2=normal, 3=normal,
+                            // 4=wide(2cols), 5=normal, 6=tall(2rows),
+                            // 7=normal, 8=wide(2cols), 9=normal ...
+                            const spanPattern = [
+                                'gc-tall',    // 0 — col1, spans 2 rows
+                                '',           // 1 — col2, row1
+                                '',           // 2 — col3, row1
+                                '',           // 3 — col4, row1
+                                'gc-wide',    // 4 — col2-3, row2 (wide)
+                                '',           // 5 — col4, row2
+                                'gc-tall',    // 6 — col1, spans 2 rows
+                                '',           // 7 — col2, row1
+                                'gc-wide',    // 8 — col3-4, row1 (wide)
+                                '',           // 9 — col2, row2
+                                '',           // 10 — col3, row2
+                                '',           // 11 — col4, row2
+                            ];
+
                             data.forEach((item, index) => {
+                                const spanClass = spanPattern[index % spanPattern.length];
+
                                 const itemDiv = document.createElement("div");
-                                const gridClass = `g${(index % 7) + 1}`;
-                                itemDiv.className = `gallery-card ${gridClass}`;
-                                
+                                itemDiv.className = "gallery-card" + (spanClass ? " " + spanClass : "");
+
                                 const img = document.createElement("img");
                                 img.src = item.image_url;
                                 img.alt = item.title;
-                                
+                                img.loading = "lazy";
+
                                 const overlay = document.createElement("div");
                                 overlay.className = "gallery-overlay";
-                                
+
                                 const textDiv = document.createElement("div");
                                 textDiv.className = "gallery-text";
-                                
+
                                 const h4 = document.createElement("h4");
-                                h4.style.margin = "0 0 4px 0";
-                                h4.style.fontFamily = "'Marcellus', serif";
-                                h4.style.fontSize = "1.1rem";
-                                h4.style.color = "#ffffff";
                                 h4.innerText = item.title;
-                                
                                 textDiv.appendChild(h4);
+
                                 if (item.category) {
                                     const span = document.createElement("span");
                                     span.className = "category-badge";
-                                    span.style.color = "var(--gold-light)";
-                                    span.style.fontSize = "0.75rem";
-                                    span.style.textTransform = "uppercase";
-                                    span.style.fontWeight = "600";
                                     span.innerText = item.category;
                                     textDiv.appendChild(span);
                                 }
-                                
+
                                 overlay.appendChild(textDiv);
                                 itemDiv.appendChild(img);
                                 itemDiv.appendChild(overlay);
