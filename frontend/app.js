@@ -133,6 +133,23 @@ function switchView(targetViewId) {
     if (activeLink) activeLink.classList.add("active");
 }
 
+async function refreshActiveView() {
+    const subviews = [
+        { id: "dashboard-subview", load: () => loadDashboardData() },
+        { id: "warehouse-subview", load: () => loadWarehouseData() },
+        { id: "crew-subview", load: () => loadCrewData() }
+    ];
+    
+    for (const view of subviews) {
+        const el = document.getElementById(view.id);
+        if (el && el.style.display !== "none") {
+            await view.load();
+            break;
+        }
+    }
+}
+window.refreshActiveView = refreshActiveView;
+
 // MODAL MANAGEMENT FUNCTIONS (ENHANCED)
 function openModal(modalId) {
     const modal = document.getElementById(modalId);
@@ -394,7 +411,7 @@ async function handleInventorySubmit(e) {
         });
         showToast(id ? "Inventory asset updated." : "Catalog asset registered.");
         closeModal("modal-inventory");
-        loadWarehouseData();
+        refreshActiveView();
     } catch (err) {}
 }
 
@@ -417,7 +434,7 @@ async function deleteInventoryItem(itemId) {
     try {
         await apiFetch(`/api/inventory/${itemId}`, { method: "DELETE" });
         showToast("Asset deleted from catalog.");
-        loadWarehouseData();
+        refreshActiveView();
     } catch (err) {}
 }
 
@@ -696,7 +713,7 @@ async function handleBookingSubmit(e) {
         
         showToast(id ? "Booking details updated." : "Booking scheduled successfully.");
         closeModal("modal-booking");
-        await loadDashboardData();
+        await refreshActiveView();
         
         // Show conflict alerts if any returned from server
         if (result.conflict_alerts && result.conflict_alerts.length > 0) {
@@ -761,7 +778,7 @@ async function deleteEventBooking(eventId) {
     try {
         await apiFetch(`/api/events/${eventId}`, { method: "DELETE" });
         showToast("Event booking cancelled.");
-        loadDashboardData();
+        refreshActiveView();
     } catch (err) {}
 }
 
@@ -1250,7 +1267,8 @@ async function handleOnboardCrewSubmit(e) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, password, role, full_name, base_daily_rate })
         });
-        showToast("Crew member onboarded successfully!");
+        const successMsg = role === "admin" ? "Manager onboarded successfully!" : "Crew member onboarded successfully!";
+        showToast(successMsg);
         closeModal("modal-onboard-crew");
     } catch (err) {
         // error logged by apiFetch

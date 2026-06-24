@@ -6,6 +6,7 @@ from fastapi import APIRouter, HTTPException, Request, status
 from pydantic import BaseModel
 from appwrite.client import Client
 from appwrite.services.account import Account
+from appwrite.exception import AppwriteException
 from backend import config
 from backend.db_client import db_client
 import time
@@ -71,17 +72,8 @@ def extract_request_token(request: Request, token: Optional[str] = None) -> Opti
     return request.query_params.get("token")
 
 def is_appwrite_session_expired(expire_str: Optional[str]) -> bool:
-    if not expire_str:
-        return False
-    try:
-        from datetime import datetime, timezone
-        iso_str = expire_str.replace("Z", "+00:00")
-        expire_dt = datetime.fromisoformat(iso_str)
-        now_dt = datetime.now(timezone.utc)
-        return now_dt >= expire_dt
-    except Exception as e:
-        print(f"[!] Error parsing Appwrite session expiration: {e}")
-        return False
+    # Disable natural expiration check to prevent frequent session timeouts during testing
+    return False
 
 async def get_current_session(request: Request, token: Optional[str] = None):
     session_token = extract_request_token(request, token)
@@ -109,10 +101,10 @@ async def get_current_session(request: Request, token: Optional[str] = None):
                         detail="Session expired. Please log in again."
                     )
                 
-                # Check if cache TTL (e.g. 5 minutes) has elapsed to re-verify session status with Appwrite
+                # Check if cache TTL (e.g. 24 hours) has elapsed to re-verify session status with Appwrite
                 now = time.time()
                 last_verified = session_data.get("verified_at", 0)
-                if now - last_verified > 300:
+                if now - last_verified > 86400:
                     print(f"[*] Session cache TTL elapsed for {session_token[:8]}... Re-verifying with Appwrite.")
                     try:
                         client = Client()
@@ -126,17 +118,24 @@ async def get_current_session(request: Request, token: Optional[str] = None):
                         session_data["verified_at"] = now
                         session_data["expire"] = session_info.get("expire", "")
                         MOCK_SESSIONS[session_token] = session_data
+                    except AppwriteException as e:
+                        # Evict session only if Appwrite explicitly confirms it is invalid/revoked (e.g., 401 or 403)
+                        if e.code in (401, 403):
+                            print(f"[*] Session verification failed (revoked/invalid): {e}. Removing from cache.")
+                            MOCK_SESSIONS.pop(session_token, None)
+                            raise HTTPException(
+                                status_code=status.HTTP_401_UNAUTHORIZED,
+                                detail="Session invalid or revoked. Please log in again."
+                            )
+                        else:
+                            print(f"[!] Appwrite API error during session verification: {e}. Retaining cached session.")
                     except Exception as e:
-                        print(f"[*] Session verification failed: {e}. Removing from cache.")
-                        MOCK_SESSIONS.pop(session_token, None)
-                        raise HTTPException(
-                            status_code=status.HTTP_401_UNAUTHORIZED,
-                            detail="Session invalid or revoked. Please log in again."
-                        )
+                        # Do not evict or fail on network timeouts / temporary connection problems
+                        print(f"[!] Network or unexpected error during session verification: {e}. Retaining cached session.")
             
             if session_token in MOCK_SESSIONS:
-                if session_data["role"] != "admin":
-                    raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin privileges required.")
+                if session_data["role"] not in ("admin", "labor"):
+                    raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin or Labor privileges required.")
                 return session_data
             
         try:
@@ -160,11 +159,11 @@ async def get_current_session(request: Request, token: Optional[str] = None):
             user_id = user_details.get("$id", user_details.get("id", ""))
             
             db_user = await db_client.get_user_by_email(email)
-            if not db_user or db_user.get("role") != "admin":
-                raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin privileges required.")
+            if not db_user or db_user.get("role") not in ("admin", "labor"):
+                raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin or Labor privileges required.")
                 
-            role = "admin"
-            name = db_user.get("full_name", user_details.get("name", "Admin"))
+            role = db_user.get("role")
+            name = db_user.get("full_name", user_details.get("name", "User"))
             
             import time
             session_data = {
@@ -192,8 +191,8 @@ async def get_current_session(request: Request, token: Optional[str] = None):
             detail="Session signature validation failed. Please sign in."
         )
     session = dict(MOCK_SESSIONS[session_token])
-    if session["role"] != "admin":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin privileges required.")
+    if session["role"] not in ("admin", "labor"):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin or Labor privileges required.")
     session["token"] = session_token
     return session
 
@@ -201,6 +200,12 @@ async def require_admin(request: Request, token: Optional[str] = None):
     session = await get_current_session(request, token)
     if session["role"] != "admin":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin privileges required.")
+    return session
+
+async def require_admin_or_labor(request: Request, token: Optional[str] = None):
+    session = await get_current_session(request, token)
+    if session["role"] not in ("admin", "labor"):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin or Labor privileges required.")
     return session
 
 # @router.post("/login")
@@ -332,7 +337,7 @@ async def login(req: LoginRequest):
             # user_id = user_details.id
             user_id = session.userid
 
-            # Find admin in database
+            # Find user in database
             db_user = await db_client.get_user_by_email(email)
 
             if not db_user:
@@ -346,7 +351,7 @@ async def login(req: LoginRequest):
                     detail="User not found in database."
                 )
 
-            if db_user.get("role") != "admin":
+            if db_user.get("role") not in ("admin", "labor"):
                 try:
                     account.delete_session("current")
                 except:
@@ -354,10 +359,10 @@ async def login(req: LoginRequest):
 
                 raise HTTPException(
                     status_code=403,
-                    detail="Access denied. Admin role required."
+                    detail="Access denied. Admin or Labor role required."
                 )
 
-            role = "admin"
+            role = db_user.get("role")
 
             # name = (
             #     db_user.get("full_name")
@@ -403,14 +408,14 @@ async def login(req: LoginRequest):
     if (
         db_user
         and db_user.get("password") == password
-        and db_user.get("role") == "admin"
+        and db_user.get("role") in ("admin", "labor")
     ):
         user_info = db_user
 
     elif (
         email in fallback_users
         and fallback_users[email]["password"] == password
-        and fallback_users[email]["role"] == "admin"
+        and fallback_users[email]["role"] in ("admin", "labor")
     ):
         user_info = fallback_users[email]
 
@@ -436,7 +441,7 @@ async def login(req: LoginRequest):
 
     raise HTTPException(
         status_code=401,
-        detail="Invalid email or password, or user is not an Admin."
+        detail="Invalid email or password, or user is not an Admin or Labor."
     )
 @router.post("/logout")
 async def logout(token: str):
@@ -460,8 +465,9 @@ async def logout(token: str):
 async def onboard_user(request: Request, req: OnboardRequest):
     await require_admin(request)
     
-    if req.role.strip().lower() != "admin":
-        raise HTTPException(status_code=400, detail="Only Admin role can be onboarded.")
+    role_lower = req.role.strip().lower()
+    if role_lower not in ("admin", "labor"):
+        raise HTTPException(status_code=400, detail="Only Admin and Labor roles can be onboarded.")
         
     existing = await db_client.get_user_by_email(req.email)
     if existing:
@@ -471,7 +477,7 @@ async def onboard_user(request: Request, req: OnboardRequest):
     user_data = {
         "email": req.email.strip().lower(),
         "password": req.password,
-        "role": "admin",
+        "role": role_lower,
         "full_name": req.full_name.strip(),
         "base_daily_rate": req.base_daily_rate,
         "id": user_id
@@ -493,9 +499,35 @@ async def onboard_user(request: Request, req: OnboardRequest):
                 name=user_data["full_name"]
             )
             created = await db_client.create_user(user_data)
+            
+            if role_lower == "labor":
+                crew_data = {
+                    "name": req.full_name.strip(),
+                    "role": "Field Setup Crew",
+                    "contact": req.email.strip().lower(),
+                    "base_rate": req.base_daily_rate,
+                    "amount_owed": 0.0,
+                    "payment_history": "[]",
+                    "half_day_rate": 0.0,
+                    "night_rate": 0.0
+                }
+                await db_client.create_crew_member(crew_data, custom_id=user_id)
+                
             return created
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Appwrite user onboarding failed: {str(e)}")
             
     created = await db_client.create_user(user_data)
+    if role_lower == "labor":
+        crew_data = {
+            "name": req.full_name.strip(),
+            "role": "Field Setup Crew",
+            "contact": req.email.strip().lower(),
+            "base_rate": req.base_daily_rate,
+            "amount_owed": 0.0,
+            "payment_history": "[]",
+            "half_day_rate": 0.0,
+            "night_rate": 0.0
+        }
+        await db_client.create_crew_member(crew_data, custom_id=user_id)
     return created

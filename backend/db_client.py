@@ -23,7 +23,7 @@ class BaseDB:
 
     # Crew
     async def get_crew(self, page=None, limit=10, search=None): raise NotImplementedError
-    async def create_crew_member(self, member: dict): raise NotImplementedError
+    async def create_crew_member(self, member: dict, custom_id: Optional[str] = None): raise NotImplementedError
     async def update_crew_member(self, crew_id: str, member: dict): raise NotImplementedError
     async def delete_crew_member(self, crew_id: str): raise NotImplementedError
 
@@ -51,6 +51,15 @@ class BaseDB:
     async def get_attendance_record(self, date_str: str, crew_id: str): raise NotImplementedError
     async def save_attendance_record(self, date_str: str, crew_id: str, record: dict): raise NotImplementedError
     async def get_all_attendance(self): raise NotImplementedError
+
+    # Callbacks
+    async def get_callbacks(self): raise NotImplementedError
+    async def create_callback(self, callback_data: dict): raise NotImplementedError
+    async def update_callback(self, callback_id: str, callback_data: dict): raise NotImplementedError
+
+    # Inventory date-blocking
+    async def check_availability(self, item_id: str, start_date: str, end_date: str, qty_needed: int) -> bool: raise NotImplementedError
+
 
 # Factory to get database client
 from backend.db.appwrite_db import AppwriteDB

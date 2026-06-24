@@ -4,15 +4,20 @@ import uuid
 import datetime as dt
 from datetime import datetime, date
 from typing import Dict, List, Optional
+import random
+import string
 from fastapi import APIRouter, HTTPException, Request, status, File, UploadFile
 from pydantic import BaseModel
 from backend import config
 from appwrite.input_file import InputFile
 from backend.db_client import db_client
-from backend.auth import require_admin, get_current_session
+from backend.auth import require_admin, get_current_session, require_admin_or_labor
 from backend.alerts import dispatch_telegram_alert
 
 router = APIRouter(prefix="/api", tags=["finance"])
+
+def generate_portal_token() -> str:
+    return "".join(random.choices(string.ascii_letters + string.digits, k=12))
 
 UPLOAD_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend", "uploads")
 
@@ -70,6 +75,7 @@ class EventSchema(BaseModel):
     notes: Optional[str] = ""
     discount: Optional[float] = 0.0
     tax_rate: Optional[float] = 0.0
+    portal_token: Optional[str] = ""
 
 class PaymentRequest(BaseModel):
     amount: float
@@ -244,6 +250,19 @@ def add_payment_status(evt: dict) -> dict:
     evt["payment_status"] = status_str
     return evt
 
+async def ensure_portal_token(evt: dict) -> dict:
+    """Auto-generate and save portal_token for events that are missing one."""
+    if not evt:
+        return evt
+    if not evt.get("portal_token"):
+        token = generate_portal_token()
+        evt["portal_token"] = token
+        try:
+            await db_client.update_event(evt["id"], {"portal_token": token})
+        except Exception as e:
+            print(f"[!] Failed to persist portal_token for event {evt.get('id')}: {e}")
+    return evt
+
 @router.get("/events")
 async def get_events(
     request: Request,
@@ -253,21 +272,66 @@ async def get_events(
     status: Optional[str] = None,
     payment_status: Optional[str] = None
 ):
-    await require_admin(request)
+    session = await require_admin_or_labor(request)
+    is_labor = session.get("role") == "labor"
+    user_id = session.get("id")
+    
     if page is not None:
         res = await db_client.get_events(page=page, limit=limit, search=search, status=status, payment_status=payment_status)
-        res["items"] = [add_payment_status(evt) for evt in res["items"]]
+        if is_labor:
+            filtered_items = []
+            for evt in res["items"]:
+                if event_is_assigned_to_user(evt, user_id):
+                    filtered_items.append(sanitize_event_for_labor(evt))
+            res["items"] = filtered_items
+            res["total"] = len(filtered_items)
+            res.pop("stats", None)
+        else:
+            patched = []
+            for evt in res["items"]:
+                patched.append(add_payment_status(await ensure_portal_token(evt)))
+            res["items"] = patched
         return res
     else:
         events = await db_client.get_events(search=search, status=status, payment_status=payment_status)
-        return [add_payment_status(evt) for evt in events]
+        if is_labor:
+            filtered_events = []
+            for evt in events:
+                if event_is_assigned_to_user(evt, user_id):
+                    filtered_events.append(sanitize_event_for_labor(evt))
+            return filtered_events
+        else:
+            patched = []
+            for evt in events:
+                patched.append(add_payment_status(await ensure_portal_token(evt)))
+            return patched
 
-@router.get("/events/{event_id}")
-async def get_event(request: Request, event_id: str):
+@router.get("/events/{event_id}/portal-link")
+async def get_event_portal_link(request: Request, event_id: str):
+    """Returns (and auto-generates if missing) the secure client portal link for an event."""
     await require_admin(request)
     res = await db_client.get_event(event_id)
     if not res:
         raise HTTPException(status_code=404, detail="Event not found")
+    res = await ensure_portal_token(res)
+    token = res.get("portal_token", "")
+    if not token:
+        raise HTTPException(status_code=500, detail="Failed to generate portal token.")
+    return {"portal_token": token, "portal_link": f"/portal/{token}"}
+
+@router.get("/events/{event_id}")
+async def get_event(request: Request, event_id: str):
+    session = await require_admin_or_labor(request)
+    res = await db_client.get_event(event_id)
+    if not res:
+        raise HTTPException(status_code=404, detail="Event not found")
+        
+    if session.get("role") == "labor":
+        if not event_is_assigned_to_user(res, session.get("id")):
+            raise HTTPException(status_code=403, detail="Access denied. You are not assigned to this event.")
+        return sanitize_event_for_labor(res)
+    
+    res = await ensure_portal_token(res)
     return add_payment_status(res)
 
 @router.post("/events")
@@ -275,6 +339,9 @@ async def create_event(request: Request, event: EventSchema):
     await require_admin(request)
     event_data = event.model_dump()
     event_data.setdefault("payment_history", "[]")
+    if not event_data.get("portal_token"):
+        event_data["portal_token"] = generate_portal_token()
+
     
     conflict_alerts = await check_inventory_overlap(
         event_data["start_date"], 
@@ -325,6 +392,9 @@ async def update_event(request: Request, event_id: str, event: EventSchema):
     event_data["amount_paid"] = existing_event.get("amount_paid", 0.0)
     event_data["payment_history"] = existing_event.get("payment_history", "[]")
     event_data["design_layout_url"] = existing_event.get("design_layout_url", event_data.get("design_layout_url", ""))
+    if not event_data.get("portal_token"):
+        event_data["portal_token"] = existing_event.get("portal_token") or generate_portal_token()
+
     
     conflict_alerts = await check_inventory_overlap(
         event_data["start_date"], 
@@ -411,10 +481,14 @@ async def log_payment(request: Request, event_id: str, payment: PaymentRequest):
 
 @router.post("/events/{event_id}/upload-layout")
 async def upload_layout(request: Request, event_id: str, file: UploadFile = File(...)):
-    await require_admin(request)
+    session = await require_admin_or_labor(request)
     event = await db_client.get_event(event_id)
     if not event:
         raise HTTPException(status_code=404, detail="Event not found")
+        
+    if session.get("role") == "labor":
+        if not event_is_assigned_to_user(event, session.get("id")):
+            raise HTTPException(status_code=403, detail="Access denied. You are not assigned to this event.")
         
     if config.DB_TYPE == "APPWRITE":
         try:
@@ -450,10 +524,15 @@ async def upload_layout(request: Request, event_id: str, file: UploadFile = File
 # --- Tasks Routes ---
 @router.get("/events/{event_id}/tasks")
 async def get_tasks_for_event(request: Request, event_id: str):
-    await require_admin(request)
+    session = await require_admin_or_labor(request)
     event = await db_client.get_event(event_id)
     if not event:
         raise HTTPException(status_code=404, detail="Event not found")
+        
+    if session.get("role") == "labor":
+        if not event_is_assigned_to_user(event, session.get("id")):
+            raise HTTPException(status_code=403, detail="Access denied. You are not assigned to this event.")
+            
     return await db_client.get_tasks_for_event(event_id)
 
 @router.post("/tasks")
@@ -463,14 +542,26 @@ async def create_task(request: Request, task: TaskSchema):
 
 @router.put("/tasks/{task_id}")
 async def update_task_status(request: Request, task_id: str, status_payload: Dict[str, str]):
-    await require_admin(request)
+    session = await require_admin_or_labor(request)
     tasks = await db_client.get_tasks()
+    target_task = None
     for task in tasks:
         if task["id"] == task_id:
-            task["status"] = status_payload.get("status", task["status"])
-            updated_task = await db_client.update_task(task_id, task)
-            return updated_task
-    raise HTTPException(status_code=404, detail="Task not found")
+            target_task = task
+            break
+            
+    if not target_task:
+        raise HTTPException(status_code=404, detail="Task not found")
+        
+    if session.get("role") == "labor":
+        event_id = target_task.get("event_id")
+        event = await db_client.get_event(event_id)
+        if not event or not event_is_assigned_to_user(event, session.get("id")):
+            raise HTTPException(status_code=403, detail="Access denied. You are not assigned to this task's event.")
+            
+    target_task["status"] = status_payload.get("status", target_task["status"])
+    updated_task = await db_client.update_task(task_id, target_task)
+    return updated_task
 
 @router.delete("/tasks/{task_id}")
 async def delete_task(request: Request, task_id: str):

@@ -282,6 +282,79 @@ def run_tests():
     assert cust_worker_final["amount_owed"] == 350.0, f"Expected 350.0, got {cust_worker_final['amount_owed']}"
     print(" -> SUCCESS: Custom rate calculation works and overrides default multipliers.")
 
+    # 7e. Test Labor Onboarding, Login, and Sanitized Access
+    print("\n[Test 7e] Testing Labor Onboarding, Login, and Sanitized Access...")
+    labor_email = f"labor_{uuid.uuid4().hex[:6]}@bhoomidecoration.com"
+    labor_payload = {
+        "email": labor_email,
+        "password": "laborpassword123",
+        "role": "labor",
+        "full_name": "Test Labor Crew",
+        "base_daily_rate": 140.0
+    }
+    
+    # 1. Onboard as Admin
+    onboard_res = client.post(f"/api/auth/onboard?token={token}", json=labor_payload)
+    assert onboard_res.status_code == 200, f"Labor onboarding failed: {onboard_res.text}"
+    labor_user = onboard_res.json()
+    labor_user_id = labor_user["id"]
+    
+    # Verify that a crew profile has been created with the exact same ID
+    crew_list_res = client.get(f"/api/crew?token={token}")
+    assert crew_list_res.status_code == 200
+    crew_ids = [c["id"] for c in crew_list_res.json()]
+    assert labor_user_id in crew_ids, f"Labor ID {labor_user_id} not found in crew profiles: {crew_ids}"
+    
+    # 2. Login as the newly created Labor user
+    labor_login = client.post("/api/auth/login", json={"email": labor_email, "password": "laborpassword123"})
+    assert labor_login.status_code == 200, f"Labor login failed: {labor_login.text}"
+    labor_login_data = labor_login.json()
+    assert labor_login_data["role"] == "labor"
+    labor_token = labor_login_data["token"]
+    
+    # 3. Create an event booking assigned to this labor user
+    test_event_payload = {
+        "client_id": cli_id,
+        "client_name": "Alice Cooper",
+        "venue_address": "San Jose Hall B",
+        "start_date": "2026-09-01",
+        "end_date": "2026-09-02",
+        "status": "Confirmed",
+        "design_layout_url": "",
+        "items_booked": json.dumps({item_id: 1}),
+        "crew_assignments": json.dumps([
+            {"worker_id": labor_user_id, "name": "Test Labor Crew", "pay_rate": 140.0, "paid": False}
+        ]),
+        "max_workforce_capacity": 4,
+        "notes": "Testing labor access sanitization"
+    }
+    create_evt_res = client.post(f"/api/events?token={token}", json=test_event_payload)
+    assert create_evt_res.status_code == 200, f"Failed to book event: {create_evt_res.text}"
+    event_id = create_evt_res.json()["event"]["id"]
+    
+    # 4. Access events list as the Labor user
+    labor_events_res = client.get(f"/api/events?token={labor_token}")
+    assert labor_events_res.status_code == 200
+    labor_events = labor_events_res.json()
+    
+    # Verify that only assigned events are visible, and financial fields are removed (sanitized)
+    assert len(labor_events) == 1
+    labor_evt = labor_events[0]
+    assert labor_evt["id"] == event_id
+    assert "total_invoice_amount" not in labor_evt
+    assert "remaining_balance" not in labor_evt
+    assert "amount_paid" not in labor_evt
+    print(" -> SUCCESS: Labor events query is successfully filtered and sanitized.")
+    
+    # 5. Retrieve checklist tasks as labor
+    labor_tasks_res = client.get(f"/api/events/{event_id}/tasks?token={labor_token}")
+    assert labor_tasks_res.status_code == 200
+    
+    # 6. Verify accessing an unassigned event is blocked for labor
+    blocked_evt_res = client.get(f"/api/events/{event_info['id']}?token={labor_token}")
+    assert blocked_evt_res.status_code == 403, f"Expected 403, got {blocked_evt_res.status_code}"
+    print(" -> SUCCESS: Access to unassigned events is successfully blocked for labor.")
+
     print("\nSUCCESS: ALL TESTS COMPLETED SUCCESSFULLY!")
 
 if __name__ == "__main__":

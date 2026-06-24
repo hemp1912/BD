@@ -7,13 +7,15 @@
     <title>Bhoomi Decoration - Admin Panel</title>
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Poppins:wght@300;400;500;600&family=Noto+Sans+Gujarati:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Marcellus&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Poppins:wght@300;400;500;600&family=Noto+Sans+Gujarati:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <!-- CSS Link -->
-    <link rel="stylesheet" href="styles.css">
-    
+    <link rel="stylesheet" href="styles.css?v=portal-v1">
+
     <!-- Instant Redirect Protection (Role Isolation) -->
     <script>
-        (function() {
+        (function () {
             const token = localStorage.getItem("eventflow_token");
             const role = localStorage.getItem("eventflow_role");
             if (!token || role !== "admin") {
@@ -21,16 +23,19 @@
             }
         })();
     </script>
-    
+
     <!-- Print Stylesheet Rules -->
     <style>
         @media print {
             body * {
                 visibility: hidden !important;
             }
-            #print-receipt-section, #print-receipt-section * {
+
+            #print-receipt-section,
+            #print-receipt-section * {
                 visibility: visible !important;
             }
+
             #print-receipt-section {
                 position: absolute !important;
                 left: 0 !important;
@@ -42,6 +47,7 @@
                 color: #000000 !important;
                 display: block !important;
             }
+
             .modal-overlay {
                 background: none !important;
                 position: absolute !important;
@@ -49,6 +55,7 @@
                 display: block !important;
                 overflow: visible !important;
             }
+
             .modal-card {
                 border: none !important;
                 box-shadow: none !important;
@@ -56,7 +63,12 @@
                 padding: 0 !important;
                 background: none !important;
             }
-            #payment-form, .modal-header, .btn, aside, header {
+
+            #payment-form,
+            .modal-header,
+            .btn,
+            aside,
+            header {
                 display: none !important;
             }
         }
@@ -69,8 +81,10 @@
     <div id="loading-skeleton">
         <div class="skeleton-container">
             <svg class="skeleton-logo" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-                <path d="M20 100 V50 C20 20 50 10 60 10 C70 10 100 20 100 50 V100" fill="none" stroke="#C9941F" stroke-width="4" />
-                <path d="M35 100 V55 C35 30 50 20 60 20 C70 20 85 30 85 55 V100" fill="none" stroke="#6B1623" stroke-width="3" />
+                <path d="M20 100 V50 C20 20 50 10 60 10 C70 10 100 20 100 50 V100" fill="none" stroke="#C9941F"
+                    stroke-width="4" />
+                <path d="M35 100 V55 C35 30 50 20 60 20 C70 20 85 30 85 55 V100" fill="none" stroke="#6B1623"
+                    stroke-width="3" />
                 <circle cx="60" cy="20" r="4" fill="#C9941F" />
             </svg>
             <div class="skeleton-title">Bhoomi Decoration</div>
@@ -88,7 +102,8 @@
 
         <!-- Mobile Header Bar -->
         <div class="mobile-header">
-            <button id="sidebar-toggle" class="btn btn-ghost" aria-label="Toggle Sidebar" style="padding: 0.5rem; border: none; font-size: 1.5rem; background: transparent; color: var(--maroon);">
+            <button id="sidebar-toggle" class="btn btn-ghost" aria-label="Toggle Sidebar"
+                style="padding: 0.5rem; border: none; font-size: 1.5rem; background: transparent; color: var(--maroon);">
                 <span class="hamburger-icon">☰</span>
             </button>
             <div class="mobile-logo">Bhoomi <span>✦</span></div>
@@ -97,15 +112,21 @@
 
         <!-- Sidebar Navigation -->
         <aside class="sidebar" id="app-sidebar">
-            <button id="sidebar-close" class="mobile-only-btn" aria-label="Close Sidebar" style="position: absolute; top: 1rem; right: 1rem; background: transparent; border: none; font-size: 1.25rem; color: var(--maroon); cursor: pointer;">✕</button>
-            <div class="sidebar-logo" style="font-family: 'Marcellus', serif; font-size: 1.5rem; text-align: center; color: var(--maroon); margin-bottom: 0.5rem;">
+            <button id="sidebar-close" class="mobile-only-btn" aria-label="Close Sidebar"
+                style="position: absolute; top: 1rem; right: 1rem; background: transparent; border: none; font-size: 1.25rem; color: var(--maroon); cursor: pointer;">✕</button>
+            <div class="sidebar-logo"
+                style="font-family: 'Marcellus', serif; font-size: 1.5rem; text-align: center; color: var(--maroon); margin-bottom: 0.5rem;">
                 Bhoomi <span>✦</span>
             </div>
 
-            <div class="lang-selector-container" style="padding: 0 1.5rem 1rem 1.5rem; border-bottom: 1px solid rgba(107,22,35,0.15);">
-                <select id="lang-selector" style="width: 100%; padding: 0.5rem; border-radius: 4px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-glass); color: var(--text-primary); font-family: 'Poppins', sans-serif; font-size: 0.85rem; cursor: pointer; outline: none; transition: border-color 0.2s;">
-                    <option value="en" style="background: var(--bg-primary); color: var(--text-primary);">English</option>
-                    <option value="gu" style="background: var(--bg-primary); color: var(--text-primary);">ગુજરાતી (Gujarati)</option>
+            <div class="lang-selector-container"
+                style="padding: 0 1.5rem 1rem 1.5rem; border-bottom: 1px solid rgba(107,22,35,0.15);">
+                <select id="lang-selector"
+                    style="width: 100%; padding: 0.5rem; border-radius: 4px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-glass); color: var(--text-primary); font-family: 'Poppins', sans-serif; font-size: 0.85rem; cursor: pointer; outline: none; transition: border-color 0.2s;">
+                    <option value="en" style="background: var(--bg-primary); color: var(--text-primary);">English
+                    </option>
+                    <option value="gu" style="background: var(--bg-primary); color: var(--text-primary);">ગુજરાતી
+                        (Gujarati)</option>
                 </select>
             </div>
 
@@ -129,6 +150,16 @@
                     <li>
                         <a class="nav-item" data-target="clients-view" id="nav-btn-clients">
                             <span data-i18n="nav_clients">Clients CRM</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-item" data-target="kanban-view" id="nav-btn-kanban">
+                            <span data-i18n="nav_kanban">Booking Pipeline</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-item" data-target="callbacks-view" id="nav-btn-callbacks">
+                            <span data-i18n="nav_callbacks">Callbacks CRM</span>
                         </a>
                     </li>
                     <li>
@@ -159,10 +190,14 @@
                 </ul>
             </nav>
 
-            <div class="user-profile-panel" style="border-top: 1px solid rgba(107,22,35,0.15); padding-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
-                <div style="font-size: 0.9rem; font-weight: 600; color: var(--maroon);" id="user-display-name">Loading...</div>
-                <div style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gold); font-weight: 600;" id="user-display-role" data-i18n="role_admin">Business Administrator</div>
-                <button id="logout-btn" class="btn btn-ghost" style="margin-top: 0.5rem; padding: 0.5rem 1rem; font-size: 0.8rem; border-color: var(--maroon);">
+            <div class="user-profile-panel"
+                style="border-top: 1px solid rgba(107,22,35,0.15); padding-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                <div style="font-size: 0.9rem; font-weight: 600; color: var(--maroon);" id="user-display-name">
+                    Loading...</div>
+                <div style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gold); font-weight: 600;"
+                    id="user-display-role" data-i18n="role_admin">Business Administrator</div>
+                <button id="logout-btn" class="btn btn-ghost"
+                    style="margin-top: 0.5rem; padding: 0.5rem 1rem; font-size: 0.8rem; border-color: var(--maroon);">
                     <span data-i18n="nav_signout">Secure Sign Out</span>
                 </button>
             </div>
@@ -173,10 +208,13 @@
 
             <!-- Operations Dashboard View -->
             <section id="dashboard-subview" class="app-subview">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
                     <div>
-                        <h2 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.8rem;" data-i18n="dash_title">Operations Dashboard</h2>
-                        <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #5a4a3d;" data-i18n="dash_subtitle">
+                        <h2 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.8rem;"
+                            data-i18n="dash_title">Operations Dashboard</h2>
+                        <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #5a4a3d;"
+                            data-i18n="dash_subtitle">
                             Track scheduling status, payouts, and net event balances.
                         </p>
                     </div>
@@ -184,7 +222,7 @@
                         <button class="btn btn-ghost" id="btn-quick-quote">
                             <span data-i18n="dash_btn_quote">On-Walk Quote Builder</span>
                         </button>
-                        <button class="btn btn-ghost" id="btn-onboard-crew-trigger" disabled>
+                        <button class="btn btn-ghost" id="btn-onboard-crew-trigger">
                             <span data-i18n="dash_btn_onboard">Onboard Crew</span>
                         </button>
                         <button class="btn btn-primary" id="btn-create-booking">
@@ -196,33 +234,47 @@
                 <!-- Admin Analytics Board -->
                 <div class="dashboard-grid">
                     <div class="glass-panel stat-card">
-                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--gold);" data-i18n="dash_stat_active">Active Bookings</span>
+                        <span
+                            style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--gold);"
+                            data-i18n="dash_stat_active">Active Bookings</span>
                         <div class="stat-val gold" id="stat-active-bookings">0</div>
                     </div>
                     <div class="glass-panel stat-card">
-                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--maroon);" data-i18n="dash_stat_tasks">Pending Tasks</span>
+                        <span
+                            style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--maroon);"
+                            data-i18n="dash_stat_tasks">Pending Tasks</span>
                         <div class="stat-val danger" id="stat-pending-tasks">0</div>
                     </div>
                     <div class="glass-panel stat-card">
-                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--text-secondary);" data-i18n="dash_stat_crew">Crew On Duty</span>
+                        <span
+                            style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--text-secondary);"
+                            data-i18n="dash_stat_crew">Crew On Duty</span>
                         <div class="stat-val purple" id="stat-crew-on-duty">0</div>
                     </div>
                     <div class="glass-panel stat-card">
-                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--status-success);" data-i18n="dash_stat_lowstock">Low Stock Items</span>
+                        <span
+                            style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--status-success);"
+                            data-i18n="dash_stat_lowstock">Low Stock Items</span>
                         <div class="stat-val success" id="stat-low-stock">0</div>
                     </div>
                 </div>
 
                 <!-- Upcoming Events Table -->
                 <div class="glass-panel" style="margin-bottom: 2rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
                         <div>
-                            <h3 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); margin-bottom: 0.15rem;">Upcoming Events</h3>
-                            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0; font-style: italic;">Sorted by nearest date · Completed events are shown in the Events Projects section.</p>
+                            <h3
+                                style="font-family: 'Marcellus', serif; color: var(--maroon-deep); margin-bottom: 0.15rem;">
+                                Upcoming Events</h3>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0; font-style: italic;">
+                                Sorted by nearest date · Completed events are shown in the Events Projects section.</p>
                         </div>
                         <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
-                            <input type="text" id="dashboard-search-input" placeholder="Search client / venue..." class="search-input" style="max-width: 200px; padding: 0.35rem 0.75rem;">
-                            <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gold); font-weight: 600;" id="timeline-capacity-status">0 Upcoming Events</div>
+                            <input type="text" id="dashboard-search-input" placeholder="Search client / venue..."
+                                class="search-input" style="max-width: 200px; padding: 0.35rem 0.75rem;">
+                            <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gold); font-weight: 600;"
+                                id="timeline-capacity-status">0 Upcoming Events</div>
                         </div>
                     </div>
 
@@ -256,8 +308,10 @@
             <section id="warehouse-subview" class="app-subview" style="display: none;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
                     <div>
-                        <h2 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.8rem;">Warehouse Catalog Inventory</h2>
-                        <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #5a4a3d;">
+                        <h2 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.8rem;">
+                            Warehouse Catalog Inventory</h2>
+                        <p
+                            style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #5a4a3d;">
                             Create, update, and manage master physical event assets.
                         </p>
                     </div>
@@ -274,21 +328,29 @@
                 <!-- Warehouse Analytics Board -->
                 <div class="dashboard-grid" style="margin-bottom: 2rem;">
                     <div class="glass-panel stat-card">
-                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--gold);">Total Unique Items</span>
+                        <span
+                            style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--gold);">Total
+                            Unique Items</span>
                         <div class="stat-val gold" id="warehouse-stat-items">0</div>
                     </div>
                     <div class="glass-panel stat-card">
-                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--text-secondary);">Total Unit Stock</span>
+                        <span
+                            style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--text-secondary);">Total
+                            Unit Stock</span>
                         <div class="stat-val purple" id="warehouse-stat-stock">0</div>
                     </div>
                     <div class="glass-panel stat-card">
-                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--maroon);">Low Stock Alerts</span>
+                        <span
+                            style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--maroon);">Low
+                            Stock Alerts</span>
                         <div class="stat-val danger" id="warehouse-stat-low">0</div>
                     </div>
                 </div>
 
-                <div class="glass-panel" style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-                    <input type="text" id="warehouse-search-input" placeholder="Search catalog assets..." class="search-input" style="max-width: 250px; margin-bottom: 0;">
+                <div class="glass-panel"
+                    style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                    <input type="text" id="warehouse-search-input" placeholder="Search catalog assets..."
+                        class="search-input" style="max-width: 250px; margin-bottom: 0;">
                 </div>
 
                 <div class="glass-panel">
@@ -314,13 +376,15 @@
                     <div id="warehouse-pagination"></div>
                 </div>
             </section>
-            
+
             <!-- Clients CRM View -->
             <section id="clients-subview" class="app-subview" style="display: none;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
                     <div>
-                        <h2 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.8rem;">Clients CRM Database</h2>
-                        <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #5a4a3d;">
+                        <h2 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.8rem;">
+                            Clients CRM Database</h2>
+                        <p
+                            style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #5a4a3d;">
                             Manage client profiles and register new customer accounts.
                         </p>
                     </div>
@@ -337,21 +401,29 @@
                 <!-- Clients Analytics Board -->
                 <div class="dashboard-grid" style="margin-bottom: 2rem;">
                     <div class="glass-panel stat-card">
-                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--text-secondary);">Total Clients</span>
+                        <span
+                            style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--text-secondary);">Total
+                            Clients</span>
                         <div class="stat-val purple" id="clients-stat-total">0</div>
                     </div>
                     <div class="glass-panel stat-card">
-                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--status-success);">Active Clients</span>
+                        <span
+                            style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--status-success);">Active
+                            Clients</span>
                         <div class="stat-val success" id="clients-stat-active">0</div>
                     </div>
                     <div class="glass-panel stat-card">
-                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--gold);">New Leads (YTD)</span>
+                        <span
+                            style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--gold);">New
+                            Leads (YTD)</span>
                         <div class="stat-val gold" id="clients-stat-new">0</div>
                     </div>
                 </div>
 
-                <div class="glass-panel" style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-                    <input type="text" id="clients-search-input" placeholder="Search clients..." class="search-input" style="max-width: 250px; margin-bottom: 0;">
+                <div class="glass-panel"
+                    style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                    <input type="text" id="clients-search-input" placeholder="Search clients..." class="search-input"
+                        style="max-width: 250px; margin-bottom: 0;">
                 </div>
 
                 <div class="glass-panel">
@@ -378,12 +450,100 @@
                 </div>
             </section>
 
+            <!-- Booking Pipeline Kanban View -->
+            <section id="kanban-subview" class="app-subview" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <div>
+                        <h2 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.8rem;" data-i18n="kanban_title">
+                            Booking Pipeline</h2>
+                        <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: var(--text-secondary);" data-i18n="kanban_subtitle">
+                            Drag and drop bookings to transition them across event stages.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="kanban-board">
+                    <div class="kanban-column" id="kanban-col-Quote" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'Quote')">
+                        <div class="kanban-column-header">
+                            <span data-i18n="status_quote">Quote</span>
+                            <span class="kanban-card-count" id="count-kanban-Quote">0</span>
+                        </div>
+                        <div class="kanban-cards-container" id="cards-kanban-Quote" style="display: flex; flex-direction: column; gap: 0.75rem; min-height: 450px;"></div>
+                    </div>
+                    <div class="kanban-column" id="kanban-col-Draft" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'Draft')">
+                        <div class="kanban-column-header">
+                            <span data-i18n="status_draft">Draft</span>
+                            <span class="kanban-card-count" id="count-kanban-Draft">0</span>
+                        </div>
+                        <div class="kanban-cards-container" id="cards-kanban-Draft" style="display: flex; flex-direction: column; gap: 0.75rem; min-height: 450px;"></div>
+                    </div>
+                    <div class="kanban-column" id="kanban-col-Confirmed" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'Confirmed')">
+                        <div class="kanban-column-header">
+                            <span data-i18n="status_confirmed">Confirmed</span>
+                            <span class="kanban-card-count" id="count-kanban-Confirmed">0</span>
+                        </div>
+                        <div class="kanban-cards-container" id="cards-kanban-Confirmed" style="display: flex; flex-direction: column; gap: 0.75rem; min-height: 450px;"></div>
+                    </div>
+                    <div class="kanban-column" id="kanban-col-Completed" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'Completed')">
+                        <div class="kanban-column-header">
+                            <span data-i18n="status_completed">Completed</span>
+                            <span class="kanban-card-count" id="count-kanban-Completed">0</span>
+                        </div>
+                        <div class="kanban-cards-container" id="cards-kanban-Completed" style="display: flex; flex-direction: column; gap: 0.75rem; min-height: 450px;"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Callbacks CRM View -->
+            <section id="callbacks-subview" class="app-subview" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <div>
+                        <h2 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.8rem;" data-i18n="callbacks_title">
+                            Callbacks CRM</h2>
+                        <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: var(--text-secondary);" data-i18n="callbacks_subtitle">
+                            Review and manage callback and lead enquiries.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="glass-panel" style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                    <input type="text" id="callbacks-search-input" placeholder="Search enquiries..." class="search-input" style="max-width: 250px; margin-bottom: 0;">
+                </div>
+
+                <div class="glass-panel">
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th data-i18n="callbacks_table_name">Name</th>
+                                    <th data-i18n="callbacks_table_phone">Phone</th>
+                                    <th data-i18n="callbacks_table_date">Date</th>
+                                    <th>Venue</th>
+                                    <th data-i18n="callbacks_table_service">Service Requested</th>
+                                    <th data-i18n="callbacks_table_msg">Message</th>
+                                    <th data-i18n="callbacks_table_status">Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="callbacks-table-body">
+                                <tr>
+                                    <td colspan="8" style="text-align: center;">Loading callbacks...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="callbacks-pagination"></div>
+                </div>
+            </section>
+
             <!-- Portfolio Gallery View -->
             <section id="gallery-subview" class="app-subview" style="display: none;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
                     <div>
-                        <h2 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.8rem;">Portfolio Gallery</h2>
-                        <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #5a4a3d;">
+                        <h2 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.8rem;">
+                            Portfolio Gallery</h2>
+                        <p
+                            style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #5a4a3d;">
                             Upload, edit, and manage wedding showcase photos displayed on landing page.
                         </p>
                     </div>
@@ -392,8 +552,10 @@
                     </button>
                 </div>
 
-                <div class="glass-panel" style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-                    <input type="text" id="gallery-search-input" placeholder="Search showcase entries..." class="search-input" style="max-width: 250px; margin-bottom: 0;">
+                <div class="glass-panel"
+                    style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                    <input type="text" id="gallery-search-input" placeholder="Search showcase entries..."
+                        class="search-input" style="max-width: 250px; margin-bottom: 0;">
                 </div>
 
                 <div class="glass-panel">
@@ -423,8 +585,10 @@
             <section id="crew-subview" class="app-subview" style="display: none;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
                     <div>
-                        <h2 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.8rem;">Crew Wages & Ledger</h2>
-                        <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #5a4a3d;">
+                        <h2 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.8rem;">Crew
+                            Wages & Ledger</h2>
+                        <p
+                            style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #5a4a3d;">
                             Track internal crew profiles, base rates, payment logs, and amounts owed.
                         </p>
                     </div>
@@ -432,7 +596,12 @@
                         <button class="btn btn-ghost" id="btn-export-crew">
                             <span data-i18n="export_pdf">📄 Export PDF</span>
                         </button>
-                        <button class="btn btn-secondary" id="btn-manage-attendance" style="border: 2px solid var(--gold); border-radius: 4px; padding: 10px 20px;">
+                        <button class="btn btn-secondary" id="btn-review-payroll"
+                            style="border: 2px solid var(--gold); border-radius: 4px; padding: 10px 20px;">
+                            <span>Review Payroll Summary</span>
+                        </button>
+                        <button class="btn btn-secondary" id="btn-manage-attendance"
+                            style="border: 2px solid var(--gold); border-radius: 4px; padding: 10px 20px;">
                             <span>Daily Attendance Register</span>
                         </button>
                         <button class="btn btn-primary" id="btn-add-crew-member">
@@ -444,21 +613,29 @@
                 <!-- Crew Analytics Board -->
                 <div class="dashboard-grid" style="margin-bottom: 2rem;">
                     <div class="glass-panel stat-card">
-                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--gold);">Roster Strength</span>
+                        <span
+                            style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--gold);">Roster
+                            Strength</span>
                         <div class="stat-val gold" id="crew-stat-total">0</div>
                     </div>
                     <div class="glass-panel stat-card">
-                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--maroon);">Wages Owed</span>
+                        <span
+                            style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--maroon);">Wages
+                            Owed</span>
                         <div class="stat-val danger" id="crew-stat-owed">₹0.00</div>
                     </div>
                     <div class="glass-panel stat-card">
-                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--text-secondary);">Active Assignments</span>
+                        <span
+                            style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--text-secondary);">Active
+                            Assignments</span>
                         <div class="stat-val purple" id="crew-stat-active">0</div>
                     </div>
                 </div>
 
-                <div class="glass-panel" style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-                    <input type="text" id="crew-search-input" placeholder="Search team members..." class="search-input" style="max-width: 250px; margin-bottom: 0;">
+                <div class="glass-panel"
+                    style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                    <input type="text" id="crew-search-input" placeholder="Search team members..." class="search-input"
+                        style="max-width: 250px; margin-bottom: 0;">
                 </div>
 
                 <div class="glass-panel">
@@ -489,10 +666,13 @@
 
             <!-- Finance Hub View -->
             <section id="finance-subview" class="app-subview" style="display: none;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
                     <div>
-                        <h2 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.8rem;">Finance Hub</h2>
-                        <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #5a4a3d;">
+                        <h2 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.8rem;">
+                            Finance Hub</h2>
+                        <p
+                            style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #5a4a3d;">
                             Filter sales, calculate receivables, and view payment transaction logs.
                         </p>
                     </div>
@@ -504,32 +684,47 @@
                 <!-- Finance Analytics Board -->
                 <div class="dashboard-grid" style="margin-bottom: 2rem;">
                     <div class="glass-panel stat-card">
-                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--gold);">Total Sales</span>
+                        <span
+                            style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--gold);">Total
+                            Sales</span>
                         <div class="stat-val gold" id="finance-stat-sales">₹0.00</div>
                     </div>
                     <div class="glass-panel stat-card">
-                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--maroon);">Receivables Balance</span>
+                        <span
+                            style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--maroon);">Receivables
+                            Balance</span>
                         <div class="stat-val danger" id="finance-stat-receivable">₹0.00</div>
                     </div>
                     <div class="glass-panel stat-card">
-                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--text-secondary);">Total Crew Wages</span>
+                        <span
+                            style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--text-secondary);">Total
+                            Crew Wages</span>
                         <div class="stat-val purple" id="finance-stat-wages">₹0.00</div>
                     </div>
                     <div class="glass-panel stat-card">
-                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--status-success);">Net Profit Margin</span>
-                        <div class="stat-val success" id="finance-stat-profit">₹0.00 (<span id="finance-stat-margin">0</span>%)</div>
+                        <span
+                            style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--status-success);">Net
+                            Profit Margin</span>
+                        <div class="stat-val success" id="finance-stat-profit">₹0.00 (<span
+                                id="finance-stat-margin">0</span>%)</div>
                     </div>
                 </div>
-                <div class="glass-panel" style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <div class="glass-panel"
+                    style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
                     <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; margin-bottom: 0;">
                         <span style="font-weight: 600;">Filter Payment Status:</span>
-                        <button class="btn btn-ghost active-filter" data-filter="All" id="filter-btn-all" style="padding: 6px 16px;">All</button>
-                        <button class="btn btn-ghost" data-filter="Fully Paid" id="filter-btn-fully" style="padding: 6px 16px;">Fully Paid</button>
-                        <button class="btn btn-ghost" data-filter="Partially Paid" id="filter-btn-partially" style="padding: 6px 16px;">Partially Paid</button>
-                        <button class="btn btn-ghost" data-filter="Unpaid" id="filter-btn-unpaid" style="padding: 6px 16px;">Unpaid</button>
+                        <button class="btn btn-ghost active-filter" data-filter="All" id="filter-btn-all"
+                            style="padding: 6px 16px;">All</button>
+                        <button class="btn btn-ghost" data-filter="Fully Paid" id="filter-btn-fully"
+                            style="padding: 6px 16px;">Fully Paid</button>
+                        <button class="btn btn-ghost" data-filter="Partially Paid" id="filter-btn-partially"
+                            style="padding: 6px 16px;">Partially Paid</button>
+                        <button class="btn btn-ghost" data-filter="Unpaid" id="filter-btn-unpaid"
+                            style="padding: 6px 16px;">Unpaid</button>
                     </div>
                     <div>
-                        <input type="text" id="finance-search-input" placeholder="Search client / venue..." class="search-input" style="max-width: 250px; margin-bottom: 0;">
+                        <input type="text" id="finance-search-input" placeholder="Search client / venue..."
+                            class="search-input" style="max-width: 250px; margin-bottom: 0;">
                     </div>
                 </div>
                 <div class="glass-panel">
@@ -559,10 +754,13 @@
 
             <!-- Invoices Hub View -->
             <section id="invoice-subview" class="app-subview" style="display: none;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
                     <div>
-                        <h2 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.8rem;">Invoices Hub</h2>
-                        <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #5a4a3d;">
+                        <h2 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.8rem;">
+                            Invoices Hub</h2>
+                        <p
+                            style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #5a4a3d;">
                             Manage billing, track event payment collections, and export high-fidelity PDF invoices.
                         </p>
                     </div>
@@ -579,30 +777,42 @@
                 <!-- Invoice Metrics Board -->
                 <div class="dashboard-grid" style="margin-bottom: 2rem;">
                     <div class="glass-panel stat-card">
-                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--gold);">Total Invoiced</span>
+                        <span
+                            style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--gold);">Total
+                            Invoiced</span>
                         <div class="stat-val gold" id="invoice-stat-total">₹0.00</div>
                     </div>
                     <div class="glass-panel stat-card">
-                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--status-success);">Total Collected</span>
+                        <span
+                            style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--status-success);">Total
+                            Collected</span>
                         <div class="stat-val success" id="invoice-stat-collected">₹0.00</div>
                     </div>
                     <div class="glass-panel stat-card">
-                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--maroon);">Total Remaining</span>
+                        <span
+                            style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--maroon);">Total
+                            Remaining</span>
                         <div class="stat-val danger" id="invoice-stat-remaining">₹0.00</div>
                     </div>
                 </div>
 
                 <!-- Filters & Search Controls -->
-                <div class="glass-panel" style="margin-bottom: 2rem; display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; justify-content: space-between;">
+                <div class="glass-panel"
+                    style="margin-bottom: 2rem; display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; justify-content: space-between;">
                     <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
                         <span style="font-weight: 600;">Filter Status:</span>
-                        <button class="btn btn-ghost active-filter" data-invoice-filter="All" id="invoice-filter-btn-all" style="padding: 6px 16px;">All</button>
-                        <button class="btn btn-ghost" data-invoice-filter="Paid" id="invoice-filter-btn-paid" style="padding: 6px 16px;">Paid</button>
-                        <button class="btn btn-ghost" data-invoice-filter="Remaining" id="invoice-filter-btn-remaining" style="padding: 6px 16px;">Remaining</button>
-                        <button class="btn btn-ghost" data-invoice-filter="Unpaid" id="invoice-filter-btn-unpaid" style="padding: 6px 16px;">Unpaid</button>
+                        <button class="btn btn-ghost active-filter" data-invoice-filter="All"
+                            id="invoice-filter-btn-all" style="padding: 6px 16px;">All</button>
+                        <button class="btn btn-ghost" data-invoice-filter="Paid" id="invoice-filter-btn-paid"
+                            style="padding: 6px 16px;">Paid</button>
+                        <button class="btn btn-ghost" data-invoice-filter="Remaining" id="invoice-filter-btn-remaining"
+                            style="padding: 6px 16px;">Remaining</button>
+                        <button class="btn btn-ghost" data-invoice-filter="Unpaid" id="invoice-filter-btn-unpaid"
+                            style="padding: 6px 16px;">Unpaid</button>
                     </div>
                     <div>
-                        <input type="text" id="invoice-search-input" placeholder="Search Client / Venue..." class="search-input" style="max-width: 250px; margin-bottom: 0;">
+                        <input type="text" id="invoice-search-input" placeholder="Search Client / Venue..."
+                            class="search-input" style="max-width: 250px; margin-bottom: 0;">
                     </div>
                 </div>
 
@@ -634,10 +844,13 @@
 
             <!-- Events Projects View -->
             <section id="events-subview" class="app-subview" style="display: none;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
                     <div>
-                        <h2 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.8rem;">Events Projects</h2>
-                        <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #5a4a3d;">
+                        <h2 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.8rem;">
+                            Events Projects</h2>
+                        <p
+                            style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #5a4a3d;">
                             Track, filter, search, and manage all booked decoration projects.
                         </p>
                     </div>
@@ -654,30 +867,42 @@
                 <!-- Events Analytics Board -->
                 <div class="dashboard-grid" style="margin-bottom: 2rem;">
                     <div class="glass-panel stat-card">
-                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--text-secondary);">Total Bookings</span>
+                        <span
+                            style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--text-secondary);">Total
+                            Bookings</span>
                         <div class="stat-val purple" id="events-stat-total">0</div>
                     </div>
                     <div class="glass-panel stat-card">
-                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--status-success);">Confirmed Projects</span>
+                        <span
+                            style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--status-success);">Confirmed
+                            Projects</span>
                         <div class="stat-val success" id="events-stat-confirmed">0</div>
                     </div>
                     <div class="glass-panel stat-card">
-                        <span style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--gold);">Draft Bookings</span>
+                        <span
+                            style="font-family: 'Poppins', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--gold);">Draft
+                            Bookings</span>
                         <div class="stat-val gold" id="events-stat-draft">0</div>
                     </div>
                 </div>
 
                 <!-- Search & Filter Controls -->
-                <div class="glass-panel" style="margin-bottom: 2rem; display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; justify-content: space-between;">
+                <div class="glass-panel"
+                    style="margin-bottom: 2rem; display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; justify-content: space-between;">
                     <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
                         <span style="font-weight: 600;">Filter Status:</span>
-                        <button class="btn btn-ghost active-filter" data-event-status-filter="All" id="event-status-filter-btn-all" style="padding: 6px 16px;">All</button>
-                        <button class="btn btn-ghost" data-event-status-filter="Draft" id="event-status-filter-btn-draft" style="padding: 6px 16px;">Draft</button>
-                        <button class="btn btn-ghost" data-event-status-filter="Confirmed" id="event-status-filter-btn-confirmed" style="padding: 6px 16px;">Confirmed</button>
-                        <button class="btn btn-ghost" data-event-status-filter="Completed" id="event-status-filter-btn-completed" style="padding: 6px 16px;">Completed</button>
+                        <button class="btn btn-ghost active-filter" data-event-status-filter="All"
+                            id="event-status-filter-btn-all" style="padding: 6px 16px;">All</button>
+                        <button class="btn btn-ghost" data-event-status-filter="Draft"
+                            id="event-status-filter-btn-draft" style="padding: 6px 16px;">Draft</button>
+                        <button class="btn btn-ghost" data-event-status-filter="Confirmed"
+                            id="event-status-filter-btn-confirmed" style="padding: 6px 16px;">Confirmed</button>
+                        <button class="btn btn-ghost" data-event-status-filter="Completed"
+                            id="event-status-filter-btn-completed" style="padding: 6px 16px;">Completed</button>
                     </div>
                     <div>
-                        <input type="text" id="events-search-input" placeholder="Search Client / Venue..." class="search-input" style="max-width: 250px; margin-bottom: 0;">
+                        <input type="text" id="events-search-input" placeholder="Search Client / Venue..."
+                            class="search-input" style="max-width: 250px; margin-bottom: 0;">
                     </div>
                 </div>
 
@@ -705,13 +930,15 @@
                     <div id="events-pagination"></div>
                 </div>
             </section>
-            
+
             <!-- System Settings View -->
             <section id="settings-subview" class="app-subview" style="display: none;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
                     <div>
-                        <h2 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.8rem;" data-i18n="settings_title">System Settings</h2>
-                        <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #5a4a3d;" data-i18n="settings_subtitle">
+                        <h2 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.8rem;"
+                            data-i18n="settings_title">System Settings</h2>
+                        <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #5a4a3d;"
+                            data-i18n="settings_subtitle">
                             Configure booking defaults, business profile details, and appearance themes.
                         </p>
                     </div>
@@ -719,54 +946,73 @@
 
                 <div class="glass-panel" style="max-width: 700px; margin-bottom: 2rem;">
                     <form id="settings-form">
-                        <h3 style="font-family: 'Marcellus', serif; color: var(--maroon); margin-bottom: 1rem;" data-i18n="settings_sec_defaults">Booking Defaults</h3>
+                        <h3 style="font-family: 'Marcellus', serif; color: var(--maroon); margin-bottom: 1rem;"
+                            data-i18n="settings_sec_defaults">Booking Defaults</h3>
                         <div class="row2" style="margin-bottom: 1.5rem;">
                             <div class="field">
-                                <label for="settings-default-tax-rate" data-i18n="settings_tax_rate">Default Tax Rate (%)</label>
-                                <input type="number" id="settings-default-tax-rate" min="0" max="100" step="0.1" placeholder="18">
+                                <label for="settings-default-tax-rate" data-i18n="settings_tax_rate">Default Tax Rate
+                                    (%)</label>
+                                <input type="number" id="settings-default-tax-rate" min="0" max="100" step="0.1"
+                                    placeholder="18">
                             </div>
                             <div class="field">
-                                <label for="settings-default-discount" data-i18n="settings_discount">Default Discount (₹)</label>
+                                <label for="settings-default-discount" data-i18n="settings_discount">Default Discount
+                                    (₹)</label>
                                 <input type="number" id="settings-default-discount" min="0" step="100" placeholder="0">
                             </div>
                         </div>
 
-                        <h3 style="font-family: 'Marcellus', serif; color: var(--maroon); margin-bottom: 1rem;" data-i18n="settings_sec_profile">Company Business Profile</h3>
+                        <h3 style="font-family: 'Marcellus', serif; color: var(--maroon); margin-bottom: 1rem;"
+                            data-i18n="settings_sec_profile">Company Business Profile</h3>
                         <div class="field" style="margin-bottom: 1rem;">
                             <label for="settings-company-name" data-i18n="settings_company_name">Company Name</label>
                             <input type="text" id="settings-company-name" placeholder="Bhoomi Decoration">
                         </div>
                         <div class="field" style="margin-bottom: 1rem;">
-                            <label for="settings-company-address" data-i18n="settings_company_address">Business Address</label>
-                            <textarea id="settings-company-address" rows="3" placeholder="Mumbai, Maharashtra, India"></textarea>
+                            <label for="settings-company-address" data-i18n="settings_company_address">Business
+                                Address</label>
+                            <textarea id="settings-company-address" rows="3"
+                                placeholder="Mumbai, Maharashtra, India"></textarea>
                         </div>
                         <div class="row2" style="margin-bottom: 1.5rem;">
                             <div class="field">
-                                <label for="settings-company-email" data-i18n="settings_company_email">Business Email</label>
-                                <input type="email" id="settings-company-email" placeholder="hello@bhoomidecoration.com">
+                                <label for="settings-company-email" data-i18n="settings_company_email">Business
+                                    Email</label>
+                                <input type="email" id="settings-company-email"
+                                    placeholder="hello@bhoomidecoration.com">
                             </div>
                             <div class="field">
-                                <label for="settings-company-phone" data-i18n="settings_company_phone">Contact Phone</label>
+                                <label for="settings-company-phone" data-i18n="settings_company_phone">Contact
+                                    Phone</label>
                                 <input type="text" id="settings-company-phone" placeholder="+91 99999 99999">
                             </div>
                         </div>
                         <div class="field" style="margin-bottom: 1.5rem;">
-                            <label for="settings-company-website" data-i18n="settings_company_website">Company Website</label>
+                            <label for="settings-company-website" data-i18n="settings_company_website">Company
+                                Website</label>
                             <input type="text" id="settings-company-website" placeholder="www.bhoomidecoration.com">
                         </div>
 
-                        <h3 style="font-family: 'Marcellus', serif; color: var(--maroon); margin-bottom: 1rem;" data-i18n="settings_sec_appearance">Appearance Color Scheme</h3>
+                        <h3 style="font-family: 'Marcellus', serif; color: var(--maroon); margin-bottom: 1rem;"
+                            data-i18n="settings_sec_appearance">Appearance Color Scheme</h3>
                         <div class="field" style="margin-bottom: 2rem;">
                             <label for="settings-theme" data-i18n="settings_theme_label">Theme Palette</label>
                             <select id="settings-theme" style="background: transparent;">
-                                <option value="crimson_red" data-i18n="settings_theme_crimson" style="background: var(--bg-primary); color: var(--text-primary);">Crimson Red (Default Brand)</option>
-                                <option value="emerald_green" data-i18n="settings_theme_emerald" style="background: var(--bg-primary); color: var(--text-primary);">Emerald Green</option>
-                                <option value="midnight_blue" data-i18n="settings_theme_midnight" style="background: var(--bg-primary); color: var(--text-primary);">Midnight Blue</option>
+                                <option value="crimson_red" data-i18n="settings_theme_crimson"
+                                    style="background: var(--bg-primary); color: var(--text-primary);">Crimson Red
+                                    (Default Brand)</option>
+                                <option value="emerald_green" data-i18n="settings_theme_emerald"
+                                    style="background: var(--bg-primary); color: var(--text-primary);">Emerald Green
+                                </option>
+                                <option value="midnight_blue" data-i18n="settings_theme_midnight"
+                                    style="background: var(--bg-primary); color: var(--text-primary);">Midnight Blue
+                                </option>
                             </select>
                         </div>
 
                         <div style="display: flex; justify-content: flex-end;">
-                            <button type="submit" class="btn btn-primary" id="btn-save-settings" data-i18n="settings_btn_save">Save Settings</button>
+                            <button type="submit" class="btn btn-primary" id="btn-save-settings"
+                                data-i18n="settings_btn_save">Save Settings</button>
                         </div>
                     </form>
                 </div>
@@ -782,13 +1028,14 @@
         <div class="modal-card glass-panel">
             <div class="modal-header">
                 <h3 id="booking-modal-title">Book New Event Project</h3>
-                <button class="btn btn-secondary" onclick="closeModal('modal-booking')" style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
+                <button class="btn btn-secondary" onclick="closeModal('modal-booking')"
+                    style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
             </div>
 
             <form id="booking-form">
                 <input type="hidden" id="booking-id">
 
-                <div class="row2">
+                <div class="row3">
                     <div class="form-group">
                         <label for="booking-client">Client Profile</label>
                         <select id="booking-client" required>
@@ -796,14 +1043,25 @@
                         </select>
                     </div>
                     <div class="form-group">
+                        <label for="booking-status">Booking Status</label>
+                        <select id="booking-status" required>
+                            <option value="Confirmed">Confirmed</option>
+                            <option value="Quote">Quote</option>
+                            <option value="Draft">Draft</option>
+                            <option value="Completed">Completed</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label style="opacity: 0;" class="desktop-only">Or Intake Client</label>
-                        <button type="button" class="btn btn-secondary" id="btn-quick-client" style="width: 100%; height: 42px;">+ Intake Client</button>
+                        <button type="button" class="btn btn-secondary" id="btn-quick-client"
+                            style="width: 100%; height: 42px;">+ Intake Client</button>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="booking-venue">Venue Target Address</label>
-                    <input type="text" id="booking-venue" required placeholder="E.g. Grand Ballroom, Taj Mahal Palace, Colaba">
+                    <input type="text" id="booking-venue" required
+                        placeholder="E.g. Grand Ballroom, Taj Mahal Palace, Colaba">
                 </div>
 
                 <div class="row2">
@@ -819,7 +1077,8 @@
 
                 <div class="form-group">
                     <label>Warehouse Reserved Stock Selection</label>
-                    <div id="booking-items-selector" style="max-height: 150px; overflow-y: auto; padding: 0.75rem; border: 1px solid rgba(107,22,35,0.15); border-radius: 4px; display: flex; flex-direction: column; gap: 0.5rem;">
+                    <div id="booking-items-selector"
+                        style="max-height: 150px; overflow-y: auto; padding: 0.75rem; border: 1px solid rgba(107,22,35,0.15); border-radius: 4px; display: flex; flex-direction: column; gap: 0.5rem;">
                         <!-- Checkboxes with quantities of items -->
                     </div>
                 </div>
@@ -831,7 +1090,8 @@
                     </div>
                     <div class="form-group">
                         <label>Crew Worker Assignments</label>
-                        <button type="button" class="btn btn-secondary" id="btn-assign-crew" style="height: 42px;">Configure Crew Wages</button>
+                        <button type="button" class="btn btn-secondary" id="btn-assign-crew"
+                            style="height: 42px;">Configure Crew Wages</button>
                     </div>
                 </div>
 
@@ -851,8 +1111,10 @@
                     <textarea id="booking-notes" rows="2" placeholder="Configure lighting to warm yellow..."></textarea>
                 </div>
 
-                <div class="form-group" style="flex-direction: row; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-booking')">Cancel</button>
+                <div class="form-group"
+                    style="flex-direction: row; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-secondary"
+                        onclick="closeModal('modal-booking')">Cancel</button>
                     <button type="submit" class="btn btn-primary">Save Booking</button>
                 </div>
             </form>
@@ -864,7 +1126,8 @@
         <div class="modal-card glass-panel" style="max-width: 450px;">
             <div class="modal-header">
                 <h3>Mobile Client Intake Form</h3>
-                <button class="btn btn-secondary" onclick="closeModal('modal-client')" style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
+                <button class="btn btn-secondary" onclick="closeModal('modal-client')"
+                    style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
             </div>
 
             <form id="client-form">
@@ -884,7 +1147,8 @@
                     <label for="client-address">Billing/Primary Address</label>
                     <input type="text" id="client-address" placeholder="123 Street Ave, Dadar, Mumbai">
                 </div>
-                <div class="form-group" style="flex-direction: row; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+                <div class="form-group"
+                    style="flex-direction: row; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('modal-client')">Cancel</button>
                     <button type="submit" class="btn btn-primary">Register Client</button>
                 </div>
@@ -897,7 +1161,8 @@
         <div class="modal-card glass-panel" style="max-width: 450px;">
             <div class="modal-header">
                 <h3 id="inventory-modal-title">Register Warehouse Asset</h3>
-                <button class="btn btn-secondary" onclick="closeModal('modal-inventory')" style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
+                <button class="btn btn-secondary" onclick="closeModal('modal-inventory')"
+                    style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
             </div>
 
             <form id="inventory-form">
@@ -941,8 +1206,10 @@
                         </select>
                     </div>
                 </div>
-                <div class="form-group" style="flex-direction: row; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-inventory')">Cancel</button>
+                <div class="form-group"
+                    style="flex-direction: row; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-secondary"
+                        onclick="closeModal('modal-inventory')">Cancel</button>
                     <button type="submit" class="btn btn-primary">Save Asset</button>
                 </div>
             </form>
@@ -954,7 +1221,8 @@
         <div class="modal-card glass-panel">
             <div class="modal-header">
                 <h3>On-Walk Quote Checklist Builder</h3>
-                <button class="btn btn-secondary" onclick="closeModal('modal-quote')" style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
+                <button class="btn btn-secondary" onclick="closeModal('modal-quote')"
+                    style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
             </div>
 
             <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1.5rem;">
@@ -970,13 +1238,17 @@
                 <!-- List of items to input quantities -->
             </div>
 
-            <div class="glass-panel" style="background: rgba(31, 75, 67, 0.1); border: 2px solid var(--gold); display: flex; justify-content: space-between; align-items: center; padding: 1.25rem; border-radius: 4px;">
+            <div class="glass-panel"
+                style="background: rgba(31, 75, 67, 0.1); border: 2px solid var(--gold); display: flex; justify-content: space-between; align-items: center; padding: 1.25rem; border-radius: 4px;">
                 <h4 style="color: var(--maroon); font-family: 'Marcellus', serif;">Estimated Booking Total:</h4>
-                <div style="font-size: 1.75rem; font-weight: 700; color: var(--maroon-deep);" id="quote-total-price">₹0.00</div>
+                <div style="font-size: 1.75rem; font-weight: 700; color: var(--maroon-deep);" id="quote-total-price">
+                    ₹0.00</div>
             </div>
 
-            <div class="form-group" style="flex-direction: row; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('modal-quote')">Close Calculator</button>
+            <div class="form-group"
+                style="flex-direction: row; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modal-quote')">Close
+                    Calculator</button>
             </div>
         </div>
     </div>
@@ -986,7 +1258,8 @@
         <div class="modal-card glass-panel" style="max-width: 480px;">
             <div class="modal-header">
                 <h3>Crew Wages & Allocation</h3>
-                <button class="btn btn-secondary" onclick="closeModal('modal-crew-allocation')" style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
+                <button class="btn btn-secondary" onclick="closeModal('modal-crew-allocation')"
+                    style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
             </div>
 
             <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.5rem;">
@@ -998,7 +1271,8 @@
             </div>
 
             <div class="form-group" style="flex-direction: row; justify-content: flex-end; gap: 0.75rem;">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('modal-crew-allocation')">Cancel</button>
+                <button type="button" class="btn btn-secondary"
+                    onclick="closeModal('modal-crew-allocation')">Cancel</button>
                 <button type="button" class="btn btn-primary" id="btn-apply-crew-allocation">Apply Allocation</button>
             </div>
         </div>
@@ -1009,48 +1283,60 @@
         <div class="modal-card glass-panel" style="max-width: 500px;">
             <div class="modal-header">
                 <h3 data-i18n="payout_modal_title">Event Invoice Details</h3>
-                <button class="btn btn-secondary" onclick="closeModal('modal-invoice-payout')" style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
+                <button class="btn btn-secondary" onclick="closeModal('modal-invoice-payout')"
+                    style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
             </div>
 
-            <div id="invoice-details-box" style="margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem;">
+            <div id="invoice-details-box"
+                style="margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem;">
                 <!-- Rendered dynamically -->
             </div>
 
             <!-- Print Receipt wrapper block -->
             <div id="print-receipt-section" class="print-receipt-only">
-                <div style="text-align: center; border-bottom: 2px solid #000000; padding-bottom: 1rem; margin-bottom: 1rem;">
+                <div
+                    style="text-align: center; border-bottom: 2px solid #000000; padding-bottom: 1rem; margin-bottom: 1rem;">
                     <h2 data-i18n="receipt_contract_title">EVENT DECORATION LOGISTICS CONTRACT</h2>
-                    <p id="print-receipt-comp-header" style="font-family: 'Marcellus', serif;">Bhoomi Decoration, Mumbai</p>
+                    <p id="print-receipt-comp-header" style="font-family: 'Marcellus', serif;">Bhoomi Decoration, Mumbai
+                    </p>
                 </div>
                 <div id="print-content-body"></div>
                 <div style="margin-top: 3rem; display: flex; justify-content: space-between;">
                     <div>
                         <p>___________________________</p>
-                        <p style="font-size: 0.8rem; text-align: center;" data-i18n="receipt_admin">Business Administrator</p>
+                        <p style="font-size: 0.8rem; text-align: center;" data-i18n="receipt_admin">Business
+                            Administrator</p>
                     </div>
                     <div>
                         <p>___________________________</p>
-                        <p style="font-size: 0.8rem; text-align: center;" data-i18n="pdf_client_sign">Client Signature</p>
+                        <p style="font-size: 0.8rem; text-align: center;" data-i18n="pdf_client_sign">Client Signature
+                        </p>
                     </div>
                 </div>
             </div>
 
             <!-- Collect Payment Form -->
-            <form id="payment-form" style="border-top: 1px solid rgba(107,22,35,0.15); padding-top: 1.25rem; margin-top: 1.25rem;">
+            <form id="payment-form"
+                style="border-top: 1px solid rgba(107,22,35,0.15); padding-top: 1.25rem; margin-top: 1.25rem;">
                 <div class="form-group">
-                    <label for="payment-amount" data-i18n="payout_record_label">Record Cash Deposit / Payment Receipt (₹)</label>
+                    <label for="payment-amount" data-i18n="payout_record_label">Record Cash Deposit / Payment Receipt
+                        (₹)</label>
                     <div style="display: flex; gap: 0.75rem;">
-                        <input type="number" id="payment-amount" required min="1" step="1" placeholder="15000" style="flex: 1;">
-                        <button type="submit" class="btn btn-primary" data-i18n="payout_btn_record">Record Payment</button>
+                        <input type="number" id="payment-amount" required min="1" step="1" placeholder="15000"
+                            style="flex: 1;">
+                        <button type="submit" class="btn btn-primary" data-i18n="payout_btn_record">Record
+                            Payment</button>
                     </div>
                 </div>
             </form>
 
-            <div class="form-group" style="flex-direction: row; justify-content: space-between; align-items: center; margin-top: 1.5rem;">
+            <div class="form-group"
+                style="flex-direction: row; justify-content: space-between; align-items: center; margin-top: 1.5rem;">
                 <button type="button" class="btn btn-secondary" id="btn-export-print">
                     <span data-i18n="payout_btn_export">Export Contract & Receipt</span>
                 </button>
-                <button type="button" class="btn btn-secondary" onclick="closeModal('modal-invoice-payout')" data-i18n="payout_btn_close">Close</button>
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modal-invoice-payout')"
+                    data-i18n="payout_btn_close">Close</button>
             </div>
         </div>
     </div>
@@ -1060,7 +1346,8 @@
         <div class="modal-card glass-panel" style="max-width: 650px; max-height: 90vh; overflow-y: auto;">
             <div class="modal-header">
                 <h3 id="manual-invoice-modal-title">Create Manual Custom Invoice</h3>
-                <button class="btn btn-secondary" onclick="closeModal('modal-manual-invoice')" style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
+                <button class="btn btn-secondary" onclick="closeModal('modal-manual-invoice')"
+                    style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
             </div>
 
             <form id="manual-invoice-form">
@@ -1076,7 +1363,9 @@
                     </div>
                     <div class="form-group">
                         <label style="opacity: 0;">Or Add Info Below</label>
-                        <span style="font-size: 0.85rem; color: var(--text-muted); display: block; padding-top: 10px;">Select to autofill, or write custom details below.</span>
+                        <span
+                            style="font-size: 0.85rem; color: var(--text-muted); display: block; padding-top: 10px;">Select
+                            to autofill, or write custom details below.</span>
                     </div>
                 </div>
 
@@ -1087,25 +1376,29 @@
                     </div>
                     <div class="form-group">
                         <label for="manual-invoice-client-email">Client Email</label>
-                        <input type="email" id="manual-invoice-client-email" required placeholder="E.g., priya@example.com">
+                        <input type="email" id="manual-invoice-client-email" required
+                            placeholder="E.g., priya@example.com">
                     </div>
                 </div>
 
                 <div class="row2">
                     <div class="form-group">
                         <label for="manual-invoice-client-phone">Client Phone</label>
-                        <input type="text" id="manual-invoice-client-phone" required placeholder="E.g., +91 98765 43210">
+                        <input type="text" id="manual-invoice-client-phone" required
+                            placeholder="E.g., +91 98765 43210">
                     </div>
                     <div class="form-group">
                         <label for="manual-invoice-client-address">Billing Address</label>
-                        <input type="text" id="manual-invoice-client-address" required placeholder="E.g., 456 Residency Rd, Mumbai">
+                        <input type="text" id="manual-invoice-client-address" required
+                            placeholder="E.g., 456 Residency Rd, Mumbai">
                     </div>
                 </div>
 
                 <!-- Event Details -->
                 <div class="form-group">
                     <label for="manual-invoice-venue">Venue Target Address</label>
-                    <input type="text" id="manual-invoice-venue" required placeholder="E.g., Taj Mahal Palace, Ballroom, Colaba">
+                    <input type="text" id="manual-invoice-venue" required
+                        placeholder="E.g., Taj Mahal Palace, Ballroom, Colaba">
                 </div>
 
                 <div class="row2">
@@ -1122,12 +1415,15 @@
                 <!-- Custom Items Builder -->
                 <div class="form-group">
                     <label>Invoice Line Items (Custom Items)</label>
-                    <div id="manual-invoice-items-list" style="margin-bottom: 0.75rem; max-height: 180px; overflow-y: auto; padding: 0.5rem; border: 1px solid rgba(107,22,35,0.15); border-radius: 4px; display: flex; flex-direction: column; gap: 0.5rem; background: rgba(255,255,255,0.2);">
-                        <div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 0.5rem;">No items added yet. Click "Add Custom Item" below.</div>
+                    <div id="manual-invoice-items-list"
+                        style="margin-bottom: 0.75rem; max-height: 180px; overflow-y: auto; padding: 0.5rem; border: 1px solid rgba(107,22,35,0.15); border-radius: 4px; display: flex; flex-direction: column; gap: 0.5rem; background: rgba(255,255,255,0.2);">
+                        <div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 0.5rem;">
+                            No items added yet. Click "Add Custom Item" below.</div>
                     </div>
-                    
+
                     <!-- Add custom item form inline -->
-                    <div style="display: grid; grid-template-columns: 2fr 1.2fr 1.2fr auto; gap: 0.5rem; align-items: end;">
+                    <div
+                        style="display: grid; grid-template-columns: 2fr 1.2fr 1.2fr auto; gap: 0.5rem; align-items: end;">
                         <div class="form-group" style="margin-bottom: 0;">
                             <label style="font-size: 0.75rem;">Item Description</label>
                             <input type="text" id="new-item-desc" placeholder="E.g., Stage Floral Arch">
@@ -1140,7 +1436,8 @@
                             <label style="font-size: 0.75rem;">Daily Rate (₹)</label>
                             <input type="number" id="new-item-rate" min="0" value="0">
                         </div>
-                        <button type="button" class="btn btn-secondary" id="btn-add-custom-item" style="padding: 0.5rem 0.75rem; height: 38px;">Add</button>
+                        <button type="button" class="btn btn-secondary" id="btn-add-custom-item"
+                            style="padding: 0.5rem 0.75rem; height: 38px;">Add</button>
                     </div>
                 </div>
 
@@ -1177,14 +1474,20 @@
                 </div>
 
                 <!-- Grand Total Preview -->
-                <div class="glass-panel" style="background: rgba(31, 75, 67, 0.1); border: 2px solid var(--gold); display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-radius: 4px; margin-top: 1rem;">
-                    <h4 style="color: var(--maroon); font-family: 'Marcellus', serif; margin: 0;">Calculated Invoice Total:</h4>
-                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--maroon-deep);" id="manual-invoice-grand-total">₹0.00</div>
+                <div class="glass-panel"
+                    style="background: rgba(31, 75, 67, 0.1); border: 2px solid var(--gold); display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-radius: 4px; margin-top: 1rem;">
+                    <h4 style="color: var(--maroon); font-family: 'Marcellus', serif; margin: 0;">Calculated Invoice
+                        Total:</h4>
+                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--maroon-deep);"
+                        id="manual-invoice-grand-total">₹0.00</div>
                 </div>
 
-                <div class="form-group" style="flex-direction: row; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-manual-invoice')">Cancel</button>
-                    <button type="submit" class="btn btn-primary" id="btn-save-manual-invoice">Save & Export PDF</button>
+                <div class="form-group"
+                    style="flex-direction: row; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-secondary"
+                        onclick="closeModal('modal-manual-invoice')">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btn-save-manual-invoice">Save & Export
+                        PDF</button>
                 </div>
             </form>
         </div>
@@ -1195,7 +1498,8 @@
         <div class="modal-card glass-panel" style="max-width: 450px;">
             <div class="modal-header">
                 <h3>Upload Layout Blueprints / Sketch</h3>
-                <button class="btn btn-secondary" onclick="closeModal('modal-upload-layout')" style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
+                <button class="btn btn-secondary" onclick="closeModal('modal-upload-layout')"
+                    style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
             </div>
 
             <form id="upload-layout-form">
@@ -1208,8 +1512,10 @@
                     </p>
                 </div>
 
-                <div class="form-group" style="flex-direction: row; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-upload-layout')">Cancel</button>
+                <div class="form-group"
+                    style="flex-direction: row; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-secondary"
+                        onclick="closeModal('modal-upload-layout')">Cancel</button>
                     <button type="submit" class="btn btn-primary" id="btn-upload-submit">Upload Layout</button>
                 </div>
             </form>
@@ -1221,7 +1527,8 @@
         <div class="modal-card glass-panel" style="max-width: 550px;">
             <div class="modal-header">
                 <h3>Client Profile Details</h3>
-                <button class="btn btn-secondary" onclick="closeModal('modal-client-details')" style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
+                <button class="btn btn-secondary" onclick="closeModal('modal-client-details')"
+                    style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
             </div>
             <div id="client-details-content" style="display: flex; flex-direction: column; gap: 1.5rem;">
                 <!-- Dynamically populated -->
@@ -1234,7 +1541,8 @@
         <div class="modal-card glass-panel" style="max-width: 650px; max-height: 85vh; overflow-y: auto;">
             <div class="modal-header">
                 <h3>Event Details & Timeline</h3>
-                <button class="btn btn-secondary" onclick="closeModal('modal-event-details')" style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
+                <button class="btn btn-secondary" onclick="closeModal('modal-event-details')"
+                    style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
             </div>
             <div id="event-details-content" style="display: flex; flex-direction: column; gap: 1.5rem;">
                 <!-- Dynamically populated -->
@@ -1246,8 +1554,9 @@
     <div class="modal-overlay" id="modal-onboard-crew">
         <div class="modal-card glass-panel" style="max-width: 450px;">
             <div class="modal-header">
-                <h3>Add Admin Member (Admin Only)</h3>
-                <button class="btn btn-secondary" onclick="closeModal('modal-onboard-crew')" style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
+                <h3>Onboard Team Member (Admin Only)</h3>
+                <button class="btn btn-secondary" onclick="closeModal('modal-onboard-crew')"
+                    style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
             </div>
 
             <form id="onboard-crew-form">
@@ -1267,15 +1576,18 @@
                     <label for="onboard-role">Access Role</label>
                     <select id="onboard-role" required>
                         <option value="admin">Admin (Manager)</option>
+                        <option value="labor">Field Crew (Labor)</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label for="onboard-rate">Base Daily Wage Rate (₹ / Day)</label>
                     <input type="number" id="onboard-rate" required min="0" value="0" step="10">
                 </div>
-                <div class="form-group" style="flex-direction: row; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-onboard-crew')">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Onboard Admin Member</button>
+                <div class="form-group"
+                    style="flex-direction: row; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-secondary"
+                        onclick="closeModal('modal-onboard-crew')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Onboard Member</button>
                 </div>
             </form>
         </div>
@@ -1286,7 +1598,8 @@
         <div class="modal-card glass-panel" style="max-width: 450px;">
             <div class="modal-header">
                 <h3 id="gallery-modal-title">Upload Portfolio Photo</h3>
-                <button class="btn btn-secondary" onclick="closeModal('modal-gallery')" style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
+                <button class="btn btn-secondary" onclick="closeModal('modal-gallery')"
+                    style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
             </div>
             <form id="gallery-form">
                 <input type="hidden" id="gallery-id">
@@ -1306,7 +1619,8 @@
                 </div>
                 <div class="form-group">
                     <label for="gallery-desc">Description</label>
-                    <textarea id="gallery-desc" rows="2" placeholder="Brief description of the decoration..."></textarea>
+                    <textarea id="gallery-desc" rows="2"
+                        placeholder="Brief description of the decoration..."></textarea>
                 </div>
                 <div class="form-group" id="gallery-file-group">
                     <label for="gallery-file">Select Showcase Image</label>
@@ -1316,8 +1630,10 @@
                     <label for="gallery-url">Image URL</label>
                     <input type="text" id="gallery-url" placeholder="http://...">
                 </div>
-                <div class="form-group" style="flex-direction: row; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-gallery')">Cancel</button>
+                <div class="form-group"
+                    style="flex-direction: row; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-secondary"
+                        onclick="closeModal('modal-gallery')">Cancel</button>
                     <button type="submit" class="btn btn-primary" id="btn-gallery-save">Upload & Save</button>
                 </div>
             </form>
@@ -1329,7 +1645,8 @@
         <div class="modal-card glass-panel" style="max-width: 450px;">
             <div class="modal-header">
                 <h3 id="crew-modal-title">Create Team Profile</h3>
-                <button class="btn btn-secondary" onclick="closeModal('modal-crew')" style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
+                <button class="btn btn-secondary" onclick="closeModal('modal-crew')"
+                    style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
             </div>
             <form id="crew-form">
                 <input type="hidden" id="crew-id">
@@ -1352,14 +1669,17 @@
                 <div class="row2">
                     <div class="form-group">
                         <label for="crew-half-day-rate">Half Day Rate (₹ - Optional)</label>
-                        <input type="number" id="crew-half-day-rate" min="0" placeholder="Auto-calculate (50%)" step="any">
+                        <input type="number" id="crew-half-day-rate" min="0" placeholder="Auto-calculate (50%)"
+                            step="any">
                     </div>
                     <div class="form-group">
                         <label for="crew-night-rate">Night Work Rate (₹ - Optional)</label>
-                        <input type="number" id="crew-night-rate" min="0" placeholder="Auto-calculate (150%)" step="any">
+                        <input type="number" id="crew-night-rate" min="0" placeholder="Auto-calculate (150%)"
+                            step="any">
                     </div>
                 </div>
-                <div class="form-group" style="flex-direction: row; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+                <div class="form-group"
+                    style="flex-direction: row; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('modal-crew')">Cancel</button>
                     <button type="submit" class="btn btn-primary">Save Profile</button>
                 </div>
@@ -1372,7 +1692,8 @@
         <div class="modal-card glass-panel" style="max-width: 450px;">
             <div class="modal-header">
                 <h3>Record Crew Wage Payout</h3>
-                <button class="btn btn-secondary" onclick="closeModal('modal-crew-payment')" style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
+                <button class="btn btn-secondary" onclick="closeModal('modal-crew-payment')"
+                    style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
             </div>
             <form id="crew-payment-form">
                 <input type="hidden" id="crew-payment-id">
@@ -1388,11 +1709,100 @@
                     <label for="crew-payment-amount">Payment Amount (₹)</label>
                     <input type="number" id="crew-payment-amount" required min="1" step="1" placeholder="₹ Amount">
                 </div>
-                <div class="form-group" style="flex-direction: row; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-crew-payment')">Cancel</button>
+                <div class="form-group"
+                    style="flex-direction: row; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-secondary"
+                        onclick="closeModal('modal-crew-payment')">Cancel</button>
                     <button type="submit" class="btn btn-primary">Record Payout</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Calendar Availability Modal -->
+    <div class="modal-overlay" id="modal-item-availability">
+        <div class="modal-card glass-panel" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3>Asset Booking Schedule</h3>
+                <button class="btn btn-secondary" onclick="closeModal('modal-item-availability')"
+                    style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
+            </div>
+            <div style="margin-bottom: 1rem;">
+                <label>Item Name:</label>
+                <span id="availability-item-name" style="font-weight: 600; font-size: 1.1rem; margin-left: 0.5rem;">-</span>
+            </div>
+            
+            <div class="availability-calendar-container">
+                <div class="availability-calendar-header">
+                    <button type="button" class="btn btn-secondary" style="padding: 0.25rem 0.5rem;" onclick="changeCalendarMonth(-1)">←</button>
+                    <span id="calendar-month-year" style="font-weight: 600;">June 2026</span>
+                    <button type="button" class="btn-secondary" style="padding: 0.25rem 0.5rem;" onclick="changeCalendarMonth(1)">→</button>
+                </div>
+                <div class="availability-calendar-grid" id="availability-calendar-grid">
+                    <!-- Loaded dynamically via JS -->
+                </div>
+            </div>
+            
+            <div style="margin-top: 1.5rem; display: flex; justify-content: flex-end;">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modal-item-availability')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payroll Review/Release Modal -->
+    <div class="modal-overlay" id="modal-payroll-release">
+        <div class="modal-card glass-panel" style="max-width: 650px; max-height: 90vh; overflow-y: auto;">
+            <div class="modal-header">
+                <h3>Calculate & Review Payroll</h3>
+                <button class="btn btn-secondary" onclick="closeModal('modal-payroll-release')"
+                    style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
+            </div>
+            
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.5rem;">
+                Summarizes active wages, days worked, and payouts due for all team members.
+            </p>
+            
+            <div class="table-wrapper" style="margin-bottom: 1.5rem; max-height: 350px; overflow-y: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Crew Member</th>
+                            <th>Role</th>
+                            <th>Days Worked</th>
+                            <th>Base Rate</th>
+                            <th style="text-align: right;">Total Wages Due</th>
+                        </tr>
+                    </thead>
+                    <tbody id="payroll-release-table-body">
+                        <!-- Loaded dynamically via JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Print Payroll Summary block -->
+            <div id="print-payroll-section" class="print-receipt-only">
+                <div style="text-align: center; border-bottom: 2px solid #000000; padding-bottom: 1rem; margin-bottom: 1rem;">
+                    <h2>BHOOMI DECORATION - PAYROLL SUMMARY</h2>
+                    <p>Mumbai, Maharashtra, India</p>
+                </div>
+                <div id="print-payroll-body"></div>
+                <div style="margin-top: 3rem; display: flex; justify-content: space-between;">
+                    <div>
+                        <p>___________________________</p>
+                        <p style="font-size: 0.8rem; text-align: center;">Business Administrator</p>
+                    </div>
+                    <div>
+                        <p>___________________________</p>
+                        <p style="font-size: 0.8rem; text-align: center;">Authorized Signature</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group"
+                style="flex-direction: row; justify-content: space-between; align-items: center; margin-top: 1.5rem;">
+                <button type="button" class="btn btn-secondary" id="btn-export-payroll-pdf">Export Payroll PDF</button>
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modal-payroll-release')">Close</button>
+            </div>
         </div>
     </div>
 
@@ -1401,7 +1811,8 @@
         <div class="modal-card glass-panel" style="max-width: 650px; max-height: 90vh; overflow-y: auto;">
             <div class="modal-header">
                 <h3>Daily Attendance Register</h3>
-                <button class="btn btn-secondary" onclick="closeModal('modal-attendance')" style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
+                <button class="btn btn-secondary" onclick="closeModal('modal-attendance')"
+                    style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
             </div>
 
             <form id="attendance-form">
@@ -1426,8 +1837,10 @@
                     </table>
                 </div>
 
-                <div class="form-group" style="flex-direction: row; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-attendance')">Cancel</button>
+                <div class="form-group"
+                    style="flex-direction: row; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-secondary"
+                        onclick="closeModal('modal-attendance')">Cancel</button>
                     <button type="submit" class="btn btn-primary">Save Attendance Register</button>
                 </div>
             </form>
@@ -1439,7 +1852,8 @@
         <div class="modal-card glass-panel" style="max-width: 500px; max-height: 80vh; overflow-y: auto;">
             <div class="modal-header">
                 <h3>Payout History</h3>
-                <button class="btn btn-secondary" onclick="closeModal('modal-crew-history')" style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
+                <button class="btn btn-secondary" onclick="closeModal('modal-crew-history')"
+                    style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
             </div>
             <div style="margin-bottom: 1rem;">
                 <label>Crew Member:</label>
@@ -1460,52 +1874,80 @@
                 </table>
             </div>
             <div style="display: flex; justify-content: flex-end;">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('modal-crew-history')">Close</button>
+                <button type="button" class="btn btn-secondary"
+                    onclick="closeModal('modal-crew-history')">Close</button>
             </div>
         </div>
     </div>
 
     <!-- Hidden Crew Payout PDF Template -->
     <div id="crew-payout-pdf-template" style="display: none;">
-        <div class="pdf-container" style="padding: 40px; font-family: 'Poppins', 'Noto Sans Gujarati', sans-serif; color: #333; background: #fff; max-width: 800px; margin: 0 auto; box-sizing: border-box; border: 1px solid #eee; border-radius: 8px;">
+        <div class="pdf-container"
+            style="padding: 40px; font-family: 'Poppins', 'Noto Sans Gujarati', sans-serif; color: #333; background: #fff; max-width: 800px; margin: 0 auto; box-sizing: border-box; border: 1px solid #eee; border-radius: 8px;">
             <!-- Brand Header -->
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #6b1623; padding-bottom: 20px; margin-bottom: 30px;">
+            <div
+                style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #6b1623; padding-bottom: 20px; margin-bottom: 30px;">
                 <div>
-                    <h1 id="pdf-crew-comp-name" style="font-family: 'Marcellus', serif; color: #6b1623; margin: 0 0 5px 0; font-size: 2.2rem; letter-spacing: 2px;">BHOOMI DECORATION</h1>
-                    <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #c9941f; margin: 0 0 10px 0; font-weight: 500;">Luxury Event & Wedding Decorators</p>
-                    <p id="pdf-crew-comp-details" style="margin: 0; font-size: 0.8rem; color: #666; line-height: 1.4;">Mumbai, Maharashtra, India<br>Email: hello@bhoomidecoration.com | Web: www.bhoomidecoration.com</p>
+                    <h1 id="pdf-crew-comp-name"
+                        style="font-family: 'Marcellus', serif; color: #6b1623; margin: 0 0 5px 0; font-size: 2.2rem; letter-spacing: 2px;">
+                        BHOOMI DECORATION</h1>
+                    <p
+                        style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #c9941f; margin: 0 0 10px 0; font-weight: 500;">
+                        Luxury Event & Wedding Decorators</p>
+                    <p id="pdf-crew-comp-details" style="margin: 0; font-size: 0.8rem; color: #666; line-height: 1.4;">
+                        Mumbai, Maharashtra, India<br>Email: hello@bhoomidecoration.com | Web: www.bhoomidecoration.com
+                    </p>
                 </div>
                 <div style="text-align: right;">
-                    <h2 style="font-family: 'Marcellus', serif; color: #333; margin: 0 0 10px 0; font-size: 1.8rem; letter-spacing: 1px;">PAYOUT RECEIPT</h2>
-                    <p style="margin: 0; font-size: 0.85rem; color: #666;">Date: <span id="pdf-payout-date">DD/MM/YYYY</span></p>
+                    <h2
+                        style="font-family: 'Marcellus', serif; color: #333; margin: 0 0 10px 0; font-size: 1.8rem; letter-spacing: 1px;">
+                        PAYOUT RECEIPT</h2>
+                    <p style="margin: 0; font-size: 0.85rem; color: #666;">Date: <span
+                            id="pdf-payout-date">DD/MM/YYYY</span></p>
                 </div>
             </div>
 
             <!-- Receipt Info Grid -->
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 35px;">
                 <div style="background: #fdfaf7; border-left: 3px solid #c9941f; padding: 15px; border-radius: 4px;">
-                    <h3 style="font-family: 'Marcellus', serif; color: #6b1623; font-size: 1rem; margin: 0 0 10px 0; letter-spacing: 0.5px;">PAID TO:</h3>
-                    <p style="margin: 0 0 5px 0; font-size: 1rem; font-weight: 600;" id="pdf-crew-name">Rajesh Sharma</p>
-                    <p style="margin: 0 0 5px 0; font-size: 0.85rem; color: #555;"><strong>Role:</strong> <span id="pdf-crew-role">Lead Florist</span></p>
-                    <p style="margin: 0; font-size: 0.85rem; color: #555;"><strong>Contact:</strong> <span id="pdf-crew-contact">+91 99999 99999</span></p>
+                    <h3
+                        style="font-family: 'Marcellus', serif; color: #6b1623; font-size: 1rem; margin: 0 0 10px 0; letter-spacing: 0.5px;">
+                        PAID TO:</h3>
+                    <p style="margin: 0 0 5px 0; font-size: 1rem; font-weight: 600;" id="pdf-crew-name">Rajesh Sharma
+                    </p>
+                    <p style="margin: 0 0 5px 0; font-size: 0.85rem; color: #555;"><strong>Role:</strong> <span
+                            id="pdf-crew-role">Lead Florist</span></p>
+                    <p style="margin: 0; font-size: 0.85rem; color: #555;"><strong>Contact:</strong> <span
+                            id="pdf-crew-contact">+91 99999 99999</span></p>
                 </div>
-                <div style="background: #fdfaf7; border-left: 3px solid #6b1623; padding: 15px; border-radius: 4px; display: flex; flex-direction: column; justify-content: center;">
-                    <h3 style="font-family: 'Marcellus', serif; color: #6b1623; font-size: 1rem; margin: 0 0 10px 0; letter-spacing: 0.5px;">PAYMENT SUMMARY:</h3>
-                    <p style="margin: 0 0 5px 0; font-size: 0.9rem;"><strong>Payment Amount:</strong> <span id="pdf-payout-amount" style="font-weight: 600; color: #1f4b43; font-size: 1.1rem;">₹0.00</span></p>
-                    <p style="margin: 0; font-size: 0.9rem;"><strong>Remaining Owed:</strong> <span id="pdf-payout-remaining" style="font-weight: 600; color: #6b1623;">₹0.00</span></p>
+                <div
+                    style="background: #fdfaf7; border-left: 3px solid #6b1623; padding: 15px; border-radius: 4px; display: flex; flex-direction: column; justify-content: center;">
+                    <h3
+                        style="font-family: 'Marcellus', serif; color: #6b1623; font-size: 1rem; margin: 0 0 10px 0; letter-spacing: 0.5px;">
+                        PAYMENT SUMMARY:</h3>
+                    <p style="margin: 0 0 5px 0; font-size: 0.9rem;"><strong>Payment Amount:</strong> <span
+                            id="pdf-payout-amount"
+                            style="font-weight: 600; color: #1f4b43; font-size: 1.1rem;">₹0.00</span></p>
+                    <p style="margin: 0; font-size: 0.9rem;"><strong>Remaining Owed:</strong> <span
+                            id="pdf-payout-remaining" style="font-weight: 600; color: #6b1623;">₹0.00</span></p>
                 </div>
             </div>
 
             <!-- Notes Section -->
-            <div style="background: #fafafa; border: 1px solid #eee; padding: 15px; border-radius: 4px; margin-bottom: 40px;">
-                <h4 style="font-family: 'Marcellus', serif; color: #6b1623; font-size: 0.9rem; margin: 0 0 8px 0;">PAYMENT NOTE</h4>
+            <div
+                style="background: #fafafa; border: 1px solid #eee; padding: 15px; border-radius: 4px; margin-bottom: 40px;">
+                <h4 style="font-family: 'Marcellus', serif; color: #6b1623; font-size: 0.9rem; margin: 0 0 8px 0;">
+                    PAYMENT NOTE</h4>
                 <p style="margin: 0; font-size: 0.8rem; color: #555; line-height: 1.4;">
-                    This document serves as formal acknowledgement of wages/payout received from Bhoomi Decoration. The recipient confirms that the payment amount listed above is correct and has been successfully received.
+                    This document serves as formal acknowledgement of wages/payout received from Bhoomi Decoration. The
+                    recipient confirms that the payment amount listed above is correct and has been successfully
+                    received.
                 </p>
             </div>
 
             <!-- Signature Lines -->
-            <div style="margin-top: 60px; display: flex; justify-content: space-between; align-items: flex-end; padding-top: 20px; border-top: 1px dashed #ddd;">
+            <div
+                style="margin-top: 60px; display: flex; justify-content: space-between; align-items: flex-end; padding-top: 20px; border-top: 1px dashed #ddd;">
                 <div style="text-align: center;">
                     <div style="width: 180px; border-bottom: 1px solid #888; margin-bottom: 5px;"></div>
                     <p style="margin: 0; font-size: 0.75rem; color: #666; font-weight: 600;">Authorized Signatory</p>
@@ -1519,7 +1961,8 @@
             </div>
 
             <!-- Footer Message -->
-            <div style="text-align: center; margin-top: 50px; font-size: 0.75rem; color: #999; font-style: italic; border-top: 1px solid #eee; padding-top: 15px;">
+            <div
+                style="text-align: center; margin-top: 50px; font-size: 0.75rem; color: #999; font-style: italic; border-top: 1px solid #eee; padding-top: 15px;">
                 Thank you for your hard work and dedication to Bhoomi Decoration events!
             </div>
         </div>
@@ -1530,47 +1973,76 @@
 
     <!-- Hidden High-Fidelity PDF Export Template -->
     <div id="invoice-pdf-template" style="display: none;">
-        <div class="pdf-container" style="padding: 30px; font-family: 'Poppins', 'Noto Sans Gujarati', sans-serif; color: #333; background: #fff; max-width: 800px; margin: 0 auto; box-sizing: border-box;">
+        <div class="pdf-container"
+            style="padding: 30px; font-family: 'Poppins', 'Noto Sans Gujarati', sans-serif; color: #333; background: #fff; max-width: 800px; margin: 0 auto; box-sizing: border-box;">
             <!-- Brand Header -->
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #6b1623; padding-bottom: 20px; margin-bottom: 30px;">
+            <div
+                style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #6b1623; padding-bottom: 20px; margin-bottom: 30px;">
                 <div>
-                    <h1 id="pdf-invoice-comp-name" style="font-family: 'Marcellus', serif; color: #6b1623; margin: 0 0 5px 0; font-size: 2.2rem; letter-spacing: 2px;">BHOOMI DECORATION</h1>
-                    <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #c9941f; margin: 0 0 10px 0; font-weight: 500;">Luxury Event & Wedding Decorators</p>
-                    <p id="pdf-invoice-comp-details" style="margin: 0; font-size: 0.8rem; color: #666; line-height: 1.4;">Mumbai, Maharashtra, India<br>Email: hello@bhoomidecoration.com | Web: www.bhoomidecoration.com</p>
+                    <h1 id="pdf-invoice-comp-name"
+                        style="font-family: 'Marcellus', serif; color: #6b1623; margin: 0 0 5px 0; font-size: 2.2rem; letter-spacing: 2px;">
+                        BHOOMI DECORATION</h1>
+                    <p
+                        style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #c9941f; margin: 0 0 10px 0; font-weight: 500;">
+                        Luxury Event & Wedding Decorators</p>
+                    <p id="pdf-invoice-comp-details"
+                        style="margin: 0; font-size: 0.8rem; color: #666; line-height: 1.4;">Mumbai, Maharashtra,
+                        India<br>Email: hello@bhoomidecoration.com | Web: www.bhoomidecoration.com</p>
                 </div>
                 <div style="text-align: right;">
-                    <h2 style="font-family: 'Marcellus', serif; color: #333; margin: 0 0 10px 0; font-size: 1.8rem; letter-spacing: 1px;" data-i18n="pdf_invoice_title">INVOICE</h2>
-                    <p style="margin: 0 0 5px 0; font-size: 0.9rem; font-weight: 600;"><span data-i18n="pdf_invoice_no">Invoice No:</span> <span id="pdf-invoice-id" style="color: #6b1623;">#EVT-XXXX</span></p>
-                    <p style="margin: 0; font-size: 0.85rem; color: #666;"><span data-i18n="pdf_date_label">Date:</span> <span id="pdf-invoice-date">DD/MM/YYYY</span></p>
+                    <h2 style="font-family: 'Marcellus', serif; color: #333; margin: 0 0 10px 0; font-size: 1.8rem; letter-spacing: 1px;"
+                        data-i18n="pdf_invoice_title">INVOICE</h2>
+                    <p style="margin: 0 0 5px 0; font-size: 0.9rem; font-weight: 600;"><span
+                            data-i18n="pdf_invoice_no">Invoice No:</span> <span id="pdf-invoice-id"
+                            style="color: #6b1623;">#EVT-XXXX</span></p>
+                    <p style="margin: 0; font-size: 0.85rem; color: #666;"><span data-i18n="pdf_date_label">Date:</span>
+                        <span id="pdf-invoice-date">DD/MM/YYYY</span>
+                    </p>
                 </div>
             </div>
 
             <!-- Client & Event Info Details Grid -->
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 35px;">
                 <div style="background: #fdfaf7; border-left: 3px solid #c9941f; padding: 15px; border-radius: 4px;">
-                    <h3 style="font-family: 'Marcellus', serif; color: #6b1623; font-size: 1rem; margin: 0 0 10px 0; letter-spacing: 0.5px;" data-i18n="pdf_invoice_to">BILLED TO:</h3>
-                    <p style="margin: 0 0 5px 0; font-size: 0.9rem; font-weight: 600;" id="pdf-client-name">Client Name</p>
-                    <p style="margin: 0 0 5px 0; font-size: 0.8rem; color: #555;" id="pdf-client-email">client@email.com</p>
-                    <p style="margin: 0 0 5px 0; font-size: 0.8rem; color: #555;" id="pdf-client-phone">+91 99999 99999</p>
-                    <p style="margin: 0; font-size: 0.8rem; color: #555; line-height: 1.3;" id="pdf-client-address">Billing Address</p>
+                    <h3 style="font-family: 'Marcellus', serif; color: #6b1623; font-size: 1rem; margin: 0 0 10px 0; letter-spacing: 0.5px;"
+                        data-i18n="pdf_invoice_to">BILLED TO:</h3>
+                    <p style="margin: 0 0 5px 0; font-size: 0.9rem; font-weight: 600;" id="pdf-client-name">Client Name
+                    </p>
+                    <p style="margin: 0 0 5px 0; font-size: 0.8rem; color: #555;" id="pdf-client-email">client@email.com
+                    </p>
+                    <p style="margin: 0 0 5px 0; font-size: 0.8rem; color: #555;" id="pdf-client-phone">+91 99999 99999
+                    </p>
+                    <p style="margin: 0; font-size: 0.8rem; color: #555; line-height: 1.3;" id="pdf-client-address">
+                        Billing Address</p>
                 </div>
                 <div style="background: #fdfaf7; border-left: 3px solid #6b1623; padding: 15px; border-radius: 4px;">
-                    <h3 style="font-family: 'Marcellus', serif; color: #6b1623; font-size: 1rem; margin: 0 0 10px 0; letter-spacing: 0.5px;" data-i18n="pdf_event_details">EVENT LOGISTICS:</h3>
-                    <p style="margin: 0 0 5px 0; font-size: 0.85rem;"><strong data-i18n="pdf_venue">Venue:</strong> <span id="pdf-event-venue">Grand Ballroom, Mumbai</span></p>
-                    <p style="margin: 0 0 5px 0; font-size: 0.85rem;"><strong data-i18n="pdf_start_date">Setup Start:</strong> <span id="pdf-event-start">YYYY-MM-DD</span></p>
-                    <p style="margin: 0; font-size: 0.85rem;"><strong data-i18n="pdf_end_date">Cleanup Deadline:</strong> <span id="pdf-event-end">YYYY-MM-DD</span></p>
+                    <h3 style="font-family: 'Marcellus', serif; color: #6b1623; font-size: 1rem; margin: 0 0 10px 0; letter-spacing: 0.5px;"
+                        data-i18n="pdf_event_details">EVENT LOGISTICS:</h3>
+                    <p style="margin: 0 0 5px 0; font-size: 0.85rem;"><strong data-i18n="pdf_venue">Venue:</strong>
+                        <span id="pdf-event-venue">Grand Ballroom, Mumbai</span>
+                    </p>
+                    <p style="margin: 0 0 5px 0; font-size: 0.85rem;"><strong data-i18n="pdf_start_date">Setup
+                            Start:</strong> <span id="pdf-event-start">YYYY-MM-DD</span></p>
+                    <p style="margin: 0; font-size: 0.85rem;"><strong data-i18n="pdf_end_date">Cleanup
+                            Deadline:</strong> <span id="pdf-event-end">YYYY-MM-DD</span></p>
                 </div>
             </div>
 
             <!-- Items Table -->
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 35px; font-size: 0.85rem; text-align: left;">
+            <table
+                style="width: 100%; border-collapse: collapse; margin-bottom: 35px; font-size: 0.85rem; text-align: left;">
                 <thead>
                     <tr style="background: #6b1623; color: #fff;">
-                        <th style="padding: 10px 12px; border-bottom: 2px solid #540e1a; font-family: 'Marcellus', serif; font-weight: 500; color: #ffffff;" data-i18n="pdf_decor_item">Reserved Catalog Item</th>
-                        <th style="padding: 10px 12px; border-bottom: 2px solid #540e1a; font-family: 'Marcellus', serif; font-weight: 500; text-align: center; color: #ffffff;" data-i18n="pdf_category">Category</th>
-                        <th style="padding: 10px 12px; border-bottom: 2px solid #540e1a; font-family: 'Marcellus', serif; font-weight: 500; text-align: center; color: #ffffff;" data-i18n="pdf_qty">Qty</th>
-                        <th style="padding: 10px 12px; border-bottom: 2px solid #540e1a; font-family: 'Marcellus', serif; font-weight: 500; text-align: right; color: #ffffff;" data-i18n="pdf_rate">Day Rate</th>
-                        <th style="padding: 10px 12px; border-bottom: 2px solid #540e1a; font-family: 'Marcellus', serif; font-weight: 500; text-align: right; color: #ffffff;" data-i18n="pdf_total">Total Price</th>
+                        <th style="padding: 10px 12px; border-bottom: 2px solid #540e1a; font-family: 'Marcellus', serif; font-weight: 500; color: #ffffff;"
+                            data-i18n="pdf_decor_item">Reserved Catalog Item</th>
+                        <th style="padding: 10px 12px; border-bottom: 2px solid #540e1a; font-family: 'Marcellus', serif; font-weight: 500; text-align: center; color: #ffffff;"
+                            data-i18n="pdf_category">Category</th>
+                        <th style="padding: 10px 12px; border-bottom: 2px solid #540e1a; font-family: 'Marcellus', serif; font-weight: 500; text-align: center; color: #ffffff;"
+                            data-i18n="pdf_qty">Qty</th>
+                        <th style="padding: 10px 12px; border-bottom: 2px solid #540e1a; font-family: 'Marcellus', serif; font-weight: 500; text-align: right; color: #ffffff;"
+                            data-i18n="pdf_rate">Day Rate</th>
+                        <th style="padding: 10px 12px; border-bottom: 2px solid #540e1a; font-family: 'Marcellus', serif; font-weight: 500; text-align: right; color: #ffffff;"
+                            data-i18n="pdf_total">Total Price</th>
                     </tr>
                 </thead>
                 <tbody id="pdf-items-body">
@@ -1582,36 +2054,44 @@
             <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 20px;">
                 <!-- Payment terms and notes -->
                 <div style="flex: 1; max-width: 50%;">
-                    <h4 style="font-family: 'Marcellus', serif; color: #6b1623; font-size: 0.9rem; margin: 0 0 10px 0;" data-i18n="pdf_terms_title">TERMS & CONDITIONS</h4>
+                    <h4 style="font-family: 'Marcellus', serif; color: #6b1623; font-size: 0.9rem; margin: 0 0 10px 0;"
+                        data-i18n="pdf_terms_title">TERMS & CONDITIONS</h4>
                     <p style="margin: 0; font-size: 0.72rem; color: #777; line-height: 1.4;" data-i18n="pdf_terms_text">
                         1. All reservation items are rental assets of Bhoomi Decoration.<br>
                         2. Payments should be made within the milestone dates.<br>
-                        3. Any damage to physical property during the setup or event span is subject to replacement charges.
+                        3. Any damage to physical property during the setup or event span is subject to replacement
+                        charges.
                     </p>
                 </div>
                 <!-- Totals Section -->
                 <div style="width: 250px;">
-                    <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 8px; color: #555;">
+                    <div
+                        style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 8px; color: #555;">
                         <span data-i18n="pdf_subtotal">Rental Subtotal:</span>
                         <span id="pdf-subtotal">₹0.00</span>
                     </div>
-                    <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 8px; color: #555;">
+                    <div
+                        style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 8px; color: #555;">
                         <span data-i18n="pdf_discount">Discount:</span>
                         <span id="pdf-discount">-₹0.00</span>
                     </div>
-                    <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 8px; color: #555; border-bottom: 1px solid #ddd; padding-bottom: 8px;">
+                    <div
+                        style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 8px; color: #555; border-bottom: 1px solid #ddd; padding-bottom: 8px;">
                         <span data-i18n="pdf_tax">Tax Rate:</span>
                         <span id="pdf-tax">0.00%</span>
                     </div>
-                    <div style="display: flex; justify-content: space-between; font-size: 1rem; font-weight: 700; margin-bottom: 8px; color: #6b1623;">
+                    <div
+                        style="display: flex; justify-content: space-between; font-size: 1rem; font-weight: 700; margin-bottom: 8px; color: #6b1623;">
                         <span data-i18n="pdf_total">Invoice Total:</span>
                         <span id="pdf-total">₹0.00</span>
                     </div>
-                    <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 8px; color: #2e7d32;">
+                    <div
+                        style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 8px; color: #2e7d32;">
                         <span data-i18n="pdf_amount_paid">Amount Paid:</span>
                         <span id="pdf-paid">₹0.00</span>
                     </div>
-                    <div style="display: flex; justify-content: space-between; font-size: 1rem; font-weight: 700; border-top: 2px double #6b1623; padding-top: 8px; margin-top: 8px; color: #c62828;">
+                    <div
+                        style="display: flex; justify-content: space-between; font-size: 1rem; font-weight: 700; border-top: 2px double #6b1623; padding-top: 8px; margin-top: 8px; color: #c62828;">
                         <span data-i18n="pdf_balance_due">Balance Due:</span>
                         <span id="pdf-balance">₹0.00</span>
                     </div>
@@ -1619,21 +2099,26 @@
             </div>
 
             <!-- Signature Lines -->
-            <div style="margin-top: 60px; display: flex; justify-content: space-between; align-items: flex-end; padding-top: 20px; border-top: 1px dashed #ddd;">
+            <div
+                style="margin-top: 60px; display: flex; justify-content: space-between; align-items: flex-end; padding-top: 20px; border-top: 1px dashed #ddd;">
                 <div style="text-align: center;">
                     <div style="width: 180px; border-bottom: 1px solid #888; margin-bottom: 5px;"></div>
-                    <p style="margin: 0; font-size: 0.75rem; color: #666; font-weight: 600;" data-i18n="pdf_auth_sign">Authorized Signatory</p>
+                    <p style="margin: 0; font-size: 0.75rem; color: #666; font-weight: 600;" data-i18n="pdf_auth_sign">
+                        Authorized Signatory</p>
                     <p style="margin: 2px 0 0 0; font-size: 0.65rem; color: #999;">Bhoomi Decoration</p>
                 </div>
                 <div style="text-align: center;">
                     <div style="width: 180px; border-bottom: 1px solid #888; margin-bottom: 5px;"></div>
-                    <p style="margin: 0; font-size: 0.75rem; color: #666; font-weight: 600;" data-i18n="pdf_client_sign">Client Signature</p>
-                    <p style="margin: 2px 0 0 0; font-size: 0.65rem; color: #999;" data-i18n="pdf_agreement_accept">Acceptance of Agreement</p>
+                    <p style="margin: 0; font-size: 0.75rem; color: #666; font-weight: 600;"
+                        data-i18n="pdf_client_sign">Client Signature</p>
+                    <p style="margin: 2px 0 0 0; font-size: 0.65rem; color: #999;" data-i18n="pdf_agreement_accept">
+                        Acceptance of Agreement</p>
                 </div>
             </div>
 
             <!-- Footer Message -->
-            <div style="text-align: center; margin-top: 50px; font-size: 0.75rem; color: #999; font-style: italic; border-top: 1px solid #eee; padding-top: 15px;" data-i18n="pdf_thank_you">
+            <div style="text-align: center; margin-top: 50px; font-size: 0.75rem; color: #999; font-style: italic; border-top: 1px solid #eee; padding-top: 15px;"
+                data-i18n="pdf_thank_you">
                 Thank you for choosing Bhoomi Decoration for your celebration!
             </div>
         </div>
@@ -1645,7 +2130,7 @@
     <!-- Shared Utilities Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="common.js"></script>
-    <script src="admin.js?v=pdf-export-v4"></script>
+    <script src="admin.js?v=portal-copy-v3"></script>
 </body>
 
 </html>

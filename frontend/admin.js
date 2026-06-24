@@ -8,6 +8,7 @@ let eventsList = [];
 let galleryList = [];
 let crewList = [];
 let activeCrewAssignments = []; // Temporary cache during booking editing
+let callbacksList = [];
 
 // Search queries
 let dashboardSearchQuery = "";
@@ -18,6 +19,7 @@ let crewSearchQuery = "";
 let financeSearchQuery = "";
 let invoiceSearchQuery = "";
 let eventsSearchQuery = "";
+let callbacksSearchQuery = "";
 
 // Pagination pages (1-indexed)
 let dashboardPage = 1;
@@ -28,6 +30,7 @@ let crewPage = 1;
 let financePage = 1;
 let invoicePage = 1;
 let eventsPage = 1;
+let callbacksPage = 1;
 
 // Global page size limit
 const PAGE_SIZE = 10;
@@ -42,8 +45,23 @@ const TRANSLATIONS = {
         "nav_events": "Events Projects",
         "nav_warehouse": "Warehouse Catalog",
         "nav_clients": "Clients CRM",
+        "nav_kanban": "Booking Pipeline",
+        "nav_callbacks": "Callbacks CRM",
         "nav_gallery": "Portfolio Gallery",
         "nav_crew": "Crew Ledger",
+        "callbacks_title": "Callbacks CRM",
+        "callbacks_subtitle": "Review and manage callback and lead enquiries.",
+        "callbacks_table_name": "Name",
+        "callbacks_table_phone": "Phone",
+        "callbacks_table_date": "Date",
+        "callbacks_table_service": "Service Requested",
+        "callbacks_table_msg": "Message",
+        "callbacks_table_status": "Status",
+        "callbacks_action_contacted": "Mark Contacted",
+        "status_quote": "Quote",
+        "status_draft": "Draft",
+        "status_confirmed": "Confirmed",
+        "status_completed": "Completed",
         "nav_finance": "Finance Hub",
         "nav_invoices": "Invoices Hub",
         "nav_signout": "Secure Sign Out",
@@ -276,8 +294,23 @@ const TRANSLATIONS = {
         "nav_events": "ઇવેન્ટ પ્રોજેક્ટ્સ",
         "nav_warehouse": "વેરહાઉસ કેટલોગ",
         "nav_clients": "ગ્રાહક સીઆરએમ",
+        "nav_kanban": "બુકિંગ પાઇપલાઇન",
+        "nav_callbacks": "કોલબેક્સ CRM",
         "nav_gallery": "પોર્ટફોલિયો ગેલેરી",
         "nav_crew": "ક્રૂ લેજર",
+        "callbacks_title": "કોલબેક્સ CRM",
+        "callbacks_subtitle": "કોલબેક અને લીડ પૂછપરછની સમીક્ષા અને સંચાલન કરો.",
+        "callbacks_table_name": "નામ",
+        "callbacks_table_phone": "ફોન",
+        "callbacks_table_date": "તારીખ",
+        "callbacks_table_service": "વિનંતી કરેલ સેવા",
+        "callbacks_table_msg": "સંદેશ",
+        "callbacks_table_status": "સ્થિતિ",
+        "callbacks_action_contacted": "સંપર્ક કર્યો",
+        "status_quote": "ક્વોટ",
+        "status_draft": "ડ્રાફ્ટ",
+        "status_confirmed": "કન્ફર્મ",
+        "status_completed": "પૂર્ણ થયેલ",
         "nav_finance": "ફાઇનાન્સ હબ",
         "nav_invoices": "ઇન્વૉઇસ હબ",
         "nav_signout": "સુરક્ષિત સાઇન આઉટ",
@@ -545,31 +578,28 @@ function translateDOMNode(node) {
 async function initializeSession() {
     const token = localStorage.getItem("eventflow_token");
     const role = localStorage.getItem("eventflow_role");
-    const name = localStorage.getItem("eventflow_user_name");
     
     if (!token || role !== "admin") {
         logout();
         return;
     }
     
-    currentUser = { token, role, name };
+    try {
+        const res = await apiFetch("/api/me");
+        const userData = res.user || res;
+        currentUser = { token, role, name: userData.name || "Admin" };
+        
+        // Bind Profile Display Details
+        document.getElementById("user-display-name").innerText = userData.name || "Admin";
+    } catch (err) {
+        logout();
+        return;
+    }
     
-    // Bind Profile Display Details
-    document.getElementById("user-display-name").innerText = name;
     translatePage();
     
-    // Set view structure without triggering loadDashboardData from switchView immediately
-    const subviews = document.querySelectorAll(".app-subview");
-    subviews.forEach(view => view.style.display = "none");
-    document.getElementById("dashboard-subview").style.display = "block";
-    
-    const navItems = document.querySelectorAll(".nav-item");
-    navItems.forEach(item => item.classList.remove("active"));
-    const activeLink = document.querySelector(`.nav-item[data-target="dashboard-view"]`);
-    if (activeLink) activeLink.classList.add("active");
-    
-    // Show the page immediately; data loads in background
-    loadDashboardData();
+    // Set view structure via Hash Router
+    handleHashChange();
     hideLoadingSkeleton();
 }
 
@@ -587,6 +617,12 @@ function switchView(targetViewId) {
     } else if (targetViewId === "events-view") {
         document.getElementById("events-subview").style.display = "block";
         loadEventsData();
+    } else if (targetViewId === "kanban-view") {
+        document.getElementById("kanban-subview").style.display = "block";
+        loadKanbanData();
+    } else if (targetViewId === "callbacks-view") {
+        document.getElementById("callbacks-subview").style.display = "block";
+        loadCallbacksData();
     } else if (targetViewId === "warehouse-view") {
         document.getElementById("warehouse-subview").style.display = "block";
         loadWarehouseData();
@@ -622,18 +658,67 @@ function hideLoadingSkeleton() {
     }
 }
 
+async function refreshActiveView() {
+    const subviews = [
+        { id: "dashboard-subview", load: () => loadDashboardData() },
+        { id: "events-subview", load: () => loadEventsData() },
+        { id: "kanban-subview", load: () => loadKanbanData() },
+        { id: "callbacks-subview", load: () => loadCallbacksData() },
+        { id: "warehouse-subview", load: () => loadWarehouseData() },
+        { id: "clients-subview", load: () => loadClientsData() },
+        { id: "gallery-subview", load: () => loadGalleryData() },
+        { id: "crew-subview", load: () => loadCrewData() },
+        { id: "finance-subview", load: () => loadFinanceData() },
+        { id: "invoice-subview", load: () => loadInvoicesData() },
+        { id: "settings-subview", load: () => loadSettingsData() }
+    ];
+    
+    for (const view of subviews) {
+        const el = document.getElementById(view.id);
+        if (el && el.style.display !== "none") {
+            await view.load();
+            break;
+        }
+    }
+}
+window.refreshActiveView = refreshActiveView;
+
 // ─── Pagination Helper ─────────────────────────────────────────────────────
-function renderPaginationControls(containerId, totalItems, currentPage, onPageChange) {
+function renderPaginationControls(containerId, totalItems, currentPage, onPageChange, maxPages = 3) {
     const container = document.getElementById(containerId);
     if (!container) return;
     const totalPages = Math.ceil(totalItems / PAGE_SIZE);
     if (totalPages <= 1) { container.innerHTML = ""; return; }
+    
     let html = `<div class="pagination-container">`;
+    html += `<div class="pagination-info">Page ${currentPage} of ${totalPages}</div>`;
+    html += `<div class="pagination-buttons">`;
     html += `<button class="pagination-btn" ${currentPage === 1 ? "disabled" : ""} onclick="${onPageChange}(${currentPage - 1})">← Prev</button>`;
-    for (let p = 1; p <= totalPages; p++) {
+    
+    let startPage = 1;
+    let endPage = totalPages;
+    
+    if (totalPages > maxPages) {
+        startPage = currentPage - Math.floor((maxPages - 1) / 2);
+        endPage = currentPage + Math.floor(maxPages / 2);
+        
+        if (startPage < 1) {
+            endPage = endPage + (1 - startPage);
+            startPage = 1;
+        }
+        if (endPage > totalPages) {
+            startPage = startPage - (endPage - totalPages);
+            endPage = totalPages;
+        }
+        startPage = Math.max(1, startPage);
+    }
+    
+    for (let p = startPage; p <= endPage; p++) {
         html += `<button class="pagination-btn ${p === currentPage ? 'active' : ''}" onclick="${onPageChange}(${p})">${p}</button>`;
     }
+    
     html += `<button class="pagination-btn" ${currentPage === totalPages ? "disabled" : ""} onclick="${onPageChange}(${currentPage + 1})">Next →</button>`;
+    html += `</div>`;
     html += `</div>`;
     container.innerHTML = html;
 }
@@ -662,7 +747,7 @@ async function loadWarehouseData(page) {
 
         if (inventoryList.length === 0) {
             tbody.innerHTML = `<tr><td colspan="6" style="text-align: center;">No catalog assets found.</td></tr>`;
-            renderPaginationControls("warehouse-pagination", 0, warehousePage, "loadWarehouseData");
+            renderPaginationControls("warehouse-pagination", 0, warehousePage, "loadWarehouseData", 3);
             return;
         }
 
@@ -677,13 +762,14 @@ async function loadWarehouseData(page) {
                 <td>${avail} / ${item.quantity_owned} units</td>
                 <td>₹${item.rental_price_per_day.toFixed(2)}/day</td>
                 <td>
+                    <button class="btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; border: 1px solid var(--gold);" onclick="openItemAvailabilityCalendar('${item.id}')">Availability</button>
                     <button class="btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;" onclick="editInventoryItem('${item.id}')">${t('edit')}</button>
                     <button class="btn-danger" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; border-radius: 8px;" onclick="deleteInventoryItem('${item.id}')">✕</button>
                 </td>
             `;
             tbody.appendChild(tr);
         });
-        renderPaginationControls("warehouse-pagination", total, warehousePage, "loadWarehouseData");
+        renderPaginationControls("warehouse-pagination", total, warehousePage, "loadWarehouseData", 3);
     } catch (err) {}
 }
 
@@ -710,9 +796,10 @@ async function handleInventorySubmit(e) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
         });
+        allInventoryItemsList = [];
         showToast(id ? "Inventory asset updated." : "Catalog asset registered.");
         closeModal("modal-inventory");
-        loadWarehouseData();
+        refreshActiveView();
     } catch (err) {}
     finally {
         if (submitBtn) submitBtn.disabled = false;
@@ -742,8 +829,9 @@ async function deleteInventoryItem(itemId) {
         async () => {
             try {
                 await apiFetch(`/api/inventory/${itemId}`, { method: "DELETE" });
+                allInventoryItemsList = [];
                 showToast("Asset deleted from catalog.");
-                loadWarehouseData();
+                refreshActiveView();
             } catch (err) {}
         }
     );
@@ -815,13 +903,7 @@ async function loadDashboardData(page) {
     const tbody    = document.getElementById("bookings-table-body");
     const alertsBox = document.getElementById("booking-alerts-box");
 
-    // ── If we already have cached data, render it instantly ──────────────────
-    if (eventsList.length > 0) {
-        renderDashboardTable(tbody, alertsBox);
-        // Then silently refresh in the background
-        fetchDashboardData().then(() => renderDashboardTable(tbody, alertsBox));
-        return;
-    }
+
 
     // ── First load: show a minimal status row, then fetch ────────────────────
     if (tbody) tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:1.2rem;color:var(--text-muted);font-size:0.85rem;">Fetching events...</td></tr>`;
@@ -896,7 +978,7 @@ function renderDashboardTable(tbody, alertsBox) {
 
     if (filtered.length === 0) {
         tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-muted);">🎉 No upcoming events scheduled. <a href="#" onclick="document.getElementById('btn-create-booking').click(); return false;" style="color: var(--maroon);">Create one?</a></td></tr>`;
-        renderPaginationControls("dashboard-pagination", 0, dashboardPage, "loadDashboardData");
+        renderPaginationControls("dashboard-pagination", 0, dashboardPage, "loadDashboardData", 3);
         return;
     }
 
@@ -955,27 +1037,26 @@ function renderDashboardTable(tbody, alertsBox) {
                     <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem;" onclick="openInvoiceModal('${evt.id}')">Invoice/Receipt</button>
                     <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem;" onclick="openLayoutUploadModal('${evt.id}')">Upload Layout</button>
                     <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem;" onclick="editEventBooking('${evt.id}')">Edit</button>
+                    <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem;" onclick="fetchAndCopyPortalLink('${evt.id}')">🔗 Portal</button>
                     <button class="btn-danger" style="padding: 0.35rem 0.5rem; font-size: 0.75rem; border-radius: 8px;" onclick="deleteEventBooking('${evt.id}')">✕</button>
                 </div>
             </td>
         `;
         tbody.appendChild(tr);
     });
-    renderPaginationControls("dashboard-pagination", filtered.length, dashboardPage, "loadDashboardData");
+    renderPaginationControls("dashboard-pagination", filtered.length, dashboardPage, "loadDashboardData", 3);
 }
 
 async function renderBookingInventoryItems() {
     // Lazy-load inventory only when needed
-    if (inventoryList.length === 0) {
-        inventoryList = await apiFetch("/api/inventory");
-    }
+    const fullInv = await getFullInventoryList();
     // Lazy-load clients dropdown only when the booking modal opens
     await populateClientsDropdown();
 
     const container = document.getElementById("booking-items-selector");
     container.innerHTML = "";
     
-    inventoryList.forEach(item => {
+    fullInv.forEach(item => {
         const div = document.createElement("div");
         div.style.display = "flex";
         div.style.justifyContent = "space-between";
@@ -1128,7 +1209,7 @@ async function handleBookingSubmit(e) {
         crew_assignments: JSON.stringify(activeCrewAssignments),
         max_workforce_capacity,
         notes,
-        status: id ? eventsList.find(e => e.id === id).status : "Confirmed",
+        status: document.getElementById("booking-status").value,
         discount,
         tax_rate
     };
@@ -1148,7 +1229,7 @@ async function handleBookingSubmit(e) {
         
         showToast(id ? "Booking details updated." : "Booking scheduled successfully.");
         closeModal("modal-booking");
-        await loadDashboardData();
+        await refreshActiveView();
         
         // Show conflict alerts if any returned from server
         if (result.conflict_alerts && result.conflict_alerts.length > 0) {
@@ -1211,6 +1292,7 @@ async function editEventBooking(eventId) {
     document.getElementById("booking-notes").value = evt.notes;
     document.getElementById("booking-discount").value = evt.discount || 0;
     document.getElementById("booking-tax-rate").value = evt.tax_rate || 0;
+    document.getElementById("booking-status").value = evt.status || "Confirmed";
     
     // Select Client
     document.getElementById("booking-client").value = evt.client_id;
@@ -1251,7 +1333,7 @@ async function deleteEventBooking(eventId) {
             try {
                 await apiFetch(`/api/events/${eventId}`, { method: "DELETE" });
                 showToast("Event booking cancelled.");
-                loadDashboardData();
+                refreshActiveView();
             } catch (err) {}
         }
     );
@@ -1259,11 +1341,11 @@ async function deleteEventBooking(eventId) {
 
 // 4. On-Walk Consultation Quote Checklist Builder
 async function openQuoteToolModal() {
-    inventoryList = await apiFetch("/api/inventory");
+    const fullInv = await getFullInventoryList();
     const container = document.getElementById("quote-items-calculator");
     container.innerHTML = "";
     
-    inventoryList.forEach(item => {
+    fullInv.forEach(item => {
         const div = document.createElement("div");
         div.className = "quote-item-grid";
         
@@ -1318,7 +1400,7 @@ async function openInvoiceModal(eventId) {
     
     // Resolve item names and rates
     let itemsHtml = "";
-    inventoryList = await apiFetch("/api/inventory");
+    const fullInv = await getFullInventoryList();
     
     // Calculate rental span
     const sDate = new Date(evt.start_date);
@@ -1328,7 +1410,7 @@ async function openInvoiceModal(eventId) {
     let itemsListTextForPrint = "";
     let subtotal = 0.0;
     Object.keys(bookedItems).forEach(itemId => {
-        const item = inventoryList.find(i => i.id === itemId);
+        const item = fullInv.find(i => i.id === itemId);
         if (item) {
             const qty = bookedItems[itemId];
             const cost = item.rental_price_per_day * qty * days;
@@ -1469,7 +1551,7 @@ async function openInvoiceModal(eventId) {
             });
             showToast("Deposit transaction logged successfully.");
             closeModal("modal-invoice-payout");
-            loadDashboardData();
+            refreshActiveView();
         } catch (err) {}
         finally {
             if (submitBtn) submitBtn.disabled = false;
@@ -1491,7 +1573,7 @@ async function toggleCrewPayrollPaid(eventId, crewIndex) {
         showToast("Crew wage ledger updated.");
         closeModal("modal-invoice-payout");
         openInvoiceModal(eventId);
-        loadDashboardData();
+        refreshActiveView();
     } catch (err) {}
 }
 
@@ -1531,7 +1613,7 @@ async function handleLayoutUploadSubmit(e) {
         
         showToast("Compressed layout blueprint uploaded successfully.");
         closeModal("modal-upload-layout");
-        loadDashboardData();
+        refreshActiveView();
     } catch (err) {
     } finally {
         submitBtn.disabled = false;
@@ -1603,7 +1685,8 @@ async function handleOnboardCrewSubmit(e) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, password, role, full_name, base_daily_rate })
         });
-        showToast("Manager onboarded successfully!");
+        const successMsg = role === "admin" ? "Manager onboarded successfully!" : "Crew member onboarded successfully!";
+        showToast(successMsg);
         closeModal("modal-onboard-crew");
     } catch (err) {}
     finally {
@@ -1647,14 +1730,15 @@ async function loadEventsData(page) {
 
         if (eventsList.length === 0) {
             tbody.innerHTML = `<tr><td colspan="7" style="text-align: center;">No events found matching the selected filter.</td></tr>`;
-            renderPaginationControls("events-pagination", 0, eventsPage, "loadEventsData");
+            renderPaginationControls("events-pagination", 0, eventsPage, "loadEventsData", 4);
             return;
         }
 
         eventsList.forEach(evt => {
             const tr = document.createElement("tr");
             const badgeClass = evt.status === "Completed" ? "badge-completed" :
-                               evt.status === "Confirmed" ? "badge-confirmed" : "badge-draft";
+                               evt.status === "Confirmed" ? "badge-confirmed" :
+                               evt.status === "Quote" ? "badge-confirmed" : "badge-draft";
             tr.innerHTML = `
                 <td>
                     <strong>${evt.client_name}</strong><br>
@@ -1672,15 +1756,20 @@ async function loadEventsData(page) {
                     <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
                         <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem; border: 1px solid var(--gold);" onclick="openEventDetailsViewModal('${evt.id}')">${t('details_btn')}</button>
                         <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem;" onclick="exportInvoiceToPDF('${evt.id}')">Export PDF</button>
-                        <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem;" onclick="openInvoiceModal('${evt.id}')">Receipt/Pay</button>
+                        ${evt.status === "Quote" ? `
+                            <button class="btn-primary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem; background: var(--maroon); color: white;" onclick="convertQuoteToInvoice('${evt.id}')">Convert to Invoice</button>
+                        ` : `
+                            <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem;" onclick="openInvoiceModal('${evt.id}')">Receipt/Pay</button>
+                        `}
                         <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem;" onclick="editEventBooking('${evt.id}')">${t('edit')}</button>
+                        <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem;" onclick="fetchAndCopyPortalLink('${evt.id}')">🔗 Portal</button>
                         <button class="btn-danger" style="padding: 0.35rem 0.5rem; font-size: 0.75rem; border-radius: 8px;" onclick="deleteEventBooking('${evt.id}')">✕</button>
                     </div>
                 </td>
             `;
             tbody.appendChild(tr);
         });
-        renderPaginationControls("events-pagination", total, eventsPage, "loadEventsData");
+        renderPaginationControls("events-pagination", total, eventsPage, "loadEventsData", 4);
     } catch (err) {}
 }
 
@@ -1708,7 +1797,7 @@ async function loadClientsData(page) {
 
         if (clientsList.length === 0) {
             tbody.innerHTML = `<tr><td colspan="6" style="text-align: center;">No client profiles found.</td></tr>`;
-            renderPaginationControls("clients-pagination", 0, clientsPage, "loadClientsData");
+            renderPaginationControls("clients-pagination", 0, clientsPage, "loadClientsData", 3);
             return;
         }
 
@@ -1727,7 +1816,7 @@ async function loadClientsData(page) {
             `;
             tbody.appendChild(tr);
         });
-        renderPaginationControls("clients-pagination", total, clientsPage, "loadClientsData");
+        renderPaginationControls("clients-pagination", total, clientsPage, "loadClientsData", 3);
     } catch (err) {}
 }
 
@@ -1751,7 +1840,7 @@ async function deleteClientItem(clientId) {
             try {
                 await apiFetch(`/api/clients/${clientId}`, { method: "DELETE" });
                 showToast("Client profile deleted.");
-                loadClientsData();
+                refreshActiveView();
             } catch (err) {}
         }
     );
@@ -1771,7 +1860,7 @@ async function loadGalleryData(page) {
 
         if (galleryList.length === 0) {
             tbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">No gallery entries found.</td></tr>`;
-            renderPaginationControls("gallery-pagination", 0, galleryPage, "loadGalleryData");
+            renderPaginationControls("gallery-pagination", 0, galleryPage, "loadGalleryData", 3);
             return;
         }
 
@@ -1789,7 +1878,7 @@ async function loadGalleryData(page) {
             `;
             tbody.appendChild(tr);
         });
-        renderPaginationControls("gallery-pagination", total, galleryPage, "loadGalleryData");
+        renderPaginationControls("gallery-pagination", total, galleryPage, "loadGalleryData", 3);
     } catch (err) {}
 }
 
@@ -1813,7 +1902,7 @@ async function handleGallerySubmit(e) {
             });
             showToast("Gallery item details updated.");
             closeModal("modal-gallery");
-            loadGalleryData();
+            refreshActiveView();
         } catch (err) {}
         finally {
             if (saveBtn) saveBtn.disabled = false;
@@ -1843,7 +1932,7 @@ async function handleGallerySubmit(e) {
             });
             showToast("Portfolio image uploaded successfully.");
             closeModal("modal-gallery");
-            loadGalleryData();
+            refreshActiveView();
         } catch (err) {
         } finally {
             if (saveBtn) {
@@ -1879,7 +1968,7 @@ async function deleteGalleryItem(photoId) {
             try {
                 await apiFetch(`/api/gallery/${photoId}`, { method: "DELETE" });
                 showToast("Photo removed from gallery.");
-                loadGalleryData();
+                refreshActiveView();
             } catch (err) {}
         }
     );
@@ -1909,7 +1998,7 @@ async function loadCrewData(page) {
 
         if (crewList.length === 0) {
             tbody.innerHTML = `<tr><td colspan="8" style="text-align: center;">No crew profiles found.</td></tr>`;
-            renderPaginationControls("crew-pagination", 0, crewPage, "loadCrewData");
+            renderPaginationControls("crew-pagination", 0, crewPage, "loadCrewData", 3);
             return;
         }
 
@@ -1934,7 +2023,7 @@ async function loadCrewData(page) {
             `;
             tbody.appendChild(tr);
         });
-        renderPaginationControls("crew-pagination", total, crewPage, "loadCrewData");
+        renderPaginationControls("crew-pagination", total, crewPage, "loadCrewData", 3);
     } catch (err) {}
 }
 
@@ -1963,7 +2052,7 @@ async function handleCrewSubmit(e) {
         });
         showToast(id ? "Crew profile updated." : "Crew member record generated.");
         closeModal("modal-crew");
-        loadCrewData();
+        refreshActiveView();
     } catch (err) {}
     finally {
         if (submitBtn) submitBtn.disabled = false;
@@ -1994,7 +2083,7 @@ async function deleteCrewMember(crewId) {
             try {
                 await apiFetch(`/api/crew/${crewId}`, { method: "DELETE" });
                 showToast("Crew member removed.");
-                loadCrewData();
+                refreshActiveView();
             } catch (err) {}
         }
     );
@@ -2038,7 +2127,7 @@ async function handleCrewPaymentSubmit(e) {
             exportCrewPayoutPDF(id, 0); // 0 is index of newest payment
         });
         
-        loadCrewData();
+        refreshActiveView();
     } catch (err) {}
     finally {
         if (submitBtn) submitBtn.disabled = false;
@@ -2141,6 +2230,18 @@ function exportCrewPayoutPDF(crewId, paymentIndex) {
     printArea.querySelector("#pdf-payout-amount").innerText = `₹${pay.amount.toFixed(2)}`;
     printArea.querySelector("#pdf-payout-remaining").innerText = `₹${member.amount_owed.toFixed(2)}`;
     
+    const wrapper = document.createElement('div');
+    wrapper.style.position = 'absolute';
+    wrapper.style.left = '0';
+    wrapper.style.top = '0';
+    wrapper.style.zIndex = '-9999';
+    wrapper.style.width = '210mm';
+    wrapper.style.background = 'white';
+    // Remove duplicate ID on the clone to prevent selector confusion in html2canvas
+    printArea.removeAttribute("id");
+    wrapper.appendChild(printArea);
+    document.body.appendChild(wrapper);
+
     const opt = {
         margin:       [10, 10, 10, 10],
         filename:     `Bhoomi_Payout_${member.name.replace(/\s+/g, '_')}_${pay.date.split('T')[0]}.pdf`,
@@ -2150,9 +2251,11 @@ function exportCrewPayoutPDF(crewId, paymentIndex) {
     };
     
     showToast("Generating Payout PDF Receipt...");
-    html2pdf().from(printArea).set(opt).save().then(() => {
+    html2pdf().from(wrapper).set(opt).save().then(() => {
+        document.body.removeChild(wrapper);
         showToast("Payout receipt exported successfully.");
     }).catch(err => {
+        document.body.removeChild(wrapper);
         console.error("PDF generation failed:", err);
         showToast("Failed to generate payout PDF.", "error");
     });
@@ -2216,7 +2319,7 @@ async function loadFinanceData(filterType = "All", page) {
 
         if (eventsList.length === 0) {
             tbody.innerHTML = `<tr><td colspan="7" style="text-align: center;">No transactions found.</td></tr>`;
-            renderPaginationControls("finance-pagination", 0, financePage, "loadFinanceData");
+            renderPaginationControls("finance-pagination", 0, financePage, "loadFinanceData", 3);
             return;
         }
 
@@ -2236,12 +2339,15 @@ async function loadFinanceData(filterType = "All", page) {
                 <td><strong class="${evt.remaining_balance > 0 ? 'text-danger' : 'text-success'}">₹${evt.remaining_balance.toFixed(2)}</strong></td>
                 <td><span class="badge ${badgeClass}">${pStatus}</span></td>
                 <td>
-                    <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem;" onclick="openInvoiceModal('${evt.id}')">Receipt/Payout</button>
+                    <div style="display: flex; gap: 0.4rem;">
+                        <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem;" onclick="openInvoiceModal('${evt.id}')">Receipt/Payout</button>
+                        <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem;" onclick="fetchAndCopyPortalLink('${evt.id}')">🔗 Portal</button>
+                    </div>
                 </td>
             `;
             tbody.appendChild(tr);
         });
-        renderPaginationControls("finance-pagination", total, financePage, "loadFinanceData");
+        renderPaginationControls("finance-pagination", total, financePage, "loadFinanceData", 3);
     } catch (err) {}
 }
 
@@ -2296,7 +2402,7 @@ async function loadInvoicesData(filterType = "All", page) {
         
         if (eventsList.length === 0) {
             tbody.innerHTML = `<tr><td colspan="7" style="text-align: center;">No invoices found.</td></tr>`;
-            renderPaginationControls("invoice-pagination", 0, invoicePage, "loadInvoicesData");
+            renderPaginationControls("invoice-pagination", 0, invoicePage, "loadInvoicesData", 4);
             return;
         }
         
@@ -2329,12 +2435,13 @@ async function loadInvoicesData(filterType = "All", page) {
                     <div style="display: flex; gap: 0.4rem;">
                         <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem;" onclick="exportInvoiceToPDF('${evt.id}')">Export PDF</button>
                         <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem;" onclick="openInvoiceModal('${evt.id}')">Receipt/Payout</button>
+                        <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem;" onclick="fetchAndCopyPortalLink('${evt.id}')">🔗 Portal</button>
                     </div>
                 </td>
             `;
             tbody.appendChild(tr);
         });
-        renderPaginationControls("invoice-pagination", total, invoicePage, "loadInvoicesData");
+        renderPaginationControls("invoice-pagination", total, invoicePage, "loadInvoicesData", 4);
     } catch (err) {
         console.error("Failed to load invoices data:", err);
     }
@@ -2410,9 +2517,7 @@ async function exportInvoiceToPDF(eventId) {
             bookedItems = JSON.parse(evt.items_booked || "{}");
         } catch (e) {}
         
-        if (inventoryList.length === 0) {
-            inventoryList = await apiFetch("/api/inventory");
-        }
+        const fullInv = await getFullInventoryList();
         
         const itemsBody = printArea.querySelector("#pdf-items-body");
         itemsBody.innerHTML = "";
@@ -2421,7 +2526,7 @@ async function exportInvoiceToPDF(eventId) {
         let itemIndex = 0;
         
         Object.keys(bookedItems).forEach(itemId => {
-            const item = inventoryList.find(i => i.id === itemId);
+            const item = fullInv.find(i => i.id === itemId);
             if (item) {
                 const qty = bookedItems[itemId];
                 const cost = item.rental_price_per_day * qty * days;
@@ -2457,6 +2562,27 @@ async function exportInvoiceToPDF(eventId) {
         printArea.querySelector("#pdf-paid").innerText = `₹${evt.amount_paid.toFixed(2)}`;
         printArea.querySelector("#pdf-balance").innerText = `₹${evt.remaining_balance.toFixed(2)}`;
         
+        const wrapper = document.createElement('div');
+        wrapper.style.position = 'absolute';
+        wrapper.style.left = '0';
+        wrapper.style.top = '0';
+        wrapper.style.zIndex = '-9999';
+        wrapper.style.width = '210mm';
+        wrapper.style.background = 'white';
+        // Remove duplicate ID on the clone to prevent selector confusion in html2canvas
+        printArea.removeAttribute("id");
+        wrapper.appendChild(printArea);
+
+        console.log("[DEBUG PDF] wrapper offsetHeight before DOM append:", wrapper.offsetHeight);
+        console.log("[DEBUG PDF] printArea offsetHeight before DOM append:", printArea.offsetHeight);
+
+        document.body.appendChild(wrapper);
+
+        console.log("[DEBUG PDF] wrapper offsetHeight after DOM append:", wrapper.offsetHeight);
+        console.log("[DEBUG PDF] printArea offsetHeight after DOM append:", printArea.offsetHeight);
+        console.log("[DEBUG PDF] wrapper bounding rect:", wrapper.getBoundingClientRect());
+        console.log("[DEBUG PDF] printArea bounding rect:", printArea.getBoundingClientRect());
+
         const opt = {
             margin:       [10, 10, 10, 10],
             filename:     `Bhoomi_Invoice_${evt.id}.pdf`,
@@ -2466,10 +2592,27 @@ async function exportInvoiceToPDF(eventId) {
         };
         
         showToast("Generating PDF Invoice...");
-        html2pdf().from(printArea).set(opt).save().then(() => {
+        html2pdf().from(wrapper).set(opt).save().then(() => {
+            console.log("[DEBUG PDF] Generation success");
+            
+            // Render as image to verify canvas output visually in screenshot
+            html2pdf().from(wrapper).set(opt).output('img').then(img => {
+                img.style.position = 'fixed';
+                img.style.top = '10px';
+                img.style.left = '10px';
+                img.style.width = '400px';
+                img.style.zIndex = '999999';
+                img.style.border = '5px solid red';
+                img.id = 'debug-pdf-img';
+                document.body.appendChild(img);
+                console.log("[DEBUG PDF] Debug preview image appended");
+            });
+
+            document.body.removeChild(wrapper);
             showToast("Invoice exported successfully.");
         }).catch(err => {
-            console.error("PDF generation failed:", err);
+            console.error("[DEBUG PDF] Generation failed:", err);
+            document.body.removeChild(wrapper);
             showToast("Failed to generate PDF.", "error");
         });
         
@@ -2635,7 +2778,7 @@ async function handleManualInvoiceSubmit(e) {
 
         showToast("Manual invoice saved successfully!");
         closeModal("modal-manual-invoice");
-        loadInvoicesData(currentInvoiceFilter);
+        refreshActiveView();
 
         // Step 5: Trigger PDF export for the new invoice
         if (result.event) {
@@ -2721,6 +2864,18 @@ async function exportManualInvoiceToPDF(eventId, data) {
     printArea.querySelector("#pdf-paid").innerText = `₹${(data.amount_paid || 0).toFixed(2)}`;
     printArea.querySelector("#pdf-balance").innerText = `₹${balance.toFixed(2)}`;
 
+    const wrapper = document.createElement('div');
+    wrapper.style.position = 'absolute';
+    wrapper.style.left = '0';
+    wrapper.style.top = '0';
+    wrapper.style.zIndex = '-9999';
+    wrapper.style.width = '210mm';
+    wrapper.style.background = 'white';
+    // Remove duplicate ID on the clone to prevent selector confusion in html2canvas
+    printArea.removeAttribute("id");
+    wrapper.appendChild(printArea);
+    document.body.appendChild(wrapper);
+
     const opt = {
         margin: [10, 10, 10, 10],
         filename: `Bhoomi_ManualInvoice_${eventId}.pdf`,
@@ -2730,9 +2885,11 @@ async function exportManualInvoiceToPDF(eventId, data) {
     };
 
     showToast("Generating PDF Invoice...");
-    html2pdf().from(printArea).set(opt).save().then(() => {
+    html2pdf().from(wrapper).set(opt).save().then(() => {
+        document.body.removeChild(wrapper);
         showToast("PDF invoice exported successfully.");
     }).catch(err => {
+        document.body.removeChild(wrapper);
         console.error("PDF generation failed:", err);
         showToast("Failed to generate PDF.", "error");
     });
@@ -2742,16 +2899,21 @@ async function exportManualInvoiceToPDF(eventId, data) {
 document.addEventListener("DOMContentLoaded", () => {
     applyTheme();
 
-    // 1. Navigation Button Actions
-    document.getElementById("nav-btn-dashboard").addEventListener("click", () => switchView("dashboard-view"));
-    document.getElementById("nav-btn-events").addEventListener("click", () => switchView("events-view"));
-    document.getElementById("nav-btn-warehouse").addEventListener("click", () => switchView("warehouse-view"));
-    document.getElementById("nav-btn-clients").addEventListener("click", () => switchView("clients-view"));
-    document.getElementById("nav-btn-gallery").addEventListener("click", () => switchView("gallery-view"));
-    document.getElementById("nav-btn-crew").addEventListener("click", () => switchView("crew-view"));
-    document.getElementById("nav-btn-finance").addEventListener("click", () => switchView("finance-view"));
-    document.getElementById("nav-btn-invoice").addEventListener("click", () => switchView("invoice-view"));
-    document.getElementById("nav-btn-settings").addEventListener("click", () => switchView("settings-view"));
+    // 1. Navigation Button Actions (Hash SPA Router)
+    document.getElementById("nav-btn-dashboard").addEventListener("click", () => window.location.hash = "dashboard");
+    document.getElementById("nav-btn-events").addEventListener("click", () => window.location.hash = "events");
+    document.getElementById("nav-btn-warehouse").addEventListener("click", () => window.location.hash = "warehouse");
+    document.getElementById("nav-btn-clients").addEventListener("click", () => window.location.hash = "clients");
+    document.getElementById("nav-btn-kanban").addEventListener("click", () => window.location.hash = "kanban");
+    document.getElementById("nav-btn-callbacks").addEventListener("click", () => window.location.hash = "callbacks");
+    document.getElementById("nav-btn-gallery").addEventListener("click", () => window.location.hash = "gallery");
+    document.getElementById("nav-btn-crew").addEventListener("click", () => window.location.hash = "crew");
+    document.getElementById("nav-btn-finance").addEventListener("click", () => window.location.hash = "finance");
+    document.getElementById("nav-btn-invoice").addEventListener("click", () => window.location.hash = "invoice");
+    document.getElementById("nav-btn-settings").addEventListener("click", () => window.location.hash = "settings");
+    
+    // Hash routing listeners
+    window.addEventListener("hashchange", handleHashChange);
 
     // 2. Form submission bindings
     document.getElementById("inventory-form").addEventListener("submit", handleInventorySubmit);
@@ -2851,6 +3013,9 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("crew-form").reset();
         openModal("modal-crew");
     });
+
+    document.getElementById("btn-review-payroll").addEventListener("click", openPayrollReleaseModal);
+    document.getElementById("btn-export-payroll-pdf").addEventListener("click", exportPayrollPDF);
 
     document.getElementById("btn-quick-quote").addEventListener("click", openQuoteToolModal);
     document.getElementById("btn-assign-crew").addEventListener("click", openCrewWagesAllocationModal);
@@ -2987,16 +3152,26 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Events section status filters
-    ["all", "draft", "confirmed", "completed"].forEach(key => {
+    ["all", "draft", "quote", "confirmed", "completed"].forEach(key => {
         const btn = document.getElementById(`event-status-filter-btn-${key}`);
         if (btn) {
             btn.addEventListener("click", () => {
-                currentEventsStatusFilter = key === "all" ? "All" : key.charAt(0).toUpperCase() + key.slice(1);
+                currentEventsStatusFilter = key === "all" ? "All" : (key === "quote" ? "Quote" : key.charAt(0).toUpperCase() + key.slice(1));
                 eventsPage = 1;
                 loadEventsData();
             });
         }
     });
+
+    // Callbacks search bindings
+    const callbacksSearchInput = document.getElementById("callbacks-search-input");
+    if (callbacksSearchInput) {
+        callbacksSearchInput.addEventListener("input", (e) => {
+            callbacksSearchQuery = e.target.value;
+            callbacksPage = 1;
+            loadCallbacksData();
+        });
+    }
 
     // Language Selector change listener
     const langSelector = document.getElementById("lang-selector");
@@ -3237,8 +3412,11 @@ function exportSectionToPDF(title, subtitle, headers, rows, filename) {
     const container = document.createElement('div');
     container.innerHTML = pdfHTML;
     container.style.position = 'absolute';
-    container.style.left = '-9999px';
+    container.style.left = '0';
     container.style.top = '0';
+    container.style.zIndex = '-9999';
+    container.style.width = '297mm';
+    container.style.background = 'white';
     document.body.appendChild(container);
 
     const opt = {
@@ -3407,9 +3585,7 @@ async function openEventDetailsViewModal(eventId) {
         if (clientsList.length === 0) {
             clientsList = await apiFetch("/api/clients") || [];
         }
-        if (inventoryList.length === 0) {
-            inventoryList = await apiFetch("/api/inventory") || [];
-        }
+        const fullInv = await getFullInventoryList();
 
         const client = clientsList.find(c => c.id === evt.client_id) || {};
         
@@ -3426,7 +3602,7 @@ async function openEventDetailsViewModal(eventId) {
         let itemsCount = 0;
         let subtotal = 0;
         Object.keys(booked).forEach(itemId => {
-            const item = inventoryList.find(i => i.id === itemId);
+            const item = fullInv.find(i => i.id === itemId);
             if (item) {
                 const qty = booked[itemId];
                 const total = item.rental_price_per_day * qty * days;
@@ -3474,6 +3650,14 @@ async function openEventDetailsViewModal(eventId) {
                     <div style="text-align:right;">
                         <span class="badge ${evt.status === 'Completed' ? 'badge-completed' : evt.status === 'Confirmed' ? 'badge-confirmed' : 'badge-draft'}">${evt.status}</span>
                     </div>
+                </div>
+
+                <div class="glass-panel" style="padding:1rem;margin-top:1rem;display:flex;justify-content:space-between;align-items:center;background:rgba(201,148,31,0.05);border:1px solid rgba(201,148,31,0.2);">
+                    <div style="flex:1;min-width:0;margin-right:1rem;">
+                        <h4 style="font-family:'Marcellus',serif;color:var(--maroon);margin:0 0 0.25rem 0;">Client Self-Service Portal</h4>
+                        <p style="margin:0;font-size:0.8rem;color:var(--text-secondary);word-break:break-all;font-family:monospace;">${window.location.origin}/portal/${evt.portal_token || ''}</p>
+                    </div>
+                    <button class="btn-primary" style="padding:0.4rem 0.8rem;font-size:0.8rem;background:var(--maroon);color:white;border:none;border-radius:4px;cursor:pointer;white-space:nowrap;" onclick="copyPortalLink('${evt.portal_token || ''}')">📋 Copy Link</button>
                 </div>
 
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:1rem;">
@@ -3556,4 +3740,480 @@ window.loadEventsData = loadEventsData;
 window.loadInvoicesData = loadInvoicesData;
 window.openAttendanceModal = openAttendanceModal;
 window.updateRowCalculatedPay = updateRowCalculatedPay;
+window.loadKanbanData = loadKanbanData;
+window.allowDrop = allowDrop;
+window.handleDrop = handleDrop;
+window.loadCallbacksData = loadCallbacksData;
+window.markCallbackContacted = markCallbackContacted;
+window.convertQuoteToInvoice = convertQuoteToInvoice;
+window.openItemAvailabilityCalendar = openItemAvailabilityCalendar;
+window.renderItemCalendar = renderItemCalendar;
+window.changeCalendarMonth = changeCalendarMonth;
+window.handleHashChange = handleHashChange;
+window.openPayrollReleaseModal = openPayrollReleaseModal;
+window.exportPayrollPDF = exportPayrollPDF;
+
+// ─── Hash Router ────────────────────────────────────────────────────────────
+const HASH_VIEW_MAP = {
+    "#dashboard": "dashboard-view",
+    "#events": "events-view",
+    "#warehouse": "warehouse-view",
+    "#clients": "clients-view",
+    "#kanban": "kanban-view",
+    "#callbacks": "callbacks-view",
+    "#gallery": "gallery-view",
+    "#crew": "crew-view",
+    "#finance": "finance-view",
+    "#invoice": "invoice-view",
+    "#settings": "settings-view"
+};
+
+function handleHashChange() {
+    const hash = window.location.hash || "#dashboard";
+    const targetViewId = HASH_VIEW_MAP[hash];
+    if (targetViewId) {
+        switchView(targetViewId);
+    }
+}
+
+// ─── Kanban Drag & Drop ──────────────────────────────────────────────────────
+async function loadKanbanData() {
+    try {
+        const res = await apiFetch("/api/events?limit=1000");
+        const events = res.items || res || [];
+        
+        const cols = ["Quote", "Draft", "Confirmed", "Completed"];
+        cols.forEach(col => {
+            const container = document.getElementById(`cards-kanban-${col}`);
+            const countEl = document.getElementById(`count-kanban-${col}`);
+            if (container) container.innerHTML = "";
+            if (countEl) countEl.innerText = "0";
+        });
+        
+        const counts = { Quote: 0, Draft: 0, Confirmed: 0, Completed: 0 };
+        
+        events.forEach(evt => {
+            const col = evt.status || "Draft";
+            if (!cols.includes(col)) return;
+            
+            counts[col]++;
+            const container = document.getElementById(`cards-kanban-${col}`);
+            if (container) {
+                const card = document.createElement("div");
+                card.className = "kanban-card";
+                card.draggable = true;
+                card.id = `kanban-evt-${evt.id}`;
+                card.addEventListener("dragstart", (e) => {
+                    e.dataTransfer.setData("text/plain", evt.id);
+                });
+                
+                card.innerHTML = `
+                    <div class="kanban-card-title">${evt.client_name}</div>
+                    <div class="kanban-card-meta">
+                        <strong>Venue:</strong> ${evt.venue_address}<br>
+                        <strong>Dates:</strong> ${evt.start_date} to ${evt.end_date}
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.5rem;">
+                        <span style="font-size:0.75rem; font-weight:600; color:var(--maroon);">₹${evt.total_invoice_amount.toFixed(0)}</span>
+                        <button class="btn-ghost" style="padding:2px 6px; font-size:0.7rem; border:1px solid var(--border-glass);" onclick="openEventDetailsViewModal('${evt.id}')">Details</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            }
+        });
+        
+        cols.forEach(col => {
+            const countEl = document.getElementById(`count-kanban-${col}`);
+            if (countEl) countEl.innerText = counts[col];
+        });
+    } catch (err) {
+        console.error("Failed to load Kanban data:", err);
+    }
+}
+
+function allowDrop(e) {
+    e.preventDefault();
+    const column = e.currentTarget;
+    column.classList.add("drag-over");
+}
+
+async function handleDrop(e, newStatus) {
+    e.preventDefault();
+    e.currentTarget.classList.remove("drag-over");
+    const eventId = e.dataTransfer.getData("text/plain");
+    if (!eventId) return;
+    
+    try {
+        const evt = await apiFetch(`/api/events/${eventId}`);
+        if (!evt) return;
+        
+        if (evt.status === newStatus) return;
+        
+        evt.status = newStatus;
+        
+        await apiFetch(`/api/events/${eventId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(evt)
+        });
+        
+        showToast(`Event status updated to ${newStatus}`);
+        loadKanbanData();
+    } catch (err) {
+        console.error("Failed to update status on drop:", err);
+    }
+}
+
+// ─── Callbacks CRM ───────────────────────────────────────────────────────────
+async function loadCallbacksData(page) {
+    if (page !== undefined) callbacksPage = page;
+    try {
+        const data = await apiFetch("/api/callbacks");
+        callbacksList = data || [];
+        
+        let filtered = callbacksList;
+        if (callbacksSearchQuery.trim() !== "") {
+            const sq = callbacksSearchQuery.toLowerCase();
+            filtered = callbacksList.filter(cb => 
+                (cb.name && cb.name.toLowerCase().includes(sq)) ||
+                (cb.phone && cb.phone.includes(sq)) ||
+                (cb.venue && cb.venue.toLowerCase().includes(sq)) ||
+                (cb.service && cb.service.toLowerCase().includes(sq)) ||
+                (cb.message && cb.message.toLowerCase().includes(sq))
+            );
+        }
+        
+        const total = filtered.length;
+        const startIndex = (callbacksPage - 1) * PAGE_SIZE;
+        const paginated = filtered.slice(startIndex, startIndex + PAGE_SIZE);
+        
+        const tbody = document.getElementById("callbacks-table-body");
+        if (tbody) {
+            tbody.innerHTML = "";
+            if (paginated.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align: center;">No callback enquiries found.</td></tr>`;
+                renderPaginationControls("callbacks-pagination", 0, callbacksPage, "loadCallbacksData", 3);
+                return;
+            }
+            
+            paginated.forEach(cb => {
+                const tr = document.createElement("tr");
+                const dateStr = cb.date || "N/A";
+                const venueStr = cb.venue || "N/A";
+                const serviceStr = cb.service || "N/A";
+                const messageStr = cb.message || "None";
+                const statusStr = cb.status || "Pending";
+                
+                let badgeClass = "badge-draft";
+                if (statusStr === "Contacted") badgeClass = "badge-completed";
+                
+                let actionBtn = "";
+                if (statusStr !== "Contacted") {
+                    actionBtn = `<button class="btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;" onclick="markCallbackContacted('${cb.id}')">${t('callbacks_action_contacted')}</button>`;
+                }
+                
+                tr.innerHTML = `
+                    <td><strong>${cb.name}</strong></td>
+                    <td><a href="tel:${cb.phone}" style="color: var(--maroon); text-decoration: none;">${cb.phone}</a></td>
+                    <td>${dateStr}</td>
+                    <td>${venueStr}</td>
+                    <td><span class="badge" style="background: rgba(107,22,35,0.05); color: var(--maroon);">${serviceStr}</span></td>
+                    <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${messageStr}">${messageStr}</td>
+                    <td><span class="badge ${badgeClass}">${statusStr}</span></td>
+                    <td>${actionBtn}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+            renderPaginationControls("callbacks-pagination", total, callbacksPage, "loadCallbacksData", 3);
+        }
+    } catch (err) {
+        console.error("Failed to load callbacks:", err);
+    }
+}
+
+async function markCallbackContacted(cbId) {
+    try {
+        await apiFetch(`/api/callbacks/${cbId}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ status: "Contacted" })
+        });
+        showToast("Callback marked as contacted.");
+        loadCallbacksData();
+    } catch (err) {
+        console.error("Failed to mark callback contacted:", err);
+    }
+}
+
+// ─── Quote to Invoice Converter ──────────────────────────────────────────────
+async function convertQuoteToInvoice(eventId) {
+    showConfirmation(
+        "Convert Quote to Invoice",
+        "Are you sure you want to convert this Quote into a Confirmed Event Booking Invoice?",
+        async () => {
+            try {
+                const quote = await apiFetch(`/api/events/${eventId}`);
+                if (!quote) {
+                    showToast("Failed to fetch quote details.", "error");
+                    return;
+                }
+                quote.status = "Confirmed";
+                await apiFetch(`/api/events/${eventId}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(quote)
+                });
+                showToast("Quote successfully converted to Confirmed Event Invoice!");
+                loadEventsData();
+                loadDashboardData();
+            } catch (err) {
+                console.error("Failed to convert quote:", err);
+            }
+        }
+    );
+}
+
+// ─── Calendar Availability Widget ───────────────────────────────────────────
+let currentCalendarItemId = null;
+let currentCalendarDate = new Date();
+
+async function openItemAvailabilityCalendar(itemId) {
+    const item = inventoryList.find(i => i.id === itemId);
+    if (!item) return;
+    
+    currentCalendarItemId = itemId;
+    document.getElementById("availability-item-name").innerText = item.name;
+    
+    openModal("modal-item-availability");
+    renderItemCalendar();
+}
+
+async function renderItemCalendar() {
+    const grid = document.getElementById("availability-calendar-grid");
+    if (!grid) return;
+    
+    grid.innerHTML = "";
+    
+    const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    weekdays.forEach(day => {
+        const h = document.createElement("div");
+        h.className = "calendar-day-header";
+        h.innerText = day;
+        grid.appendChild(h);
+    });
+    
+    const year = currentCalendarDate.getFullYear();
+    const month = currentCalendarDate.getMonth();
+    
+    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    document.getElementById("calendar-month-year").innerText = `${monthNames[month]} ${year}`;
+    
+    const firstDay = new Date(year, month, 1).getDay();
+    const totalDays = new Date(year, month + 1, 0).getDate();
+    
+    for (let i = 0; i < firstDay; i++) {
+        const emptyCell = document.createElement("div");
+        emptyCell.className = "calendar-day empty";
+        grid.appendChild(emptyCell);
+    }
+    
+    let allEvts = [];
+    try {
+        const res = await apiFetch("/api/events?limit=1000");
+        allEvts = res.items || res || [];
+    } catch (e) {
+        console.error("Failed to fetch events for calendar:", e);
+    }
+    
+    const bookedDates = new Set();
+    
+    allEvts.forEach(evt => {
+        if (evt.status === "Cancelled" || evt.status === "Quote") return;
+        
+        let booked = {};
+        try {
+            booked = JSON.parse(evt.items_booked || "{}");
+        } catch (e) {}
+        
+        if (booked[currentCalendarItemId]) {
+            const start = new Date(evt.start_date);
+            const end = new Date(evt.end_date);
+            let current = new Date(start);
+            while (current <= end) {
+                const dateStr = current.toISOString().split('T')[0];
+                bookedDates.add(dateStr);
+                current.setDate(current.getDate() + 1);
+            }
+        }
+    });
+    
+    for (let day = 1; day <= totalDays; day++) {
+        const cell = document.createElement("div");
+        cell.className = "calendar-day";
+        cell.innerText = day;
+        
+        const currentMonthStr = String(month + 1).padStart(2, "0");
+        const currentDayStr = String(day).padStart(2, "0");
+        const dateStr = `${year}-${currentMonthStr}-${currentDayStr}`;
+        
+        if (bookedDates.has(dateStr)) {
+            cell.classList.add("booked");
+            cell.title = "Reserved/Booked";
+        } else {
+            cell.classList.add("available");
+            cell.title = "Available";
+        }
+        
+        grid.appendChild(cell);
+    }
+}
+
+function changeCalendarMonth(offset) {
+    currentCalendarDate.setMonth(currentCalendarDate.getMonth() + offset);
+    renderItemCalendar();
+}
+
+// ─── Payroll Calculator & Release ───────────────────────────────────────────
+async function openPayrollReleaseModal() {
+    const tbody = document.getElementById("payroll-release-table-body");
+    if (!tbody) return;
+    
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">Loading payroll data...</td></tr>`;
+    openModal("modal-payroll-release");
+    
+    try {
+        const res = await apiFetch("/api/crew");
+        const crew = res.items || res || [];
+        tbody.innerHTML = "";
+        
+        if (crew.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">No crew profiles registered.</td></tr>`;
+            return;
+        }
+        
+        let totalWages = 0;
+        let printHtml = `
+            <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+                <thead>
+                    <tr style="background: #6b1623; color: #fff;">
+                        <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Name</th>
+                        <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Role</th>
+                        <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">Days Worked</th>
+                        <th style="padding: 8px; border: 1px solid #ddd; text-align: right;">Base Rate</th>
+                        <th style="padding: 8px; border: 1px solid #ddd; text-align: right;">Wages Due</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+        
+        crew.forEach(item => {
+            const tr = document.createElement("tr");
+            const wages = (item.base_rate || 0) * (item.days_worked || 0);
+            totalWages += wages;
+            
+            tr.innerHTML = `
+                <td><strong>${item.name}</strong></td>
+                <td>${item.role || 'Specialist'}</td>
+                <td style="text-align: center;">${item.days_worked || 0}</td>
+                <td>₹${(item.base_rate || 0).toFixed(2)}</td>
+                <td style="text-align: right; font-weight: 600; color: var(--maroon);">₹${wages.toFixed(2)}</td>
+            `;
+            tbody.appendChild(tr);
+            
+            printHtml += `
+                <tr>
+                    <td style="padding: 8px; border: 1px solid #ddd;">${item.name}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">${item.role || 'Specialist'}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${item.days_worked || 0}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">₹${(item.base_rate || 0).toFixed(2)}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd; text-align: right; font-weight: 600;">₹${wages.toFixed(2)}</td>
+                </tr>
+            `;
+        });
+        
+        printHtml += `
+                    <tr style="font-weight: 700; background: #fafafa;">
+                        <td colspan="4" style="padding: 8px; border: 1px solid #ddd; text-align: right;">Total Payroll:</td>
+                        <td style="padding: 8px; border: 1px solid #ddd; text-align: right; color: #6b1623;">₹${totalWages.toFixed(2)}</td>
+                    </tr>
+                </tbody>
+            </table>
+        `;
+        
+        document.getElementById("print-payroll-body").innerHTML = printHtml;
+    } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--status-danger);">Failed to calculate payroll.</td></tr>`;
+    }
+}
+
+function exportPayrollPDF() {
+    const element = document.getElementById("print-payroll-section");
+    if (!element) return;
+    
+    const wrapper = element.cloneNode(true);
+    wrapper.style.display = "block";
+    wrapper.style.padding = "20px";
+    wrapper.style.background = "#ffffff";
+    wrapper.style.width = "210mm";
+    wrapper.style.fontFamily = "'Poppins', sans-serif";
+    document.body.appendChild(wrapper);
+    
+    const opt = {
+        margin: [10, 10, 10, 10],
+        filename: `Bhoomi_Payroll_${new Date().toISOString().slice(0, 10)}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    
+    showToast("Generating Payroll PDF...");
+    html2pdf().from(wrapper).set(opt).save().then(() => {
+        document.body.removeChild(wrapper);
+        showToast("Payroll PDF exported successfully.");
+    }).catch(err => {
+        document.body.removeChild(wrapper);
+        console.error("Payroll PDF generation failed:", err);
+        showToast("Failed to generate PDF.", "error");
+    });
+}
+
+function copyPortalLink(token) {
+    // Guard against null, undefined, 'null', 'undefined', or empty string
+    if (!token || token === 'null' || token === 'undefined' || token.trim() === '') {
+        showToast("Portal link not ready yet — please refresh the page and try again.", "error");
+        return;
+    }
+    const link = `${window.location.origin}/portal/${token}`;
+    navigator.clipboard.writeText(link)
+        .then(() => { showToast("Portal link copied! Share it with your client.", "success"); })
+        .catch(() => showToast("Failed to copy portal link.", "error"));
+}
+window.copyPortalLink = copyPortalLink;
+
+async function fetchAndCopyPortalLink(eventId) {
+    try {
+        showToast("Fetching portal link...", "info");
+        const res = await apiFetch(`/api/events/${eventId}/portal-link`);
+        if (!res || !res.portal_token) {
+            showToast("Could not generate portal link.", "error");
+            return;
+        }
+        const link = `${window.location.origin}/portal/${res.portal_token}`;
+        await navigator.clipboard.writeText(link);
+        showToast("🔗 Portal link copied! Share it with your client.", "success");
+    } catch (err) {
+        console.error("fetchAndCopyPortalLink error:", err);
+        showToast("Failed to get portal link.", "error");
+    }
+}
+window.fetchAndCopyPortalLink = fetchAndCopyPortalLink;
+
+let allInventoryItemsList = [];
+async function getFullInventoryList() {
+    if (allInventoryItemsList.length === 0) {
+        allInventoryItemsList = await apiFetch("/api/inventory");
+    }
+    return allInventoryItemsList;
+}
+window.getFullInventoryList = getFullInventoryList;
 

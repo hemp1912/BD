@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bhoomi Decoration — Client Portal</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+    
+    <style>
+        body {
+            background-color: var(--ivory);
+            color: var(--text-primary);
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .portal-wrapper {
+            max-width: 800px;
+            margin: 3rem auto;
+            padding: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .portal-wrapper {
+                margin: 1rem auto;
+                padding: 1rem;
+            }
+        }
+
+        .portal-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            border-bottom: 2px solid var(--border-glass);
+            padding-bottom: 1.5rem;
+        }
+
+        .portal-logo {
+            font-family: 'Marcellus', serif;
+            font-size: 2.2rem;
+            color: var(--maroon);
+            margin: 0;
+        }
+
+        .portal-logo span {
+            color: var(--gold);
+        }
+
+        .portal-subtitle {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-top: 0.5rem;
+            font-weight: 500;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 560px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, var(--maroon-deep), var(--maroon));
+            color: #ffffff;
+            border-radius: 4px;
+            padding: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 10px 25px rgba(107, 22, 35, 0.1);
+        }
+
+        @media (max-width: 560px) {
+            .summary-card {
+                flex-direction: column;
+                gap: 1.5rem;
+                text-align: center;
+            }
+        }
+
+        .summary-amount h4 {
+            margin: 0;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            opacity: 0.8;
+        }
+
+        .summary-amount div {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-top: 0.25rem;
+        }
+
+        .summary-details {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        @media (max-width: 560px) {
+            .summary-details {
+                text-align: center;
+            }
+        }
+
+        .summary-details div {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .detail-section-title {
+            font-family: 'Marcellus', serif;
+            font-size: 1.25rem;
+            color: var(--maroon-deep);
+            border-bottom: 1px solid var(--border-glass);
+            padding-bottom: 0.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .item-list-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.85rem 0.5rem;
+            border-bottom: 1px dashed var(--border-glass);
+            font-size: 0.9rem;
+        }
+
+        .item-list-row:last-child {
+            border-bottom: none;
+        }
+
+        .item-list-row.total-row {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--maroon-deep);
+            border-top: 2px solid var(--maroon);
+            border-bottom: none;
+            padding-top: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .receipt-card {
+            background: rgba(255,255,255,0.5);
+            border: 1px solid var(--border-glass);
+            border-radius: 4px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+
+        .layout-blueprint-container {
+            border: 1px solid var(--border-glass);
+            background: #ffffff;
+            border-radius: 4px;
+            padding: 1rem;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .layout-blueprint-container img {
+            max-width: 100%;
+            max-height: 400px;
+            object-fit: contain;
+            border-radius: 2px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .portal-error-container {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .portal-error-container svg {
+            width: 80px;
+            height: 80px;
+            fill: var(--maroon);
+            margin-bottom: 1.5rem;
+        }
+
+        .portal-error-container h2 {
+            font-family: 'Marcellus', serif;
+            color: var(--maroon-deep);
+            margin-bottom: 1rem;
+        }
+
+        .portal-error-container p {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .btn-call {
+            background: #25D366;
+            color: #ffffff;
+            border: none;
+            padding: 12px 28px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.2);
+            transition: background-color 0.2s;
+        }
+
+        .btn-call:hover {
+            background-color: #20ba5a;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="portal-app">
+        <!-- Loading state -->
+        <div id="portal-loading" style="text-align: center; padding: 10rem 2rem;">
+            <div class="loader-spinner" style="margin: 0 auto 1.5rem auto; width: 40px; height: 40px;"></div>
+            <p style="color: var(--text-secondary); font-style: italic;">Loading secure self-service portal...</p>
+        </div>
+
+        <!-- Portal display block (hidden initially) -->
+        <div id="portal-view" style="display: none;" class="portal-wrapper">
+            <header class="portal-header">
+                <h1 class="portal-logo">Bhoomi<span>✦</span> Decoration</h1>
+                <div class="portal-subtitle">Client Event Portal</div>
+            </header>
+
+            <!-- Balance summary block -->
+            <div class="summary-card">
+                <div class="summary-amount">
+                    <h4 id="portal-balance-header-label">Remaining Balance Due</h4>
+                    <div id="portal-remaining-balance">₹0.00</div>
+                </div>
+                <div class="summary-details">
+                    <div id="portal-total-invoiced">Total Invoice: ₹0.00</div>
+                    <div id="portal-total-paid">Deposits Paid: ₹0.00</div>
+                    <div id="portal-payment-status-badge">Status: Unpaid</div>
+                </div>
+            </div>
+
+            <!-- Booking details -->
+            <div class="info-grid">
+                <div class="glass-panel" style="padding: 1.5rem;">
+                    <div style="font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); font-weight: 600;">Customer Client</div>
+                    <h3 id="portal-client-name" style="margin: 0.25rem 0; font-family: 'Marcellus', serif; color: var(--maroon);">Client Name</h3>
+                    <div id="portal-client-address" style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.25rem;">Address info</div>
+                </div>
+                <div class="glass-panel" style="padding: 1.5rem;">
+                    <div style="font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); font-weight: 600;">Event Venue & Dates</div>
+                    <h3 id="portal-venue" style="margin: 0.25rem 0; font-family: 'Marcellus', serif; color: var(--maroon);">Taj Mahal Ballroom</h3>
+                    <div id="portal-dates" style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.25rem;">Dates details</div>
+                </div>
+            </div>
+
+            <!-- Resolved Reserved Items -->
+            <h3 class="detail-section-title">Reserved Decoration Layout Items</h3>
+            <div class="glass-panel" style="padding: 1rem;" id="portal-items-box">
+                <!-- Resolved items populated dynamically -->
+            </div>
+
+            <!-- Payments received history -->
+            <h3 class="detail-section-title">Logistics Payout History</h3>
+            <div id="portal-receipts-box">
+                <!-- Receipts populated dynamically -->
+            </div>
+
+            <!-- Design layout blueprints upload -->
+            <div id="portal-layout-section" style="display: none;">
+                <h3 class="detail-section-title">Stage & Mandap Blueprint Design</h3>
+                <div class="layout-blueprint-container" id="portal-blueprint-box">
+                    <!-- Layout blueprint loader -->
+                </div>
+            </div>
+
+            <!-- Help Contact CTA -->
+            <div style="text-align: center; margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border-glass);">
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1.25rem;">Have questions regarding your layout, pricing, or payment details?</p>
+                <a id="portal-whatsapp-cta" href="https://wa.me/919876543210" target="_blank" class="btn-call">
+                    <svg viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg" style="fill: #fff;">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.458 5.704 1.459h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                    </svg>
+                    Contact Support on WhatsApp
+                </a>
+            </div>
+        </div>
+
+        <!-- Error display block -->
+        <div id="portal-error" style="display: none;" class="portal-wrapper">
+            <div class="portal-error-container glass-panel">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                </svg>
+                <h2 id="error-title">Access Restricted</h2>
+                <p id="error-message">This client self-service portal link is invalid, expired, or deactivated.</p>
+                <a href="/" class="btn btn-primary" style="display: inline-block; text-decoration: none;">Go to Homepage</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Extrapolate token from path: /portal/{token}
+            const pathParts = window.location.pathname.split("/");
+            const token = pathParts[pathParts.length - 1];
+
+            const loadingDiv = document.getElementById("portal-loading");
+            const viewDiv = document.getElementById("portal-view");
+            const errorDiv = document.getElementById("portal-error");
+
+            if (!token || token === "portal" || token === "") {
+                showError("Invalid Access Link", "No secure access token was provided in the URL query path.");
+                return;
+            }
+
+            // Fetch portal data
+            fetch(`/api/portal/${token}`)
+                .then(res => {
+                    if (res.status === 410) {
+                        return res.json().then(data => {
+                            throw new Error(data.detail || "This portal link has expired (valid up to 30 days post-event).");
+                        });
+                    }
+                    if (!res.ok) {
+                        throw new Error("Unable to locate a wedding event booking associated with this token.");
+                    }
+                    return res.json();
+                })
+                .then(event => {
+                    // Populate details
+                    document.getElementById("portal-remaining-balance").innerText = `₹${event.remaining_balance.toFixed(2)}`;
+                    document.getElementById("portal-total-invoiced").innerText = `Total Invoice: ₹${event.total_invoice_amount.toFixed(2)}`;
+                    document.getElementById("portal-total-paid").innerText = `Deposits Paid: ₹${event.amount_paid.toFixed(2)}`;
+                    
+                    const balanceHeader = document.getElementById("portal-balance-header-label");
+                    if (event.remaining_balance <= 0) {
+                        balanceHeader.innerText = "Invoice Fully Paid!";
+                        document.getElementById("portal-remaining-balance").style.color = "#059669";
+                    }
+                    
+                    // Status Badge
+                    const badge = document.getElementById("portal-payment-status-badge");
+                    let badgeColor = "rgba(107, 114, 128, 0.15)";
+                    let badgeTextColor = "var(--text-secondary)";
+                    let badgeText = "Unpaid";
+                    
+                    if (event.remaining_balance <= 0) {
+                        badgeColor = "rgba(16, 185, 129, 0.15)";
+                        badgeTextColor = "#059669";
+                        badgeText = "Fully Paid";
+                    } else if (event.amount_paid > 0) {
+                        badgeColor = "rgba(201, 148, 31, 0.15)";
+                        badgeTextColor = "var(--gold)";
+                        badgeText = "Partially Paid";
+                    }
+                    
+                    badge.style.background = badgeColor;
+                    badge.style.color = badgeTextColor;
+                    badge.innerText = `Status: ${badgeText}`;
+
+                    document.getElementById("portal-client-name").innerText = event.client_name;
+                    document.getElementById("portal-client-address").innerText = "Billed Client Profile";
+                    document.getElementById("portal-venue").innerText = event.venue_address;
+                    document.getElementById("portal-dates").innerText = `${event.start_date} to ${event.end_date} (${event.rental_days} Rental Days)`;
+
+                    // Populate resolved items
+                    const itemsBox = document.getElementById("portal-items-box");
+                    itemsBox.innerHTML = "";
+                    if (event.resolved_items && event.resolved_items.length > 0) {
+                        event.resolved_items.forEach(item => {
+                            const row = document.createElement("div");
+                            row.className = "item-list-row";
+                            row.innerHTML = `
+                                <div>
+                                    <strong>${item.name}</strong><br>
+                                    <small style="color: var(--text-muted);">${item.category}</small>
+                                </div>
+                                <div style="text-align: right;">
+                                    <span>${item.quantity} units x ${event.rental_days}d</span><br>
+                                    <span style="font-weight: 600; color: var(--maroon);">₹${item.cost.toFixed(2)}</span>
+                                </div>
+                            `;
+                            itemsBox.appendChild(row);
+                        });
+                        
+                        // Discount & Tax Summary row
+                        if (event.discount > 0) {
+                            const discRow = document.createElement("div");
+                            discRow.className = "item-list-row";
+                            discRow.innerHTML = `
+                                <div style="color: #b91c1c; font-weight: 500;">Deducted Discount</div>
+                                <div style="color: #b91c1c; font-weight: 600;">-₹${event.discount.toFixed(2)}</div>
+                            `;
+                            itemsBox.appendChild(discRow);
+                        }
+                        if (event.tax_rate > 0) {
+                            const taxRow = document.createElement("div");
+                            taxRow.className = "item-list-row";
+                            taxRow.innerHTML = `
+                                <div style="color: var(--text-secondary); font-weight: 500;">Applied Tax (${event.tax_rate}%)</div>
+                                <div style="font-weight: 600;">+₹${((event.total_invoice_amount - (event.total_invoice_amount / (1 + event.tax_rate/100))) || 0).toFixed(2)}</div>
+                            `;
+                            itemsBox.appendChild(taxRow);
+                        }
+
+                        const totalRow = document.createElement("div");
+                        totalRow.className = "item-list-row total-row";
+                        totalRow.innerHTML = `
+                            <div>Total Invoice Cost</div>
+                            <div>₹${event.total_invoice_amount.toFixed(2)}</div>
+                        `;
+                        itemsBox.appendChild(totalRow);
+                    } else {
+                        itemsBox.innerHTML = `<div style="text-align:center; font-style:italic; color:var(--text-muted); font-size:0.85rem; padding: 1rem 0;">No reserved catalog items found.</div>`;
+                    }
+
+                    // Populate receipts
+                    const receiptsBox = document.getElementById("portal-receipts-box");
+                    receiptsBox.innerHTML = "";
+                    let history = [];
+                    try {
+                        history = JSON.parse(event.payment_history || "[]");
+                    } catch (e) {}
+
+                    if (history.length > 0) {
+                        history.forEach((rec, idx) => {
+                            const card = document.createElement("div");
+                            card.className = "receipt-card";
+                            const dateStr = rec.received_at ? rec.received_at.split("T")[0] : "N/A";
+                            card.innerHTML = `
+                                <div>
+                                    <strong>Receipt Milestone #${idx + 1}</strong><br>
+                                    <small style="color: var(--text-muted);">Method: ${rec.payment_method} · Date: ${dateStr}</small>
+                                </div>
+                                <div style="font-weight: 700; color: #059669; font-size: 0.95rem;">+₹${rec.amount.toFixed(2)}</div>
+                            `;
+                            receiptsBox.appendChild(card);
+                        });
+                    } else {
+                        receiptsBox.innerHTML = `<div class="glass-panel" style="text-align:center; font-style:italic; color:var(--text-muted); font-size:0.85rem; padding: 1rem 0;">No deposit receipts recorded.</div>`;
+                    }
+
+                    // Populate blueprint if it exists
+                    if (event.design_layout_url) {
+                        document.getElementById("portal-layout-section").style.display = "block";
+                        const bpBox = document.getElementById("portal-blueprint-box");
+                        bpBox.innerHTML = `<img src="${event.design_layout_url}" alt="Decoration Layout Blueprints">`;
+                    }
+
+                    // Setup WhatsApp CTA pre-filled text
+                    const waLink = document.getElementById("portal-whatsapp-cta");
+                    const txt = encodeURIComponent(`Hi Bhoomi Decoration! I'm reviewing my portal link (Token: ${token}) for the venue "${event.venue_address}".`);
+                    waLink.href = `https://wa.me/919876543210?text=${txt}`;
+
+                    // Show view
+                    loadingDiv.style.display = "none";
+                    viewDiv.style.display = "block";
+                })
+                .catch(err => {
+                    showError(err.message.includes("expired") ? "Portal Expired" : "Portal Link Invalid", err.message);
+                });
+
+            function showError(title, message) {
+                loadingDiv.style.display = "none";
+                viewDiv.style.display = "none";
+                errorDiv.style.display = "block";
+                document.getElementById("error-title").innerText = title;
+                document.getElementById("error-message").innerText = message;
+            }
+        });
+    </script>
+</body>
+</html>

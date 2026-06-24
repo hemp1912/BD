@@ -57,7 +57,7 @@ async def get_crew(
             
         return res
     else:
-        crew = await db_client.get_crew()
+        crew = await db_client.get_crew(search=search)
         try:
             all_att = await db_client.get_all_attendance()
         except Exception:

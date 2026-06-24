@@ -142,7 +142,7 @@ class AppwriteDB(BaseDB):
                 "attributes": [
                     {"type": "string", "key": "client_id", "size": 100, "required": True},
                     {"type": "string", "key": "client_name", "size": 255, "required": True},
-                    {"type": "venue_address", "key": "venue_address", "size": 500, "required": True},
+                    {"type": "string", "key": "venue_address", "size": 500, "required": True},
                     {"type": "string", "key": "start_date", "size": 50, "required": True},
                     {"type": "string", "key": "end_date", "size": 50, "required": True},
                     {"type": "string", "key": "status", "size": 50, "required": True, "default": "Draft"},
@@ -156,8 +156,10 @@ class AppwriteDB(BaseDB):
                     {"type": "integer", "key": "max_workforce_capacity", "required": False, "default": 4},
                     {"type": "string", "key": "notes", "size": 5000, "required": False, "default": ""},
                     {"type": "float", "key": "tax_rate", "required": False, "default": 0.0},
-                    {"type": "float", "key": "discount", "required": False, "default": 0.0}
+                    {"type": "float", "key": "discount", "required": False, "default": 0.0},
+                    {"type": "string", "key": "portal_token", "size": 100, "required": False, "default": ""}
                 ],
+
                 "indexes": []
             },
             config.APPWRITE_TASKS_COLLECTION_ID: {
@@ -221,8 +223,22 @@ class AppwriteDB(BaseDB):
                 "indexes": [
                     {"key": "date_index", "type": "key", "attributes": ["date"]}
                 ]
+            },
+            config.APPWRITE_CALLBACKS_COLLECTION_ID: {
+                "name": "Callbacks",
+                "attributes": [
+                    {"type": "string", "key": "name", "size": 255, "required": True},
+                    {"type": "string", "key": "phone", "size": 50, "required": True},
+                    {"type": "string", "key": "date", "size": 50, "required": False, "default": ""},
+                    {"type": "string", "key": "venue", "size": 255, "required": False, "default": ""},
+                    {"type": "string", "key": "service", "size": 100, "required": False, "default": ""},
+                    {"type": "string", "key": "message", "size": 1000, "required": False, "default": ""},
+                    {"type": "string", "key": "status", "size": 50, "required": False, "default": "Pending"}
+                ],
+                "indexes": []
             }
         }
+
 
         # Grant read, create, update, delete permissions to Role.any()
         permissions = [
@@ -860,50 +876,50 @@ class AppwriteDB(BaseDB):
             return None
 
     async def create_user(self, user: dict):
-        doc_id = "usr_" + str(uuid.uuid4())[:8]
+        doc_id = user.get("id") or ("usr_" + str(uuid.uuid4())[:8])
+        # Clean user dict to contain only fields in the Appwrite Users collection schema
+        schema_fields = {"email", "role", "full_name", "base_daily_rate", "id"}
+        user_data = {k: v for k, v in user.items() if k in schema_fields}
+        user_data["id"] = doc_id
+        
         doc = await asyncio.to_thread(
             self.databases.create_document,
             self.db_id,
             config.APPWRITE_USERS_COLLECTION_ID,
             doc_id,
-            user
+            user_data
         )
         return self._clean_doc(doc)
 
-    # Gallery CRUD
     async def get_gallery(self, page=None, limit=10, search=None):
-        queries = []
+        res = await asyncio.to_thread(
+            self.databases.list_documents,
+            self.db_id, 
+            config.APPWRITE_GALLERY_COLLECTION_ID,
+            queries=[Query.limit(1000)]
+        )
+        all_items = [self._clean_doc(d) for d in self._get_documents_list(res)]
+        
         if search:
-            search_str = search.strip()
-            queries.append(Query.or_([
-                Query.contains("title", search_str),
-                Query.contains("category", search_str)
-            ]))
+            q = search.strip().lower()
+            all_items = [
+                item for item in all_items if
+                (item.get("title") and q in item.get("title").lower()) or
+                (item.get("category") and q in item.get("category").lower())
+            ]
             
+        total = len(all_items)
+        
         if page is not None:
-            queries.append(Query.limit(limit))
-            queries.append(Query.offset((page - 1) * limit))
-            
-            res = await asyncio.to_thread(
-                self.databases.list_documents,
-                self.db_id, 
-                config.APPWRITE_GALLERY_COLLECTION_ID,
-                queries=queries
-            )
-            items = [self._clean_doc(d) for d in self._get_documents_list(res)]
-            total = self._get_total_count(res)
+            start = (page - 1) * limit
+            items = all_items[start : start + limit]
             return {
                 "items": items,
                 "total": total
             }
         else:
-            res = await asyncio.to_thread(
-                self.databases.list_documents,
-                self.db_id, 
-                config.APPWRITE_GALLERY_COLLECTION_ID,
-                queries=[Query.limit(1000)]
-            )
-            return [self._clean_doc(d) for d in self._get_documents_list(res)]
+            return all_items
+
 
     async def get_gallery_item(self, photo_id: str):
         try:
@@ -951,63 +967,57 @@ class AppwriteDB(BaseDB):
         except Exception:
             return False
 
-    # Crew CRUD
     async def get_crew(self, page=None, limit=10, search=None):
-        queries = []
+        # Fetch all crew to compute stats and perform in-memory search/pagination
+        all_crew_res = await asyncio.to_thread(
+            self.databases.list_documents,
+            self.db_id,
+            config.APPWRITE_CREW_COLLECTION_ID,
+            queries=[Query.limit(1000)]
+        )
+        all_crew = [self._clean_doc(d) for d in self._get_documents_list(all_crew_res)]
+        
+        # Stats computation (global, before search filtering)
+        total_crew = len(all_crew)
+        owed_wages = sum(c.get("amount_owed", 0.0) for c in all_crew)
+        
+        # Active assignments (global)
+        all_events_res = await asyncio.to_thread(
+            self.databases.list_documents,
+            self.db_id,
+            config.APPWRITE_EVENTS_COLLECTION_ID,
+            queries=[Query.limit(1000)]
+        )
+        all_events = [self._clean_doc(d) for d in self._get_documents_list(all_events_res)]
+        
+        crew_on_duty_set = set()
+        for e in all_events:
+            if e.get("status") in ("Confirmed", "Draft"):
+                try:
+                    assignments = json.loads(e.get("crew_assignments") or "[]")
+                    for worker in assignments:
+                        w_id = worker.get("worker_id")
+                        if w_id:
+                            crew_on_duty_set.add(w_id)
+                except Exception:
+                    pass
+        active_assignments = len(crew_on_duty_set)
+        
+        # Search filtering
+        filtered_crew = all_crew
         if search:
-            search_str = search.strip()
-            queries.append(Query.or_([
-                Query.contains("name", search_str),
-                Query.contains("role", search_str)
-            ]))
+            q = search.strip().lower()
+            filtered_crew = [
+                c for c in all_crew if
+                (c.get("name") and q in c.get("name").lower()) or
+                (c.get("role") and q in c.get("role").lower())
+            ]
             
+        total = len(filtered_crew)
+        
         if page is not None:
-            queries.append(Query.limit(limit))
-            queries.append(Query.offset((page - 1) * limit))
-            
-            res = await asyncio.to_thread(
-                self.databases.list_documents,
-                self.db_id, 
-                config.APPWRITE_CREW_COLLECTION_ID,
-                queries=queries
-            )
-            items = [self._clean_doc(d) for d in self._get_documents_list(res)]
-            total = self._get_total_count(res)
-            
-            # Fetch all crew to compute stats
-            all_crew_res = await asyncio.to_thread(
-                self.databases.list_documents,
-                self.db_id,
-                config.APPWRITE_CREW_COLLECTION_ID,
-                queries=[Query.limit(1000)]
-            )
-            all_crew = [self._clean_doc(d) for d in self._get_documents_list(all_crew_res)]
-            
-            total_crew = len(all_crew)
-            owed_wages = sum(c.get("amount_owed", 0.0) for c in all_crew)
-            
-            # Active assignments
-            all_events_res = await asyncio.to_thread(
-                self.databases.list_documents,
-                self.db_id,
-                config.APPWRITE_EVENTS_COLLECTION_ID,
-                queries=[Query.limit(1000)]
-            )
-            all_events = [self._clean_doc(d) for d in self._get_documents_list(all_events_res)]
-            
-            crew_on_duty_set = set()
-            for e in all_events:
-                if e.get("status") in ("Confirmed", "Draft"):
-                    try:
-                        assignments = json.loads(e.get("crew_assignments") or "[]")
-                        for worker in assignments:
-                            w_id = worker.get("worker_id")
-                            if w_id:
-                                crew_on_duty_set.add(w_id)
-                    except Exception:
-                        pass
-            active_assignments = len(crew_on_duty_set)
-            
+            start = (page - 1) * limit
+            items = filtered_crew[start : start + limit]
             return {
                 "items": items,
                 "total": total,
@@ -1018,23 +1028,10 @@ class AppwriteDB(BaseDB):
                 }
             }
         else:
-            queries = [Query.limit(1000)]
-            if search:
-                search_str = search.strip()
-                queries.append(Query.or_([
-                    Query.contains("name", search_str),
-                    Query.contains("role", search_str)
-                ]))
-            res = await asyncio.to_thread(
-                self.databases.list_documents,
-                self.db_id, 
-                config.APPWRITE_CREW_COLLECTION_ID,
-                queries=queries
-            )
-            return [self._clean_doc(d) for d in self._get_documents_list(res)]
+            return filtered_crew
 
-    async def create_crew_member(self, member: dict):
-        doc_id = "crw_" + str(uuid.uuid4())[:8]
+    async def create_crew_member(self, member: dict, custom_id: Optional[str] = None):
+        doc_id = custom_id or ("crw_" + str(uuid.uuid4())[:8])
         member.setdefault("amount_owed", 0.0)
         member.setdefault("payment_history", "[]")
         doc = await asyncio.to_thread(
@@ -1130,4 +1127,85 @@ class AppwriteDB(BaseDB):
             queries=[Query.limit(1000)]
         )
         return [self._clean_doc(d) for d in self._get_documents_list(res)]
+
+    # Callbacks CRUD
+    async def get_callbacks(self):
+        res = await asyncio.to_thread(
+            self.databases.list_documents,
+            self.db_id,
+            config.APPWRITE_CALLBACKS_COLLECTION_ID,
+            queries=[Query.limit(1000)]
+        )
+        all_callbacks = [self._clean_doc(d) for d in self._get_documents_list(res)]
+        # Sort newest first based on id (since they have random uuid postfixes, we can sort by id or document metadata)
+        # Actually since _clean_doc doesn't expose Appwrite's $createdAt, we can sort by ID or just keep the returned order.
+        # Let's sort them by the numeric/timestamp or creation or just keep it default. We'll add a timestamp or sort descending.
+        return all_callbacks
+
+    async def create_callback(self, callback_data: dict):
+        doc_id = "cb_" + str(uuid.uuid4())[:8]
+        callback_data.setdefault("status", "Pending")
+        doc = await asyncio.to_thread(
+            self.databases.create_document,
+            self.db_id,
+            config.APPWRITE_CALLBACKS_COLLECTION_ID,
+            doc_id,
+            callback_data
+        )
+        return self._clean_doc(doc)
+
+    async def update_callback(self, callback_id: str, callback_data: dict):
+        data = {k: v for k, v in callback_data.items() if k != "id"}
+        doc = await asyncio.to_thread(
+            self.databases.update_document,
+            self.db_id,
+            config.APPWRITE_CALLBACKS_COLLECTION_ID,
+            callback_id,
+            data
+        )
+        return self._clean_doc(doc)
+
+    # Date-Blocking check
+    async def check_availability(self, item_id: str, start_date: str, end_date: str, qty_needed: int) -> bool:
+        item = await self.get_inventory_item(item_id)
+        if not item:
+            return False
+        owned = item.get("quantity_owned", 0)
+        
+        # Parse start and end dates
+        from datetime import datetime, timedelta
+        try:
+            s_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+            e_date = datetime.strptime(end_date, "%Y-%m-%d").date()
+        except Exception:
+            return False
+            
+        # Get all events to verify overlapping items
+        events = await self.get_events()
+        
+        current_date = s_date
+        while current_date <= e_date:
+            in_use = 0
+            for evt in events:
+                if evt.get("status") == "Cancelled":
+                    continue
+                try:
+                    evt_start = datetime.strptime(evt.get("start_date", ""), "%Y-%m-%d").date()
+                    evt_end = datetime.strptime(evt.get("end_date", ""), "%Y-%m-%d").date()
+                except Exception:
+                    continue
+                
+                if evt_start <= current_date <= evt_end:
+                    try:
+                        booked = json.loads(evt.get("items_booked", "{}"))
+                        in_use += booked.get(item_id, 0)
+                    except Exception:
+                        pass
+            
+            if (owned - in_use) < qty_needed:
+                return False
+            current_date += timedelta(days=1)
+            
+        return True
+
 

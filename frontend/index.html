@@ -4,14 +4,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bhoomi Decoration</title>
-    <!-- Fonts -->
+    <title>Bhoomi Decoration — Premium Wedding Mandap & Floral Decorators</title>
+    <meta name="description"
+        content="Bhoomi Decoration is Gujarat and Mumbai's premier wedding decorator since 2010. Specializing in stunning traditional mandaps, floral styling, lighting, and theme ceremonies. Booking now.">
+    <link rel="canonical" href="https://bhoomidecoration.onrender.com">
+
+    <!-- Open Graph tags for social sharing preview -->
+    <meta property="og:title" content="Bhoomi Decoration — Premium Wedding Mandap & Floral Decorators">
+    <meta property="og:description"
+        content="Serving Gujarat & Mumbai since 2010 with 500+ weddings decorated. Exquisite traditional mandaps, stages, floral setups, and lighting layouts.">
+    <meta property="og:image" content="https://bhoomidecoration.onrender.com/static/seed_layout_1.jpg">
+    <meta property="og:url" content="https://bhoomidecoration.onrender.com">
+    <meta property="og:type" content="website">
+
+    <!-- Twitter Card tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Bhoomi Decoration — Premium Wedding Mandap & Floral Decorators">
+    <meta name="twitter:description"
+        content="Serving Gujarat & Mumbai since 2010 with 500+ weddings decorated. Exquisite traditional mandaps, stages, floral setups, and lighting layouts.">
+    <meta name="twitter:image" content="https://bhoomidecoration.onrender.com/static/seed_layout_1.jpg">
+
+    <!-- Preconnect to domains -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- Inline SVG Favicon for a Mandap silhouette -->
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 90 V50 C10 20 40 10 50 10 C60 10 90 20 90 50 V90 M25 90 V55 C25 35 40 25 50 25 C60 25 75 35 75 55 V90' fill='none' stroke='%236B1623' stroke-width='4'/%3E%3Ccircle cx='50' cy='10' r='5' fill='%23C9941F'/%3E%3C/svg%3E">
+
+    <!-- Fonts -->
     <link
         href="https://fonts.googleapis.com/css2?family=Marcellus&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Poppins:wght@300;400;500;600&family=Noto+Sans+Gujarati:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
+
+    <!-- LocalBusiness Schema.org JSON-LD Markup -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "name": "Bhoomi Decoration",
+      "image": "https://bhoomidecoration.onrender.com/static/seed_layout_1.jpg",
+      "telephone": "+91 98765 43210",
+      "email": "hello@bhoomidecoration.com",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Bayad Studio",
+        "addressLocality": "Bayad",
+        "addressRegion": "Gujarat",
+        "addressCountry": "IN"
+      },
+      "url": "https://bhoomidecoration.onrender.com",
+      "priceRange": "$$",
+      "areaServed": [
+        {
+          "@type": "AdministrativeArea",
+          "name": "Gujarat"
+        },
+        {
+          "@type": "AdministrativeArea",
+          "name": "Mumbai"
+        }
+      ],
+      "founder": {
+        "@type": "Person",
+        "name": "Rajesh Deshpande"
+      },
+      "foundingDate": "2010"
+    }
+    </script>
+
     <!-- CSS Link -->
     <link rel="stylesheet" href="styles.css">
+
 
     <!-- Instant Redirect Protection -->
     <script>
@@ -116,10 +180,9 @@
                     <a href="#gallery">Gallery</a>
                     <a href="#testimonials">Reviews</a>
                 </div>
-                <div style="display: flex; gap: 0.75rem; align-items: center;">
-                    <button class="btn btn-ghost" onclick="openModal('gateway-view')"
-                        style="padding: 8px 16px; font-size: 0.8rem;">Portal</button>
-                    <a class="nav-cta" href="#contact">Get a Quote</a>
+                <div style="display: flex; align-items: center;">
+                    <button class="nav-cta" onclick="openModal('gateway-view')"
+                        style="padding: 8px 22px; font-size: 0.82rem; cursor: pointer; border-radius: 2px;">Login</button>
                 </div>
                 <button class="menu-toggle" id="menuToggle"
                     aria-label="Open menu"><span></span><span></span><span></span></button>
@@ -137,8 +200,7 @@
                 <a href="#gallery">Gallery</a>
                 <a href="#testimonials">Reviews</a>
                 <a href="#" onclick="event.preventDefault(); openModal('gateway-view');"
-                    style="color: var(--gold);">Logistics Portal →</a>
-                <a href="#contact" style="color:var(--maroon);">Get a Quote →</a>
+                    style="color: var(--gold);">Login →</a>
             </div>
         </div>
 
@@ -161,8 +223,10 @@
                             Weddings</span></div>
                     <h1 class="hero-title">We build the mandap<em>where your story begins</em></h1>
                     <p class="hero-sub">Bhoomi Decoration designs and builds wedding mandaps, stage decor, floral
-                        installations and lighting for Mumbai's families — every setup planned around your rituals, your
-                        palette, and your venue, down to the last marigold.</p>
+                        installations and lighting for families across Gujarat and Mumbai — every setup custom-designed
+                        at our Bayad studio, planned around your traditions, palette, and venue down to the last
+                        marigold.</p>
+
                     <div class="hero-actions">
                         <a href="#contact" class="btn btn-primary">Plan Your Wedding Decor</a>
                         <a href="#gallery" class="btn btn-ghost">View Our Work</a>
@@ -375,7 +439,65 @@
             </div>
         </section>
 
+        <!-- PRICING PACKAGES -->
+        <section id="pricing">
+            <div class="wrap">
+                <div class="section-head reveal">
+                    <span class="eyebrow">Pricing Packages</span>
+                    <h2>Transparent pricing for your dream wedding</h2>
+                    <p>Select a pre-designed layout package or consult with us for a fully custom theme layout.</p>
+                </div>
+                <div class="pricing-grid reveal">
+                    <div class="pricing-card">
+                        <h3>Basic Mandap Package</h3>
+                        <div class="price">₹25,000 – ₹40,000</div>
+                        <ul class="pricing-features">
+                            <li>✦ Traditional 4-Pillar Mandap structure</li>
+                            <li>✦ Fresh Marigold & Mango leaf drapery</li>
+                            <li>✦ Basic stage backdrop with spotlighting</li>
+                            <li>✦ Groom & Bride traditional seating chairs</li>
+                            <li>✦ Setup and cleanup teardown services</li>
+                        </ul>
+                        <a href="#contact" class="btn btn-ghost">Select Package</a>
+                    </div>
+                    <div class="pricing-card popular">
+                        <div class="popular-badge">Most Popular</div>
+                        <h3>Full Wedding Decor</h3>
+                        <div class="price">₹75,000 – ₹1,50,000</div>
+                        <ul class="pricing-features">
+                            <li>✦ Premium floral mandap (Imported flowers)</li>
+                            <li>✦ Full stage backdrop & ambient uplighting</li>
+                            <li>✦ Elegant entry archway & welcome board</li>
+                            <li>✦ Matching pathway floral stands (x4)</li>
+                            <li>✦ Haldi / Mehendi ceremonial props</li>
+                            <li>✦ VIP guest seating & carpet runners</li>
+                        </ul>
+                        <a href="#contact" class="btn btn-primary">Select Package</a>
+                    </div>
+                    <div class="pricing-card">
+                        <h3>Premium All-Inclusive</h3>
+                        <div class="price">₹2,00,000+</div>
+                        <ul class="pricing-features">
+                            <li>✦ Fully bespoke thematic venue design</li>
+                            <li>✦ Royal floating mandap or canopy stage</li>
+                            <li>✦ High-fidelity stage LED backdrop & wash lights</li>
+                            <li>✦ Intricate floral ceiling installations</li>
+                            <li>✦ Exclusive lounges, photo booths & props</li>
+                            <li>✦ Dedicated site manager on-site throughout</li>
+                        </ul>
+                        <a href="#contact" class="btn btn-ghost">Consult Theme</a>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 2rem; font-style: italic; color: var(--text-secondary); font-size: 0.9rem;"
+                    class="reveal">
+                    * Prices vary depending on venue size and specific seasonal flower selections. Contact us for custom
+                    quotes.
+                </div>
+            </div>
+        </section>
+
         <!-- GALLERY -->
+
         <section id="gallery" class="alt-bg">
             <div class="wrap">
                 <div class="section-head reveal">
@@ -405,23 +527,25 @@
                 </div>
                 <div class="testi-grid reveal">
                     <div class="testi-card">
-                        <div class="testi-quote">"They turned a banquet hall in Andheri into something that looked like
+                        <div class="testi-quote">"They turned a banquet hall in Ahmedabad into something that looked
+                            like
                             a palace courtyard. Every relative asked who did our decor."</div>
                         <div class="testi-name">Anjali & Rohit Sharma</div>
-                        <div class="testi-loc">Wedding, Andheri</div>
+                        <div class="testi-loc">Wedding, Ahmedabad</div>
                     </div>
                     <div class="testi-card">
                         <div class="testi-quote">"As the bride's father, I didn't want to manage five vendors. Bhoomi
                             handled mandap, flowers and lighting as one team — huge relief."</div>
-                        <div class="testi-name">Suresh Patil</div>
-                        <div class="testi-loc">Daughter's Wedding, Thane</div>
+                        <div class="testi-name">Suresh Patel</div>
+                        <div class="testi-loc">Daughter's Wedding, Vadodara</div>
                     </div>
                     <div class="testi-card">
                         <div class="testi-quote">"Our haldi and mehendi each had a completely different look, both
                             stunning, both ready hours before guests arrived."</div>
                         <div class="testi-name">Priya Mehta</div>
-                        <div class="testi-loc">Wedding, Bandra</div>
+                        <div class="testi-loc">Wedding, Mumbai (Juhu)</div>
                     </div>
+
                 </div>
             </div>
         </section>
@@ -444,8 +568,7 @@
                         <div><b>Studio</b>Bayad, Gujarat — visits by appointment</div>
                     </div>
                 </div>
-                <form class="reveal"
-                    onsubmit="event.preventDefault(); alert('Thank you! We will call you back within a day.');">
+                <form class="reveal" id="contact-form">
                     <div class="row2">
                         <div class="field"><label for="name">Your Name</label><input id="name" type="text" required>
                         </div>
@@ -455,7 +578,7 @@
                     <div class="row2">
                         <div class="field"><label for="date">Wedding Date</label><input id="date" type="date"></div>
                         <div class="field"><label for="venue">Venue / Area</label><input id="venue" type="text"
-                                placeholder="e.g. Bandra, Thane"></div>
+                                placeholder="e.g. Ahmedabad, Mumbai"></div>
                     </div>
                     <div class="field">
                         <label for="service">What do you need?</label>
@@ -469,8 +592,10 @@
                     </div>
                     <div class="field"><label for="msg">Anything else we should know?</label><textarea id="msg"
                             rows="3"></textarea></div>
-                    <button class="btn btn-primary submit-btn" type="submit">Request a Callback</button>
+                    <button class="btn btn-primary submit-btn" type="submit" id="contact-submit-btn">Request a
+                        Callback</button>
                 </form>
+
             </div>
         </section>
 
@@ -510,19 +635,99 @@
     <script src="common.js"></script>
     <script src="login.js"></script>
 
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/919876543210?text=Hi%20Bhoomi%20Decoration!%20I'm%20interested%20in%20wedding%20decor%20for%20my%20event."
+        class="whatsapp-float" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path
+                d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.458 5.704 1.459h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"
+                fill="%23FFF" />
+        </svg>
+        <span>WhatsApp Us</span>
+    </a>
+
+    <!-- Shared Utilities Scripts -->
+    <script src="common.js"></script>
+    <script src="login.js"></script>
+
     <!-- Inline UI logic for Landing page Portfolio -->
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            // Portfolio Website Interactivity
+            // 1. Warmup Server Countdown Skeleton logic
+            const skeleton = document.getElementById("loading-skeleton");
+            const subtitle = skeleton ? skeleton.querySelector(".skeleton-subtitle") : null;
+            let elapsed = 0;
+            let pingSuccess = false;
+            let timer = null;
+
+            // Start countdown text if server takes longer to respond
+            const startCountdown = () => {
+                timer = setInterval(() => {
+                    elapsed++;
+                    if (subtitle && !pingSuccess) {
+                        subtitle.innerText = `Waking up server... usually 15-20 seconds (Server warming up: ${elapsed}s...)`;
+                    }
+                }, 1000);
+            };
+
+            // Fast ping check
+            const pingTimer = setTimeout(startCountdown, 600);
+
+            fetch("/api/ping")
+                .then(res => {
+                    pingSuccess = true;
+                    clearTimeout(pingTimer);
+                    if (timer) clearInterval(timer);
+                    if (skeleton) skeleton.classList.add("hidden");
+                })
+                .catch(err => {
+                    console.warn("Ping failed, hiding loading screen anyway:", err);
+                    clearTimeout(pingTimer);
+                    if (timer) clearInterval(timer);
+                    if (skeleton) skeleton.classList.add("hidden");
+                });
+
+            // 2. Mobile Hamburger Menu Slide-in and rotation animation
             const menuToggle = document.getElementById('menuToggle');
             const mobileMenu = document.getElementById('mobileMenu');
             if (menuToggle && mobileMenu) {
-                menuToggle.addEventListener('click', () => {
-                    mobileMenu.style.display = mobileMenu.style.display === 'none' ? 'block' : 'none';
+                menuToggle.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const isOpen = menuToggle.classList.toggle('open');
+                    if (isOpen) {
+                        mobileMenu.style.display = 'block';
+                        // Trigger reflow for transition
+                        setTimeout(() => mobileMenu.classList.add('active'), 10);
+                    } else {
+                        mobileMenu.classList.remove('active');
+                        setTimeout(() => {
+                            if (!mobileMenu.classList.contains('active')) {
+                                mobileMenu.style.display = 'none';
+                            }
+                        }, 300);
+                    }
                 });
-                mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => mobileMenu.style.display = 'none'));
+
+                // Auto-close menu when clicking links
+                mobileMenu.querySelectorAll('a').forEach(a => {
+                    a.addEventListener('click', () => {
+                        menuToggle.classList.remove('open');
+                        mobileMenu.classList.remove('active');
+                        setTimeout(() => mobileMenu.style.display = 'none', 300);
+                    });
+                });
+
+                // Close menu when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (mobileMenu.classList.contains('active') && !mobileMenu.contains(e.target) && !menuToggle.contains(e.target)) {
+                        menuToggle.classList.remove('open');
+                        mobileMenu.classList.remove('active');
+                        setTimeout(() => mobileMenu.style.display = 'none', 300);
+                    }
+                });
             }
 
+            // 3. Scroll Reveal Animation observer
             const reveals = document.querySelectorAll('.reveal');
             const revealObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
@@ -531,42 +736,97 @@
             }, { threshold: 0.15 });
             reveals.forEach(el => revealObserver.observe(el));
 
-            // Hide skeleton for guest users on homepage
-            const skeleton = document.getElementById("loading-skeleton");
-            if (skeleton) {
-                setTimeout(() => {
-                    skeleton.classList.add("hidden");
-                }, 50);
+            // 4. Contact Form submit JSON logic + Phone Validation
+            const contactForm = document.getElementById("contact-form");
+            const submitBtn = document.getElementById("contact-submit-btn");
+
+            if (contactForm && submitBtn) {
+                contactForm.addEventListener("submit", (e) => {
+                    e.preventDefault();
+
+                    const name = document.getElementById("name").value;
+                    const phone = document.getElementById("phone").value;
+                    const date = document.getElementById("date").value;
+                    const venue = document.getElementById("venue").value;
+                    const service = document.getElementById("service").value;
+                    const msg = document.getElementById("msg").value;
+
+                    // Clean phone number and validate length
+                    const digits = phone.replace(/\D/g, "");
+                    if (digits.length < 10) {
+                        showToast("Please enter a valid phone number containing at least 10 digits.", "warning");
+                        return;
+                    }
+
+                    // Disable button to prevent duplicate submissions
+                    submitBtn.disabled = true;
+                    const originalText = submitBtn.innerText;
+                    submitBtn.innerText = "Submitting...";
+
+                    const payload = {
+                        name: name.trim(),
+                        phone: phone.trim(),
+                        date: date,
+                        venue: venue.trim(),
+                        service: service,
+                        message: msg.trim()
+                    };
+
+                    fetch("/api/callbacks", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(payload)
+                    })
+                        .then(res => {
+                            if (!res.ok) throw new Error("Could not process request. Please try again.");
+                            return res.json();
+                        })
+                        .then(data => {
+                            showToast("Thank you! Your enquiry has been received.", "success");
+                            contactForm.reset();
+
+                            // Wait briefly before opening WhatsApp support channel
+                            setTimeout(() => {
+                                if (data.whatsapp_link) {
+                                    window.open(data.whatsapp_link, "_blank");
+                                }
+                            }, 1200);
+                        })
+                        .catch(err => {
+                            showToast(err.message, "danger");
+                        })
+                        .finally(() => {
+                            submitBtn.disabled = false;
+                            submitBtn.innerText = originalText;
+                        });
+                });
             }
 
-            // Dynamically load gallery items — CSS Grid mosaic layout
+            // 5. Dynamically load gallery items with Loading Skeletons & Fallback
             const galleryGrid = document.querySelector(".gallery-grid");
             if (galleryGrid) {
+                // Inject 6 Loading Skeletons
+                galleryGrid.innerHTML = "";
+                for (let i = 0; i < 6; i++) {
+                    const skel = document.createElement("div");
+                    skel.className = `gallery-card skeleton-card`;
+                    skel.innerHTML = `<div class="skeleton-shimmer"></div>`;
+                    galleryGrid.appendChild(skel);
+                }
+
+                const spanPattern = [
+                    'gc-tall', '', '', '', 'gc-wide', '',
+                    'gc-tall', '', 'gc-wide', '', '', ''
+                ];
+
                 fetch("/api/gallery")
-                    .then(res => res.json())
+                    .then(res => {
+                        if (!res.ok) throw new Error("API failed");
+                        return res.json();
+                    })
                     .then(data => {
+                        galleryGrid.innerHTML = "";
                         if (data && data.length > 0) {
-                            galleryGrid.innerHTML = "";
-
-                            // Repeating mosaic pattern (matches reference design):
-                            // 0=tall(2rows), 1=normal, 2=normal, 3=normal,
-                            // 4=wide(2cols), 5=normal, 6=tall(2rows),
-                            // 7=normal, 8=wide(2cols), 9=normal ...
-                            const spanPattern = [
-                                'gc-tall',    // 0 — col1, spans 2 rows
-                                '',           // 1 — col2, row1
-                                '',           // 2 — col3, row1
-                                '',           // 3 — col4, row1
-                                'gc-wide',    // 4 — col2-3, row2 (wide)
-                                '',           // 5 — col4, row2
-                                'gc-tall',    // 6 — col1, spans 2 rows
-                                '',           // 7 — col2, row1
-                                'gc-wide',    // 8 — col3-4, row1 (wide)
-                                '',           // 9 — col2, row2
-                                '',           // 10 — col3, row2
-                                '',           // 11 — col4, row2
-                            ];
-
                             data.forEach((item, index) => {
                                 const spanClass = spanPattern[index % spanPattern.length];
 
@@ -600,9 +860,45 @@
                                 itemDiv.appendChild(overlay);
                                 galleryGrid.appendChild(itemDiv);
                             });
+                        } else {
+                            // Show static fallbacks if empty
+                            showFallbackCards();
                         }
                     })
-                    .catch(err => console.error("Error loading gallery:", err));
+                    .catch(err => {
+                        console.warn("Loading fallback gallery cards:", err);
+                        showFallbackCards();
+                    });
+
+                function showFallbackCards() {
+                    galleryGrid.innerHTML = "";
+                    const fallbacks = [
+                        { title: "Haldi Ceremony Mandap", cat: "Haldi" },
+                        { title: "Sangeet Stage Backdrop", cat: "Sangeet" },
+                        { title: "Premium Entryway Florals", cat: "Entrance" },
+                        { title: "Traditional Mandap Design", cat: "Wedding" },
+                        { title: "Mehendi Reception Backdrop", cat: "Mehendi" },
+                        { title: "Luxury Theme Walkway Setup", cat: "Theme" }
+                    ];
+
+                    fallbacks.forEach((fb, index) => {
+                        const spanClass = spanPattern[index % spanPattern.length];
+                        const div = document.createElement("div");
+                        div.className = `gallery-card fallback-card ${spanClass}`;
+                        div.innerHTML = `
+                            <div class="fallback-image-placeholder">
+                                <span>Photo Coming Soon</span>
+                            </div>
+                            <div class="gallery-overlay" style="opacity: 1; background: rgba(0,0,0,0.15);">
+                                <div class="gallery-text">
+                                    <h4>${fb.title}</h4>
+                                    <span class="category-badge">${fb.cat}</span>
+                                </div>
+                            </div>
+                        `;
+                        galleryGrid.appendChild(div);
+                    });
+                }
             }
         });
     </script>
