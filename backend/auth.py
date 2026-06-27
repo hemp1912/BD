@@ -486,18 +486,41 @@ async def onboard_user(request: Request, req: OnboardRequest):
     if config.DB_TYPE == "APPWRITE":
         try:
             from appwrite.services.users import Users
+            from appwrite.exception import AppwriteException
             client = Client()
             client.set_endpoint(config.APPWRITE_ENDPOINT)
             client.set_project(config.APPWRITE_PROJECT_ID)
             client.set_key(config.APPWRITE_API_KEY)
             
             users_service = Users(client)
-            users_service.create(
-                user_id=user_id,
-                email=user_data["email"],
-                password=user_data["password"],
-                name=user_data["full_name"]
-            )
+            try:
+                users_service.create(
+                    user_id=user_id,
+                    email=user_data["email"],
+                    password=user_data["password"],
+                    name=user_data["full_name"]
+                )
+            except AppwriteException as ae:
+                if ae.code == 409 or "already exists" in str(ae).lower():
+                    # List users by email search
+                    found_users = users_service.list(search=user_data["email"])
+                    if found_users and found_users.get("users"):
+                        existing_auth_user = found_users["users"][0]
+                        try:
+                            users_service.delete(user_id=existing_auth_user["$id"])
+                        except:
+                            pass
+                        users_service.create(
+                            user_id=user_id,
+                            email=user_data["email"],
+                            password=user_data["password"],
+                            name=user_data["full_name"]
+                        )
+                    else:
+                        raise ae
+                else:
+                    raise ae
+
             created = await db_client.create_user(user_data)
             
             if role_lower == "labor":

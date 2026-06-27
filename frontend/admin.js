@@ -2231,12 +2231,13 @@ function exportCrewPayoutPDF(crewId, paymentIndex) {
     printArea.querySelector("#pdf-payout-remaining").innerText = `₹${member.amount_owed.toFixed(2)}`;
     
     const wrapper = document.createElement('div');
-    wrapper.style.position = 'absolute';
-    wrapper.style.left = '0';
+    wrapper.style.position = 'fixed';
+    wrapper.style.left = '-9999px';
     wrapper.style.top = '0';
-    wrapper.style.zIndex = '-9999';
+    wrapper.style.zIndex = '9999';
     wrapper.style.width = '210mm';
     wrapper.style.background = 'white';
+    wrapper.style.overflow = 'visible';
     // Remove duplicate ID on the clone to prevent selector confusion in html2canvas
     printArea.removeAttribute("id");
     wrapper.appendChild(printArea);
@@ -2246,16 +2247,16 @@ function exportCrewPayoutPDF(crewId, paymentIndex) {
         margin:       [10, 10, 10, 10],
         filename:     `Bhoomi_Payout_${member.name.replace(/\s+/g, '_')}_${pay.date.split('T')[0]}.pdf`,
         image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, letterRendering: true, scrollY: 0 },
+        html2canvas:  { scale: 2, useCORS: true, letterRendering: true, scrollY: 0, windowWidth: 794 },
         jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
     
     showToast("Generating Payout PDF Receipt...");
     html2pdf().from(wrapper).set(opt).save().then(() => {
         document.body.removeChild(wrapper);
-        showToast("Payout receipt exported successfully.");
+        showToast("Payout receipt exported successfully.", "success");
     }).catch(err => {
-        document.body.removeChild(wrapper);
+        if (document.body.contains(wrapper)) document.body.removeChild(wrapper);
         console.error("PDF generation failed:", err);
         showToast("Failed to generate payout PDF.", "error");
     });
@@ -2449,173 +2450,180 @@ async function loadInvoicesData(filterType = "All", page) {
 
 async function exportInvoiceToPDF(eventId) {
     try {
+        showToast("Fetching invoice data...");
+
         const evt = await apiFetch(`/api/events/${eventId}`);
-        if (!evt) {
-            showToast("Failed to fetch event invoice details", "error");
-            return;
-        }
-        
+        if (!evt) { showToast("Failed to fetch event invoice details", "error"); return; }
+
         if (clientsList.length === 0) {
             clientsList = await apiFetch("/api/clients");
         }
         const client = clientsList.find(c => c.id === evt.client_id) || {};
-        
-        const template = document.getElementById("invoice-pdf-template");
-        if (!template) {
-            showToast("Invoice template not found", "error");
-            return;
-        }
-        
-        const printArea = template.cloneNode(true);
-        printArea.style.display = "block";
-        translateDOMNode(printArea);
 
-        // Explicitly overwrite any data-i18n label spans that may not render correctly in cloned nodes
-        const invoiceNoLabelEl = printArea.querySelector("[data-i18n='pdf_invoice_no']");
-        if (invoiceNoLabelEl) invoiceNoLabelEl.innerText = t('pdf_invoice_no');
-        const dateLabelEl = printArea.querySelector("[data-i18n='pdf_date_label']");
-        if (dateLabelEl) dateLabelEl.innerText = t('pdf_date_label');
-        const titleEl = printArea.querySelector("[data-i18n='pdf_invoice_title']");
-        if (titleEl) titleEl.innerText = t('pdf_invoice_title');
-
-        const compName = localStorage.getItem("settings_company_name") || "Bhoomi Decoration";
-        const compEmail = localStorage.getItem("settings_company_email") || "hello@bhoomidecoration.com";
-        const compPhone = localStorage.getItem("settings_company_phone") || "+91 99999 99999";
+        const compName    = localStorage.getItem("settings_company_name")    || "Bhoomi Decoration";
+        const compEmail   = localStorage.getItem("settings_company_email")   || "hello@bhoomidecoration.com";
+        const compPhone   = localStorage.getItem("settings_company_phone")   || "+91 99999 99999";
         const compWebsite = localStorage.getItem("settings_company_website") || "www.bhoomidecoration.com";
         const compAddress = localStorage.getItem("settings_company_address") || "Mumbai, Maharashtra, India";
 
-        const nameEl = printArea.querySelector("#pdf-invoice-comp-name");
-        if (nameEl) nameEl.innerText = compName.toUpperCase();
-        
-        const detailsEl = printArea.querySelector("#pdf-invoice-comp-details");
-        if (detailsEl) {
-            detailsEl.innerHTML = `${compAddress}<br>Email: ${compEmail} | Web: ${compWebsite}`;
-        }
-        
-        printArea.querySelector("#pdf-invoice-id").innerText = `#${evt.id}`;
-        printArea.querySelector("#pdf-invoice-date").innerText = new Date().toLocaleDateString(currentLanguage === 'gu' ? 'gu-IN' : 'en-IN', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
-        
-        printArea.querySelector("#pdf-client-name").innerText = client.name || evt.client_name || "N/A";
-        printArea.querySelector("#pdf-client-email").innerText = client.email || "N/A";
-        printArea.querySelector("#pdf-client-phone").innerText = client.phone || "N/A";
-        printArea.querySelector("#pdf-client-address").innerText = client.address || evt.venue_address || "N/A";
-        
-        printArea.querySelector("#pdf-event-venue").innerText = evt.venue_address || "N/A";
-        printArea.querySelector("#pdf-event-start").innerText = evt.start_date || "N/A";
-        printArea.querySelector("#pdf-event-end").innerText = evt.end_date || "N/A";
-        
-        const sDate = new Date(evt.start_date);
-        const eDate = new Date(evt.end_date);
-        const days = Math.max(1, Math.round((eDate - sDate) / (1000 * 60 * 60 * 24)) + 1);
-        
-        let bookedItems = {};
-        try {
-            bookedItems = JSON.parse(evt.items_booked || "{}");
-        } catch (e) {}
-        
-        const fullInv = await getFullInventoryList();
-        
-        const itemsBody = printArea.querySelector("#pdf-items-body");
-        itemsBody.innerHTML = "";
-        
+        const days = evt.rental_days || Math.max(1, Math.round((new Date(evt.end_date) - new Date(evt.start_date)) / (1000 * 60 * 60 * 24)) + 1);
+
+        // Use server-resolved items (backend pre-joins inventory names & costs)
+        const resolvedItems = evt.resolved_items || [];
+
+        // Build items rows HTML
+        let itemRowsHTML = "";
         let subtotal = 0.0;
-        let itemIndex = 0;
-        
-        Object.keys(bookedItems).forEach(itemId => {
-            const item = fullInv.find(i => i.id === itemId);
-            if (item) {
-                const qty = bookedItems[itemId];
-                const cost = item.rental_price_per_day * qty * days;
-                subtotal += cost;
-                
-                const tr = document.createElement("tr");
-                tr.style.backgroundColor = itemIndex % 2 === 0 ? "#ffffff" : "#fdfaf7";
-                tr.innerHTML = `
-                    <td style="padding: 10px 12px; border-bottom: 1px solid #eee;"><strong>${item.name}</strong></td>
-                    <td style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center; color: #666;">${item.category}</td>
-                    <td style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center; font-weight: 600;">${qty}</td>
-                    <td style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: right; color: #666;">₹${item.rental_price_per_day.toFixed(2)}</td>
-                    <td style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: right; font-weight: 600; color: #6b1623;">₹${cost.toFixed(2)}</td>
-                `;
-                itemsBody.appendChild(tr);
-                itemIndex++;
-            }
+
+        resolvedItems.forEach((item, idx) => {
+            subtotal += item.cost;
+            const bg = idx % 2 === 0 ? "#ffffff" : "#fdfaf7";
+            itemRowsHTML += `
+                <tr style="background:${bg};">
+                    <td style="padding:9px 12px;border-bottom:1px solid #eee;"><strong>${item.name}</strong></td>
+                    <td style="padding:9px 12px;border-bottom:1px solid #eee;text-align:center;color:#666;">${item.category}</td>
+                    <td style="padding:9px 12px;border-bottom:1px solid #eee;text-align:center;font-weight:600;">${item.quantity}</td>
+                    <td style="padding:9px 12px;border-bottom:1px solid #eee;text-align:right;color:#666;">₹${item.rate.toFixed(2)}/day</td>
+                    <td style="padding:9px 12px;border-bottom:1px solid #eee;text-align:right;font-weight:600;color:#6b1623;">₹${item.cost.toFixed(2)}</td>
+                </tr>`;
         });
-        
-        if (itemIndex === 0) {
-            itemsBody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px; color: #888;">${t('pdf_no_items')}</td></tr>`;
+
+        if (resolvedItems.length === 0) {
+            itemRowsHTML = `<tr><td colspan="5" style="text-align:center;padding:20px;color:#888;">No reserved catalog items found.</td></tr>`;
         }
-        
-        const discount = evt.discount || 0.0;
-        const taxRate = evt.tax_rate || 0.0;
-        const afterDiscount = Math.max(0.0, subtotal - discount);
-        const taxAmount = afterDiscount * (taxRate / 100.0);
-        
-        printArea.querySelector("#pdf-subtotal").innerText = `₹${subtotal.toFixed(2)}`;
-        printArea.querySelector("#pdf-discount").innerText = `-₹${discount.toFixed(2)}`;
-        printArea.querySelector("#pdf-tax").innerText = `${taxRate.toFixed(1)}%`;
-        printArea.querySelector("#pdf-total").innerText = `₹${evt.total_invoice_amount.toFixed(2)}`;
-        printArea.querySelector("#pdf-paid").innerText = `₹${evt.amount_paid.toFixed(2)}`;
-        printArea.querySelector("#pdf-balance").innerText = `₹${evt.remaining_balance.toFixed(2)}`;
-        
-        const wrapper = document.createElement('div');
-        wrapper.style.position = 'absolute';
-        wrapper.style.left = '0';
-        wrapper.style.top = '0';
-        wrapper.style.zIndex = '-9999';
-        wrapper.style.width = '210mm';
-        wrapper.style.background = 'white';
-        // Remove duplicate ID on the clone to prevent selector confusion in html2canvas
-        printArea.removeAttribute("id");
-        wrapper.appendChild(printArea);
 
-        console.log("[DEBUG PDF] wrapper offsetHeight before DOM append:", wrapper.offsetHeight);
-        console.log("[DEBUG PDF] printArea offsetHeight before DOM append:", printArea.offsetHeight);
 
-        document.body.appendChild(wrapper);
+        const discount     = evt.discount || 0.0;
+        const taxRate      = evt.tax_rate  || 0.0;
+        const invoiceTotal = evt.total_invoice_amount || 0.0;
+        const amtPaid      = evt.amount_paid          || 0.0;
+        const balance      = evt.remaining_balance    || 0.0;
 
-        console.log("[DEBUG PDF] wrapper offsetHeight after DOM append:", wrapper.offsetHeight);
-        console.log("[DEBUG PDF] printArea offsetHeight after DOM append:", printArea.offsetHeight);
-        console.log("[DEBUG PDF] wrapper bounding rect:", wrapper.getBoundingClientRect());
-        console.log("[DEBUG PDF] printArea bounding rect:", printArea.getBoundingClientRect());
+        const invoiceDate  = new Date().toLocaleDateString("en-IN", { year: "numeric", month: "long", day: "numeric" });
+
+        // ── Build complete self-contained HTML string ──────────────────────────
+        const invoiceHTML = `
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Marcellus&family=Poppins:wght@300;400;500;600;700&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Poppins', Arial, sans-serif; color: #333; background: #fff; padding: 30px; }
+  h1,h2,h3,h4 { font-family: 'Marcellus', Georgia, serif; font-weight: 400; }
+</style>
+</head>
+<body>
+  <!-- Header -->
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #6b1623;padding-bottom:18px;margin-bottom:24px;">
+    <div>
+      <h1 style="color:#6b1623;margin:0 0 4px;font-size:1.9rem;letter-spacing:2px;">${compName.toUpperCase()}</h1>
+      <p style="font-style:italic;font-size:0.95rem;color:#c9941f;margin:0 0 6px;">Luxury Event &amp; Wedding Decorators</p>
+      <p style="margin:0;font-size:0.75rem;color:#666;line-height:1.5;">${compAddress}<br>${compEmail} &nbsp;|&nbsp; ${compPhone} &nbsp;|&nbsp; ${compWebsite}</p>
+    </div>
+    <div style="text-align:right;">
+      <h2 style="color:#333;margin:0 0 8px;font-size:1.5rem;letter-spacing:1px;">INVOICE</h2>
+      <p style="margin:0 0 4px;font-size:0.85rem;font-weight:600;">Invoice No: <span style="color:#6b1623;">#${evt.id.slice(-8).toUpperCase()}</span></p>
+      <p style="margin:0;font-size:0.8rem;color:#666;">Date: ${invoiceDate}</p>
+    </div>
+  </div>
+
+  <!-- Client & Event Grid -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:26px;">
+    <div style="background:#fdfaf7;border-left:3px solid #c9941f;padding:13px 15px;border-radius:4px;">
+      <h3 style="color:#6b1623;font-size:0.85rem;margin:0 0 8px;letter-spacing:0.5px;">BILLED TO:</h3>
+      <p style="margin:0 0 3px;font-size:0.88rem;font-weight:600;">${client.name || evt.client_name || "N/A"}</p>
+      <p style="margin:0 0 3px;font-size:0.78rem;color:#555;">${client.email || "—"}</p>
+      <p style="margin:0 0 3px;font-size:0.78rem;color:#555;">${client.phone || "—"}</p>
+      <p style="margin:0;font-size:0.78rem;color:#555;line-height:1.4;">${client.address || evt.venue_address || "—"}</p>
+    </div>
+    <div style="background:#fdfaf7;border-left:3px solid #6b1623;padding:13px 15px;border-radius:4px;">
+      <h3 style="color:#6b1623;font-size:0.85rem;margin:0 0 8px;letter-spacing:0.5px;">EVENT DETAILS:</h3>
+      <p style="margin:0 0 3px;font-size:0.82rem;"><strong>Venue:</strong> ${evt.venue_address || "—"}</p>
+      <p style="margin:0 0 3px;font-size:0.82rem;"><strong>Setup Start:</strong> ${evt.start_date || "—"}</p>
+      <p style="margin:0;font-size:0.82rem;"><strong>Cleanup By:</strong> ${evt.end_date || "—"}</p>
+      <p style="margin:0;font-size:0.82rem;"><strong>Rental Days:</strong> ${days}</p>
+    </div>
+  </div>
+
+  <!-- Items Table -->
+  <table style="width:100%;border-collapse:collapse;margin-bottom:26px;font-size:0.82rem;text-align:left;">
+    <thead>
+      <tr style="background:#6b1623;color:#fff;">
+        <th style="padding:10px 12px;font-family:'Marcellus',serif;font-weight:500;">Reserved Item</th>
+        <th style="padding:10px 12px;font-family:'Marcellus',serif;font-weight:500;text-align:center;">Category</th>
+        <th style="padding:10px 12px;font-family:'Marcellus',serif;font-weight:500;text-align:center;">Qty</th>
+        <th style="padding:10px 12px;font-family:'Marcellus',serif;font-weight:500;text-align:right;">Day Rate</th>
+        <th style="padding:10px 12px;font-family:'Marcellus',serif;font-weight:500;text-align:right;">Total</th>
+      </tr>
+    </thead>
+    <tbody>${itemRowsHTML}</tbody>
+  </table>
+
+  <!-- Summary -->
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;">
+    <div style="flex:1;max-width:52%;">
+      <h4 style="color:#6b1623;font-size:0.82rem;margin:0 0 8px;">TERMS &amp; CONDITIONS</h4>
+      <p style="margin:0;font-size:0.7rem;color:#777;line-height:1.5;">
+        1. All reservation items are rental assets of Bhoomi Decoration.<br>
+        2. Payments should be made within agreed milestone dates.<br>
+        3. Any damage to physical property is subject to replacement charges.
+      </p>
+    </div>
+    <div style="width:240px;">
+      <div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:5px;color:#555;">
+        <span>Rental Subtotal:</span><span>₹${subtotal.toFixed(2)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:5px;color:#c00;">
+        <span>Discount:</span><span>-₹${discount.toFixed(2)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:5px;color:#555;border-bottom:1px solid #ddd;padding-bottom:5px;">
+        <span>Tax (${taxRate.toFixed(1)}%):</span><span>₹${(invoiceTotal - (invoiceTotal / (1 + taxRate / 100)) || 0).toFixed(2)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:0.95rem;font-weight:700;margin-bottom:5px;color:#6b1623;">
+        <span>Invoice Total:</span><span>₹${invoiceTotal.toFixed(2)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:5px;color:#059669;">
+        <span>Amount Paid:</span><span>₹${amtPaid.toFixed(2)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:0.95rem;font-weight:700;border-top:2px double #6b1623;padding-top:5px;color:#c62828;">
+        <span>Balance Due:</span><span>₹${balance.toFixed(2)}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Signature Lines -->
+  <div style="margin-top:50px;display:flex;justify-content:space-between;align-items:flex-end;padding-top:14px;border-top:1px dashed #ddd;">
+    <div style="text-align:center;">
+      <div style="width:180px;border-bottom:1px solid #888;margin-bottom:4px;"></div>
+      <p style="margin:0;font-size:0.72rem;color:#666;font-weight:600;">Authorized Signatory</p>
+    </div>
+    <div style="text-align:center;">
+      <div style="width:180px;border-bottom:1px solid #888;margin-bottom:4px;"></div>
+      <p style="margin:0;font-size:0.72rem;color:#666;font-weight:600;">Client Signature</p>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div style="margin-top:24px;text-align:center;padding-top:12px;border-top:1px solid #eee;">
+    <p style="margin:0;font-size:0.7rem;color:#aaa;">Thank you for choosing ${compName} for your celebration!</p>
+  </div>
+</body>
+</html>`;
 
         const opt = {
-            margin:       [10, 10, 10, 10],
-            filename:     `Bhoomi_Invoice_${evt.id}.pdf`,
-            image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2, useCORS: true, letterRendering: true, scrollY: 0 },
-            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            margin:      [0, 0, 0, 0],
+            filename:    `Bhoomi_Invoice_${evt.id}.pdf`,
+            image:       { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true },
+            jsPDF:       { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
-        
-        showToast("Generating PDF Invoice...");
-        html2pdf().from(wrapper).set(opt).save().then(() => {
-            console.log("[DEBUG PDF] Generation success");
-            
-            // Render as image to verify canvas output visually in screenshot
-            html2pdf().from(wrapper).set(opt).output('img').then(img => {
-                img.style.position = 'fixed';
-                img.style.top = '10px';
-                img.style.left = '10px';
-                img.style.width = '400px';
-                img.style.zIndex = '999999';
-                img.style.border = '5px solid red';
-                img.id = 'debug-pdf-img';
-                document.body.appendChild(img);
-                console.log("[DEBUG PDF] Debug preview image appended");
-            });
 
-            document.body.removeChild(wrapper);
-            showToast("Invoice exported successfully.");
-        }).catch(err => {
-            console.error("[DEBUG PDF] Generation failed:", err);
-            document.body.removeChild(wrapper);
-            showToast("Failed to generate PDF.", "error");
-        });
-        
+        showToast("Generating PDF Invoice...");
+        await html2pdf().from(invoiceHTML).set(opt).save();
+        showToast("Invoice exported successfully!", "success");
+
     } catch (err) {
         console.error("Error exporting PDF:", err);
         showToast("Error generating PDF invoice.", "error");
@@ -2865,12 +2873,13 @@ async function exportManualInvoiceToPDF(eventId, data) {
     printArea.querySelector("#pdf-balance").innerText = `₹${balance.toFixed(2)}`;
 
     const wrapper = document.createElement('div');
-    wrapper.style.position = 'absolute';
-    wrapper.style.left = '0';
+    wrapper.style.position = 'fixed';
+    wrapper.style.left = '-9999px';
     wrapper.style.top = '0';
-    wrapper.style.zIndex = '-9999';
+    wrapper.style.zIndex = '9999';
     wrapper.style.width = '210mm';
     wrapper.style.background = 'white';
+    wrapper.style.overflow = 'visible';
     // Remove duplicate ID on the clone to prevent selector confusion in html2canvas
     printArea.removeAttribute("id");
     wrapper.appendChild(printArea);
@@ -2880,7 +2889,7 @@ async function exportManualInvoiceToPDF(eventId, data) {
         margin: [10, 10, 10, 10],
         filename: `Bhoomi_ManualInvoice_${eventId}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, letterRendering: true, scrollY: 0 },
+        html2canvas: { scale: 2, useCORS: true, letterRendering: true, scrollY: 0, windowWidth: 794 },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
@@ -3411,12 +3420,13 @@ function exportSectionToPDF(title, subtitle, headers, rows, filename) {
 
     const container = document.createElement('div');
     container.innerHTML = pdfHTML;
-    container.style.position = 'absolute';
-    container.style.left = '0';
+    container.style.position = 'fixed';
+    container.style.left = '-9999px';
     container.style.top = '0';
-    container.style.zIndex = '-9999';
+    container.style.zIndex = '9999';
     container.style.width = '297mm';
     container.style.background = 'white';
+    container.style.overflow = 'visible';
     document.body.appendChild(container);
 
     const opt = {
@@ -4152,9 +4162,14 @@ function exportPayrollPDF() {
     
     const wrapper = element.cloneNode(true);
     wrapper.style.display = "block";
+    wrapper.style.position = 'fixed';
+    wrapper.style.left = '-9999px';
+    wrapper.style.top = '0';
+    wrapper.style.zIndex = '9999';
     wrapper.style.padding = "20px";
     wrapper.style.background = "#ffffff";
     wrapper.style.width = "210mm";
+    wrapper.style.overflow = 'visible';
     wrapper.style.fontFamily = "'Poppins', sans-serif";
     document.body.appendChild(wrapper);
     

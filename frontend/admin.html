@@ -27,49 +27,62 @@
     <!-- Print Stylesheet Rules -->
     <style>
         @media print {
-            body * {
-                visibility: hidden !important;
+            /* Hide the main operations dashboard view, backdrops, loading skeletons and toast containers completely */
+            #app-view,
+            .sidebar-backdrop,
+            #loading-skeleton,
+            #toast-container,
+            header,
+            aside {
+                display: none !important;
             }
 
-            #print-receipt-section,
-            #print-receipt-section * {
-                visibility: visible !important;
+            /* Make body white and clean */
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
             }
 
-            #print-receipt-section {
+            /* Display the active modal overlay as the main print page */
+            .modal-overlay.active {
+                display: block !important;
                 position: absolute !important;
-                left: 0 !important;
-                top: 0 !important;
+                inset: 0 !important;
+                background: #ffffff !important;
+                opacity: 1 !important;
+                z-index: 9999 !important;
+                overflow: visible !important;
+            }
+
+            .modal-overlay.active .modal-card {
+                background: #ffffff !important;
+                border: none !important;
+                box-shadow: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                max-width: 100% !important;
+                width: 100% !important;
+                display: block !important;
+            }
+
+            /* Hide interactive fields, buttons, forms, and headers in the modal during print */
+            .modal-overlay.active .modal-card > *:not(.print-receipt-only) {
+                display: none !important;
+            }
+
+            /* Ensure print-receipt-only sections are displayed and styled properly for printing */
+            .print-receipt-only {
+                display: block !important;
                 width: 100% !important;
                 margin: 0 !important;
                 padding: 1.5cm !important;
                 background: #ffffff !important;
                 color: #000000 !important;
-                display: block !important;
+                visibility: visible !important;
             }
 
-            .modal-overlay {
-                background: none !important;
-                position: absolute !important;
-                inset: 0 !important;
-                display: block !important;
-                overflow: visible !important;
-            }
-
-            .modal-card {
-                border: none !important;
-                box-shadow: none !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                background: none !important;
-            }
-
-            #payment-form,
-            .modal-header,
-            .btn,
-            aside,
-            header {
-                display: none !important;
+            .print-receipt-only * {
+                visibility: visible !important;
             }
         }
     </style>
@@ -1566,7 +1579,7 @@
                 </div>
                 <div class="form-group">
                     <label for="onboard-password">Initial Password</label>
-                    <input type="password" id="onboard-password" required placeholder="••••••••">
+                    <input type="password" id="onboard-password" required minlength="8" placeholder="••••••••">
                 </div>
                 <div class="form-group">
                     <label for="onboard-name">Full Name</label>

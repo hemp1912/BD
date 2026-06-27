@@ -422,9 +422,9 @@ class AppwriteDB(BaseDB):
             cleaned.pop("data")
 
         # Fallbacks for truncated Appwrite keys (due to key length differences)
-        if cleaned.get("total_invoice_amount") is None and "total_invoice_amoun" in cleaned:
+        if "total_invoice_amoun" in cleaned:
             cleaned["total_invoice_amount"] = cleaned.get("total_invoice_amoun")
-        if cleaned.get("max_workforce_capacity") is None and "max_workforce_cap" in cleaned:
+        if "max_workforce_cap" in cleaned:
             cleaned["max_workforce_capacity"] = cleaned.get("max_workforce_cap")
 
         # Ensure default values for numerical fields to avoid frontend crashes
@@ -447,6 +447,12 @@ class AppwriteDB(BaseDB):
         ]:
             if num_field in cleaned and cleaned.get(num_field) is None:
                 cleaned[num_field] = default_val
+
+        # Dynamically compute remaining_balance to ensure consistency (e.g. for seeded data)
+        if "total_invoice_amount" in cleaned and "amount_paid" in cleaned:
+            amount_paid = cleaned.get("amount_paid") or 0.0
+            total_invoice_amount = cleaned.get("total_invoice_amount") or 0.0
+            cleaned["remaining_balance"] = max(0.0, total_invoice_amount - amount_paid)
 
         # Remove system fields for uniform JSON responses
         for key in list(cleaned.keys()):
@@ -748,17 +754,28 @@ class AppwriteDB(BaseDB):
 
     async def create_event(self, event: dict):
         doc_id = "evt_" + str(uuid.uuid4())[:8]
+        event_data = dict(event)
+        if "total_invoice_amount" in event_data:
+            event_data["total_invoice_amoun"] = event_data["total_invoice_amount"]
+        if "max_workforce_capacity" in event_data:
+            event_data["max_workforce_cap"] = event_data["max_workforce_capacity"]
+        
         doc = await asyncio.to_thread(
             self.databases.create_document,
             self.db_id,
             config.APPWRITE_EVENTS_COLLECTION_ID,
             doc_id,
-            event
+            event_data
         )
         return self._clean_doc(doc)
 
     async def update_event(self, event_id: str, event: dict):
         data = {k: v for k, v in event.items() if k != "id"}
+        if "total_invoice_amount" in data:
+            data["total_invoice_amoun"] = data["total_invoice_amount"]
+        if "max_workforce_capacity" in data:
+            data["max_workforce_cap"] = data["max_workforce_capacity"]
+            
         doc = await asyncio.to_thread(
             self.databases.update_document,
             self.db_id,

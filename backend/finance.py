@@ -332,7 +332,63 @@ async def get_event(request: Request, event_id: str):
         return sanitize_event_for_labor(res)
     
     res = await ensure_portal_token(res)
-    return add_payment_status(res)
+    res = add_payment_status(res)
+
+    # ── Resolve booked items for PDF/invoice usage ──────────────────────────
+    inventory = await db_client.get_inventory()
+    inv_map = {item.get("id"): item for item in inventory if item.get("id")}
+
+    try:
+        items_booked = json.loads(res.get("items_booked", "{}"))
+    except Exception:
+        items_booked = {}
+
+    try:
+        from datetime import datetime as _dt
+        s_date = _dt.strptime(res.get("start_date", ""), "%Y-%m-%d").date()
+        e_date = _dt.strptime(res.get("end_date",   ""), "%Y-%m-%d").date()
+        rental_days = max(1, (e_date - s_date).days + 1)
+    except Exception:
+        rental_days = 1
+
+    resolved_items = []
+    for item_id, qty in items_booked.items():
+        if item_id in inv_map:
+            item_info = inv_map[item_id]
+            rate = float(item_info.get("rental_price_per_day", 0.0))
+            cost = rate * int(qty) * rental_days
+            resolved_items.append({
+                "item_id":  item_id,
+                "name":     item_info.get("name", "Unknown Item"),
+                "category": item_info.get("category", "General"),
+                "quantity": int(qty),
+                "rate":     rate,
+                "cost":     cost
+            })
+
+    # Include custom items from notes
+    notes = res.get("notes", "")
+    if notes:
+        try:
+            notes_data = json.loads(notes)
+            if isinstance(notes_data, dict) and "custom_items" in notes_data:
+                for c_item in notes_data["custom_items"]:
+                    qty  = int(c_item.get("qty") or 0)
+                    rate = float(c_item.get("rate") or 0.0)
+                    resolved_items.append({
+                        "item_id":  "custom",
+                        "name":     c_item.get("desc", "Custom Item"),
+                        "category": "Custom",
+                        "quantity": qty,
+                        "rate":     rate,
+                        "cost":     qty * rate * rental_days
+                    })
+        except Exception:
+            pass
+
+    res["resolved_items"] = resolved_items
+    res["rental_days"]    = rental_days
+    return res
 
 @router.post("/events")
 async def create_event(request: Request, event: EventSchema):

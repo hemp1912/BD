@@ -19,7 +19,7 @@ A single image comparison slider showing a bare banquet hall transformed by deco
 Uses two SVG illustrations (before: plain hall, after: decorated mandap) since we can't rely on uploaded photos.
 
 ### Feature 3 — 🎭 Ceremony Type Matcher
-5 community tabs (Gujarati / Maharashtrian / Punjabi / South Indian / Muslim). Each tab shows:
+5 community tabs (Gujarati / Maharashtrian / Punjabi / South Indian ). Each tab shows:
 - Specific mandap styles typical for that community
 - Rituals Bhoomi understands (for trust)
 - Relevant service highlights
