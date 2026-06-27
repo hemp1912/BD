@@ -157,7 +157,8 @@ class AppwriteDB(BaseDB):
                     {"type": "string", "key": "notes", "size": 5000, "required": False, "default": ""},
                     {"type": "float", "key": "tax_rate", "required": False, "default": 0.0},
                     {"type": "float", "key": "discount", "required": False, "default": 0.0},
-                    {"type": "string", "key": "portal_token", "size": 100, "required": False, "default": ""}
+                    {"type": "string", "key": "portal_token", "size": 100, "required": False, "default": ""},
+                    {"type": "integer", "key": "progress_stage", "required": False, "default": 0}
                 ],
 
                 "indexes": []
@@ -193,7 +194,8 @@ class AppwriteDB(BaseDB):
                     {"type": "string", "key": "title", "size": 255, "required": True},
                     {"type": "string", "key": "category", "size": 100, "required": True},
                     {"type": "string", "key": "description", "size": 1000, "required": False, "default": ""},
-                    {"type": "string", "key": "image_url", "size": 2048, "required": True}
+                    {"type": "string", "key": "image_url", "size": 2048, "required": True},
+                    {"type": "string", "key": "event_id", "size": 100, "required": False, "default": ""}
                 ],
                 "indexes": []
             },
@@ -271,6 +273,30 @@ class AppwriteDB(BaseDB):
                 "indexes": [
                     {"key": "date_idx", "type": "key", "attributes": ["date"]}
                 ]
+            },
+            config.APPWRITE_SETTINGS_COLLECTION_ID: {
+                "name": "Settings",
+                "attributes": [
+                    {"type": "string", "key": "company_name", "size": 255, "required": False, "default": "Bhoomi Decoration"},
+                    {"type": "string", "key": "company_address", "size": 500, "required": False, "default": "Mumbai, Maharashtra, India"},
+                    {"type": "string", "key": "company_email", "size": 255, "required": False, "default": "hello@bhoomidecoration.com"},
+                    {"type": "string", "key": "company_phone", "size": 100, "required": False, "default": "+91 99999 99999"},
+                    {"type": "string", "key": "company_website", "size": 255, "required": False, "default": "www.bhoomidecoration.com"},
+                    {"type": "float", "key": "default_tax_rate", "required": False, "default": 18.0},
+                    {"type": "float", "key": "default_discount", "required": False, "default": 0.0},
+                    {"type": "string", "key": "smtp_host", "size": 255, "required": False, "default": "smtp.gmail.com"},
+                    {"type": "integer", "key": "smtp_port", "required": False, "default": 587},
+                    {"type": "string", "key": "smtp_user", "size": 255, "required": False, "default": ""},
+                    {"type": "string", "key": "smtp_pass", "size": 255, "required": False, "default": ""},
+                    {"type": "string", "key": "email_subject", "size": 255, "required": False, "default": "Bhoomi Decoration Event Portal & Invoice — {client_name}"},
+                    {"type": "string", "key": "email_body", "size": 1500, "required": False, "default": "Hi {client_name},\n\nThank you for choosing Bhoomi Decoration.\n\nHere is your Bhoomi Decoration Event Portal link to track payments, designs and invoices:\n{portal_url}\n\nInvoice Details:\n- Invoice Total: ₹{total}\n- Amount Paid: ₹{paid}\n- Remaining Balance: ₹{remaining}\n\nBest regards,\nBhoomi Decoration Team"},
+                    {"type": "string", "key": "confirm_email_subject", "size": 255, "required": False, "default": "Event Booking Confirmed — Bhoomi Decoration"},
+                    {"type": "string", "key": "confirm_email_body", "size": 1500, "required": False, "default": "Dear {client_name},\n\nWe are delighted to confirm your event booking with Bhoomi Decoration.\n\nBooking Details:\n- Event ID: {event_id}\n- Venue: {venue_address}\n- Dates: {start_date} to {end_date}\n\nYou can track the live progress and uploads here:\n{portal_url}\n\nThank you,\nBhoomi Decoration Team"},
+                    {"type": "string", "key": "completed_email_subject", "size": 255, "required": False, "default": "Thank You from Bhoomi Decoration!"},
+                    {"type": "string", "key": "completed_email_body", "size": 1500, "required": False, "default": "Dear {client_name},\n\nWe want to say a big thank you for choosing Bhoomi Decoration for your recent event.\n\nIt was our pleasure assisting you. You can review your final invoice and download a PDF copy from your portal: {portal_url}\n\nBest regards,\nBhoomi Decoration Team"},
+                    {"type": "string", "key": "theme", "size": 50, "required": False, "default": "crimson_red"}
+                ],
+                "indexes": []
             }
         }
 
@@ -1378,3 +1404,95 @@ class AppwriteDB(BaseDB):
             override_id
         )
         return True
+
+    # ──────────────────────────────────────────────────────────────────────────
+    # System Settings Persistence
+    # ──────────────────────────────────────────────────────────────────────────
+    async def get_settings(self):
+        try:
+            res = await asyncio.to_thread(
+                self.databases.list_documents,
+                self.db_id,
+                config.APPWRITE_SETTINGS_COLLECTION_ID,
+                queries=[Query.limit(1)]
+            )
+            docs = self._get_documents_list(res)
+            if docs:
+                return self._clean_doc(docs[0])
+            else:
+                default_data = {
+                    "company_name": "Bhoomi Decoration",
+                    "company_address": "Mumbai, Maharashtra, India",
+                    "company_email": "hello@bhoomidecoration.com",
+                    "company_phone": "+91 99999 99999",
+                    "company_website": "www.bhoomidecoration.com",
+                    "default_tax_rate": 18.0,
+                    "default_discount": 0.0,
+                    "smtp_host": "smtp.gmail.com",
+                    "smtp_port": 587,
+                    "smtp_user": "",
+                    "smtp_pass": "",
+                    "email_subject": "Bhoomi Decoration Event Portal & Invoice — {client_name}",
+                    "email_body": "Hi {client_name},\n\nThank you for choosing Bhoomi Decoration.\n\nPortal: {portal_url}\n\nTotal: ₹{total} | Paid: ₹{paid} | Remaining: ₹{remaining}\n\nBest regards,\nBhoomi Decoration Team",
+                    "confirm_email_subject": "Event Booking Confirmed — Bhoomi Decoration",
+                    "confirm_email_body": "Dear {client_name},\n\nYour booking is confirmed!\n\nVenue: {venue_address}\nDates: {start_date} to {end_date}\n\nTrack here: {portal_url}\n\nThank you,\nBhoomi Decoration Team",
+                    "completed_email_subject": "Thank You from Bhoomi Decoration!",
+                    "completed_email_body": "Dear {client_name},\n\nThank you for choosing Bhoomi Decoration!\n\nView your invoice: {portal_url}\n\nBest regards,\nBhoomi Decoration Team",
+                    "theme": "crimson_red"
+                }
+                new_doc = await asyncio.to_thread(
+                    self.databases.create_document,
+                    self.db_id,
+                    config.APPWRITE_SETTINGS_COLLECTION_ID,
+                    "global_settings",
+                    default_data
+                )
+                return self._clean_doc(new_doc)
+        except Exception as e:
+            print(f"Error fetching settings: {e}")
+            return {
+                "id": "global_settings",
+                "company_name": "Bhoomi Decoration",
+                "company_address": "Mumbai, Maharashtra, India",
+                "company_email": "hello@bhoomidecoration.com",
+                "company_phone": "+91 99999 99999",
+                "company_website": "www.bhoomidecoration.com",
+                "default_tax_rate": 18.0,
+                "default_discount": 0.0,
+                "smtp_host": "smtp.gmail.com",
+                "smtp_port": 587,
+                "smtp_user": "",
+                "smtp_pass": "",
+                "email_subject": "Bhoomi Decoration Event Portal & Invoice — {client_name}",
+                "email_body": "Hi {client_name},\n\nPortal: {portal_url}\n\nTotal: ₹{total}\n\nBhoomi Decoration Team",
+                "confirm_email_subject": "Event Booking Confirmed — Bhoomi Decoration",
+                "confirm_email_body": "Dear {client_name},\n\nYour booking is confirmed!\n\nBhoomi Decoration Team",
+                "completed_email_subject": "Thank You from Bhoomi Decoration!",
+                "completed_email_body": "Dear {client_name},\n\nThank you for choosing us!\n\nBhoomi Decoration Team",
+                "theme": "crimson_red"
+            }
+
+    async def update_settings(self, data: dict):
+        try:
+            clean_data = {k: v for k, v in data.items() if k != "id"}
+            doc = await asyncio.to_thread(
+                self.databases.update_document,
+                self.db_id,
+                config.APPWRITE_SETTINGS_COLLECTION_ID,
+                "global_settings",
+                clean_data
+            )
+            return self._clean_doc(doc)
+        except Exception as e:
+            try:
+                doc = await asyncio.to_thread(
+                    self.databases.create_document,
+                    self.db_id,
+                    config.APPWRITE_SETTINGS_COLLECTION_ID,
+                    "global_settings",
+                    data
+                )
+                return self._clean_doc(doc)
+            except Exception as e2:
+                print(f"Error updating settings: {e2}")
+                return data

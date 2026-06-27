@@ -1,4 +1,5 @@
 import os
+from typing import Optional
 from pydantic import BaseModel
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse, FileResponse, RedirectResponse
@@ -253,6 +254,18 @@ async def get_portal_data(token: str):
         except Exception:
             pass
             
+    # Fetch tagged gallery photos for the event
+    event_photos = []
+    try:
+        gallery_items = await db_client.get_gallery()
+        event_photos = [
+            item.get("image_url")
+            for item in gallery_items
+            if item.get("event_id") == target_event.get("id")
+        ]
+    except Exception as g_err:
+        print(f"[!] Error fetching gallery items for portal: {g_err}")
+
     public_event = {
         "id": target_event.get("id"),
         "client_name": target_event.get("client_name"),
@@ -270,6 +283,7 @@ async def get_portal_data(token: str):
         "resolved_items": resolved_items,
         "rental_days": days,
         "progress_stage": int(target_event.get("progress_stage") or 0),
+        "event_photos": event_photos
     }
     
     return public_event
@@ -451,28 +465,65 @@ async def update_event_progress(event_id: str, payload: ProgressStageSchema, req
     updated = await db_client.update_event(event_id, event)
     return {"status": "success", "event": updated}
 
+class SettingsSchema(BaseModel):
+    company_name: Optional[str] = "Bhoomi Decoration"
+    company_address: Optional[str] = "Mumbai, Maharashtra, India"
+    company_email: Optional[str] = "hello@bhoomidecoration.com"
+    company_phone: Optional[str] = "+91 99999 99999"
+    company_website: Optional[str] = "www.bhoomidecoration.com"
+    default_tax_rate: Optional[float] = 18.0
+    default_discount: Optional[float] = 0.0
+    smtp_host: Optional[str] = "smtp.gmail.com"
+    smtp_port: Optional[int] = 587
+    smtp_user: Optional[str] = ""
+    smtp_pass: Optional[str] = ""
+    email_subject: Optional[str] = "Bhoomi Decoration Event Portal & Invoice — {client_name}"
+    email_body: Optional[str] = ""
+    theme: Optional[str] = "crimson_red"
+
+@app.get("/api/admin/settings")
+async def get_system_settings(request: Request):
+    from backend.auth import require_admin
+    await require_admin(request)
+    from backend.db_client import db_client
+    return await db_client.get_settings()
+
+@app.put("/api/admin/settings")
+async def update_system_settings(request: Request, payload: SettingsSchema):
+    from backend.auth import require_admin
+    await require_admin(request)
+    from backend.db_client import db_client
+    return await db_client.update_settings(payload.dict())
+
 class EmailRequestSchema(BaseModel):
     to_email: str
     subject: str
     body: str
-    smtp_host: str
-    smtp_port: int
-    smtp_user: str
-    smtp_pass: str
 
 @app.post("/api/send-email")
-async def send_email_api(payload: EmailRequestSchema):
-    import smtplib
-    from email.mime.text import MIMEText
-    from email.mime.multipart import MIMEMultipart
+async def send_email_api(payload: EmailRequestSchema, request: Request):
+    from backend.auth import require_admin
+    await require_admin(request)
     
-    if not payload.smtp_host or not payload.smtp_user or not payload.smtp_pass:
+    from backend.db_client import db_client
+    settings = await db_client.get_settings()
+    
+    smtp_host = settings.get("smtp_host")
+    smtp_port = settings.get("smtp_port") or 587
+    smtp_user = settings.get("smtp_user")
+    smtp_pass = settings.get("smtp_pass")
+    
+    if not smtp_host or not smtp_user or not smtp_pass:
         raise HTTPException(status_code=400, detail="SMTP Configuration (host, user, pass) is incomplete. Please configure it in System Settings.")
         
     try:
+        import smtplib
+        from email.mime.text import MIMEText
+        from email.mime.multipart import MIMEMultipart
+        
         # Create message container
         msg = MIMEMultipart()
-        msg['From'] = payload.smtp_user
+        msg['From'] = smtp_user
         msg['To'] = payload.to_email
         msg['Subject'] = payload.subject
         
@@ -480,12 +531,12 @@ async def send_email_api(payload: EmailRequestSchema):
         msg.attach(MIMEText(payload.body, 'plain'))
         
         # Connect to SMTP server
-        server = smtplib.SMTP(payload.smtp_host, payload.smtp_port)
+        server = smtplib.SMTP(smtp_host, int(smtp_port))
         server.starttls()
-        server.login(payload.smtp_user, payload.smtp_pass)
+        server.login(smtp_user, smtp_pass)
         
         # Send mail
-        server.sendmail(payload.smtp_user, payload.to_email, msg.as_string())
+        server.sendmail(smtp_user, payload.to_email, msg.as_string())
         server.quit()
         
         return {"status": "success", "message": f"Email successfully sent to {payload.to_email}!"}

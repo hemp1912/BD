@@ -6,7 +6,7 @@ from datetime import datetime, date
 from typing import Dict, List, Optional
 import random
 import string
-from fastapi import APIRouter, HTTPException, Request, status, File, UploadFile
+from fastapi import APIRouter, HTTPException, Request, status, File, UploadFile, BackgroundTasks
 from pydantic import BaseModel
 from backend import config
 from appwrite.input_file import InputFile
@@ -76,6 +76,7 @@ class EventSchema(BaseModel):
     discount: Optional[float] = 0.0
     tax_rate: Optional[float] = 0.0
     portal_token: Optional[str] = ""
+    progress_stage: Optional[int] = 0
 
 class PaymentRequest(BaseModel):
     amount: float
@@ -391,7 +392,7 @@ async def get_event(request: Request, event_id: str):
     return res
 
 @router.post("/events")
-async def create_event(request: Request, event: EventSchema):
+async def create_event(request: Request, event: EventSchema, background_tasks: BackgroundTasks):
     await require_admin(request)
     event_data = event.model_dump()
     event_data.setdefault("payment_history", "[]")
@@ -430,6 +431,15 @@ async def create_event(request: Request, event: EventSchema):
     alert_summary = f"New Event Booked!\nClient: {event.client_name}\nVenue: {event.venue_address}\nDates: {event.start_date} to {event.end_date}\nInvoice Total: ${total_cost:.2f}"
     await dispatch_telegram_alert(alert_summary)
 
+    # Trigger Booking Confirmation Email in the background
+    try:
+        from backend.mail_helper import get_event_email_context, send_system_email
+        client_email, email_context = await get_event_email_context(created_event, request)
+        if client_email:
+            background_tasks.add_task(send_system_email, client_email, "confirmation", email_context)
+    except Exception as e:
+        print(f"Error scheduling confirmation email: {e}")
+
     return {
         "event": add_payment_status(created_event),
         "conflict_alerts": conflict_alerts,
@@ -437,7 +447,7 @@ async def create_event(request: Request, event: EventSchema):
     }
 
 @router.put("/events/{event_id}")
-async def update_event(request: Request, event_id: str, event: EventSchema):
+async def update_event(request: Request, event_id: str, event: EventSchema, background_tasks: BackgroundTasks):
     await require_admin(request)
     existing_event = await db_client.get_event(event_id)
     if not existing_event:
@@ -486,6 +496,20 @@ async def update_event(request: Request, event_id: str, event: EventSchema):
         
     alert_summary = f"Event Updated!\nClient: {event.client_name}\nVenue: {event.venue_address}\nDates: {event.start_date} to {event.end_date}\nInvoice Total: ${total_cost:.2f}"
     await dispatch_telegram_alert(alert_summary)
+
+    # Check for Completion Transitions & Trigger Completed/Thank-You Email
+    old_stage = existing_event.get("progress_stage")
+    new_stage = updated_event.get("progress_stage")
+    old_status = existing_event.get("status")
+    new_status = updated_event.get("status")
+    if (new_status == "Completed" and old_status != "Completed") or (new_stage == 3 and old_stage != 3):
+        try:
+            from backend.mail_helper import get_event_email_context, send_system_email
+            client_email, email_context = await get_event_email_context(updated_event, request)
+            if client_email:
+                background_tasks.add_task(send_system_email, client_email, "completed", email_context)
+        except Exception as e:
+            print(f"Error scheduling completed email: {e}")
 
     return {
         "event": add_payment_status(updated_event),

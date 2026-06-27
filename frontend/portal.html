@@ -814,6 +814,21 @@
                     </div>
                 </div>
 
+                <!-- 📸 Event Photo Album -->
+                <div class="portal-section" id="portal-photos-section">
+                    <div class="section-head">
+                        <h3>📸 Event Photo Album</h3>
+                    </div>
+                    <div class="section-body" style="padding: 1.5rem;">
+                        <div id="portal-photos-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.25rem;">
+                            <!-- Populated dynamically by JS -->
+                        </div>
+                        <div id="portal-photos-placeholder" style="text-align: center; padding: 2rem; color: var(--text-secondary); font-style: italic;">
+                            Photos will be available after your event.
+                        </div>
+                    </div>
+                </div>
+
                 <!-- FEEDBACK FORM SECTION -->
                 <div class="portal-section" id="portal-feedback-section">
                     <div class="section-head">
@@ -892,10 +907,10 @@
                 <div style="text-align:right;">
                     <h2
                         style="font-family:'Marcellus',serif; color:#333; margin:0 0 8px; font-size:1.6rem; letter-spacing:1px;">
-                        INVOICE</h2>
-                    <p style="margin:0 0 4px; font-size:0.85rem; font-weight:600;">Invoice No: <span
+                        INVOICE / ઇન્વોઇસ</h2>
+                    <p style="margin:0 0 4px; font-size:0.85rem; font-weight:600;">Invoice No / ઇન્વોઇસ નંબર: <span
                             id="ppdf-invoice-id" style="color:#6b1623;">#EVT-XXXX</span></p>
-                    <p style="margin:0; font-size:0.8rem; color:#666;">Date: <span
+                    <p style="margin:0; font-size:0.8rem; color:#666;">Date / તારીખ: <span
                             id="ppdf-invoice-date">DD/MM/YYYY</span></p>
                 </div>
             </div>
@@ -904,7 +919,7 @@
                 <div style="background:#fdfaf7; border-left:3px solid #c9941f; padding:14px 16px; border-radius:4px;">
                     <h3
                         style="font-family:'Marcellus',serif; color:#6b1623; font-size:0.9rem; margin:0 0 8px; letter-spacing:0.5px;">
-                        BILLED TO:</h3>
+                        BILLED TO / પ્રતિ:</h3>
                     <p style="margin:0 0 4px; font-size:0.88rem; font-weight:600;" id="ppdf-client-name">Client Name</p>
                     <p style="margin:0 0 4px; font-size:0.78rem; color:#555;" id="ppdf-client-phone">+91 99999 99999</p>
                     <p style="margin:0; font-size:0.78rem; color:#555; line-height:1.4;" id="ppdf-client-address">
@@ -913,12 +928,12 @@
                 <div style="background:#fdfaf7; border-left:3px solid #6b1623; padding:14px 16px; border-radius:4px;">
                     <h3
                         style="font-family:'Marcellus',serif; color:#6b1623; font-size:0.9rem; margin:0 0 8px; letter-spacing:0.5px;">
-                        EVENT DETAILS:</h3>
-                    <p style="margin:0 0 4px; font-size:0.82rem;"><strong>Venue:</strong> <span id="ppdf-venue">—</span>
+                        EVENT DETAILS / ઇવેન્ટ વિગતો:</h3>
+                    <p style="margin:0 0 4px; font-size:0.82rem;"><strong>Venue / સ્થળ:</strong> <span id="ppdf-venue">—</span>
                     </p>
-                    <p style="margin:0 0 4px; font-size:0.82rem;"><strong>From:</strong> <span id="ppdf-start">—</span>
+                    <p style="margin:0 0 4px; font-size:0.82rem;"><strong>From / શરૂઆત:</strong> <span id="ppdf-start">—</span>
                     </p>
-                    <p style="margin:0; font-size:0.82rem;"><strong>To:</strong> <span id="ppdf-end">—</span></p>
+                    <p style="margin:0; font-size:0.82rem;"><strong>To / અંત:</strong> <span id="ppdf-end">—</span></p>
                 </div>
             </div>
             <!-- Items Table -->
@@ -926,19 +941,19 @@
                 style="width:100%; border-collapse:collapse; margin-bottom:30px; font-size:0.82rem; text-align:left;">
                 <thead>
                     <tr style="background:#6b1623; color:#fff;">
-                        <th style="padding:10px 12px; font-family:'Marcellus',serif; font-weight:500;">Item</th>
+                        <th style="padding:10px 12px; font-family:'Marcellus',serif; font-weight:500;">Item / વિગત</th>
                         <th
                             style="padding:10px 12px; font-family:'Marcellus',serif; font-weight:500; text-align:center;">
-                            Category</th>
+                            Category / શ્રેણી</th>
                         <th
                             style="padding:10px 12px; font-family:'Marcellus',serif; font-weight:500; text-align:center;">
-                            Qty</th>
+                            Qty / જથ્થો</th>
                         <th
                             style="padding:10px 12px; font-family:'Marcellus',serif; font-weight:500; text-align:right;">
-                            Day Rate</th>
+                            Day Rate / દૈનિક દર</th>
                         <th
                             style="padding:10px 12px; font-family:'Marcellus',serif; font-weight:500; text-align:right;">
-                            Total</th>
+                            Total / કુલ રકમ</th>
                     </tr>
                 </thead>
                 <tbody id="ppdf-items-body">
@@ -948,38 +963,37 @@
             <!-- Summary -->
             <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:16px;">
                 <div style="flex:1; max-width:52%;">
-                    <h4 style="font-family:'Marcellus',serif; color:#6b1623; font-size:0.85rem; margin:0 0 8px;">TERMS
-                        &amp; CONDITIONS</h4>
+                    <h4 style="font-family:'Marcellus',serif; color:#6b1623; font-size:0.85rem; margin:0 0 8px;">TERMS &amp; CONDITIONS / નિયમો અને શરતો</h4>
                     <p style="margin:0; font-size:0.7rem; color:#777; line-height:1.5;">
-                        1. All reservation items are rental assets of Bhoomi Decoration.<br>
-                        2. Payments should be made within the agreed milestone dates.<br>
-                        3. Any damage to physical property is subject to replacement charges.
+                        1. All reservation items are rental assets of Bhoomi Decoration. / ૧. બધી બુકિંગ આઇટમો ભૂમિ ડેકોરેશનની ભાડાની સંપત્તિ છે.<br>
+                        2. Payments should be made within agreed milestone dates. / ૨. ચૂકવણી નિર્ધારિત સમય મર્યાદામાં થવી જોઈએ.<br>
+                        3. Any damage to physical property is subject to replacement charges. / ૩. ભૌતિક સંપત્તિને નુકસાન થવાના કિસ્સામાં બદલી ખર્ચ લાગુ થશે.
                     </p>
                 </div>
                 <div style="width:240px;">
                     <div
                         style="display:flex; justify-content:space-between; font-size:0.82rem; margin-bottom:6px; color:#555;">
-                        <span>Rental Subtotal:</span><span id="ppdf-subtotal">₹0.00</span>
+                        <span>Rental Subtotal / પેટા સરવાળો:</span><span id="ppdf-subtotal">₹0.00</span>
                     </div>
                     <div
                         style="display:flex; justify-content:space-between; font-size:0.82rem; margin-bottom:6px; color:#555;">
-                        <span>Discount:</span><span id="ppdf-discount">-₹0.00</span>
+                        <span>Discount / ડિસ્કાઉન્ટ:</span><span id="ppdf-discount">-₹0.00</span>
                     </div>
                     <div
                         style="display:flex; justify-content:space-between; font-size:0.82rem; margin-bottom:6px; color:#555; border-bottom:1px solid #ddd; padding-bottom:6px;">
-                        <span>Tax:</span><span id="ppdf-tax">0%</span>
+                        <span>Tax / ટેક્સ:</span><span id="ppdf-tax">0%</span>
                     </div>
                     <div
                         style="display:flex; justify-content:space-between; font-size:0.95rem; font-weight:700; margin-bottom:6px; color:#6b1623;">
-                        <span>Invoice Total:</span><span id="ppdf-total">₹0.00</span>
+                        <span>Invoice Total / કુલ રકમ:</span><span id="ppdf-total">₹0.00</span>
                     </div>
                     <div
                         style="display:flex; justify-content:space-between; font-size:0.82rem; margin-bottom:6px; color:#059669;">
-                        <span>Amount Paid:</span><span id="ppdf-paid">₹0.00</span>
+                        <span>Amount Paid / ચૂકવેલ રકમ:</span><span id="ppdf-paid">₹0.00</span>
                     </div>
                     <div
                         style="display:flex; justify-content:space-between; font-size:0.95rem; font-weight:700; border-top:2px double #6b1623; padding-top:6px; color:#c62828;">
-                        <span>Balance Due:</span><span id="ppdf-balance">₹0.00</span>
+                        <span>Balance Due / બાકી ચૂકવણી:</span><span id="ppdf-balance">₹0.00</span>
                     </div>
                 </div>
             </div>
@@ -988,17 +1002,16 @@
                 style="margin-top:50px; display:flex; justify-content:space-between; align-items:flex-end; padding-top:16px; border-top:1px dashed #ddd;">
                 <div style="text-align:center;">
                     <div style="width:180px; border-bottom:1px solid #888; margin-bottom:4px;"></div>
-                    <p style="margin:0; font-size:0.72rem; color:#666; font-weight:600;">Authorized Signatory</p>
+                    <p style="margin:0; font-size:0.72rem; color:#666; font-weight:600;">Authorized Signatory / અધિકૃત સહી</p>
                 </div>
                 <div style="text-align:center;">
                     <div style="width:180px; border-bottom:1px solid #888; margin-bottom:4px;"></div>
-                    <p style="margin:0; font-size:0.72rem; color:#666; font-weight:600;">Client Signature</p>
+                    <p style="margin:0; font-size:0.72rem; color:#666; font-weight:600;">Client Signature / ગ્રાહક સહી</p>
                 </div>
             </div>
             <!-- Footer -->
             <div style="margin-top:28px; text-align:center; padding-top:14px; border-top:1px solid #eee;">
-                <p style="margin:0; font-size:0.72rem; color:#999;">Thank you for choosing Bhoomi Decoration for your
-                    celebration!</p>
+                <p style="margin:0; font-size:0.72rem; color:#999;">Thank you for choosing Bhoomi Decoration for your celebration! / તમારી ઉજવણી માટે ભૂમિ ડેકોરેશન પસંદ કરવા બદલ આભાર!</p>
             </div>
         </div>
     </div>
@@ -1213,13 +1226,22 @@
                 itemsBody.innerHTML = "";
                 const items = event.resolved_items || [];
                 let subtotal = 0;
+                const CAT_TRANSLATIONS = {
+                    "Lighting": "Lighting / લાઇટિંગ",
+                    "Drapery": "Drapery / ડેકોરેશન કાપડ",
+                    "Floral": "Floral / ફૂલો",
+                    "Furniture": "Furniture / ફર્નિચર",
+                    "Other": "Other / અન્ય",
+                    "Custom": "Custom / કસ્ટમ"
+                };
                 items.forEach((item, idx) => {
                     subtotal += item.cost;
                     const tr = document.createElement("tr");
                     tr.style.backgroundColor = idx % 2 === 0 ? "#ffffff" : "#fdfaf7";
+                    const catTrans = CAT_TRANSLATIONS[item.category] || item.category;
                     tr.innerHTML = `
                         <td style="padding:9px 12px; border-bottom:1px solid #eee;"><strong>${item.name}</strong></td>
-                        <td style="padding:9px 12px; border-bottom:1px solid #eee; text-align:center; color:#666;">${item.category}</td>
+                        <td style="padding:9px 12px; border-bottom:1px solid #eee; text-align:center; color:#666;">${catTrans}</td>
                         <td style="padding:9px 12px; border-bottom:1px solid #eee; text-align:center; font-weight:600;">${item.quantity}</td>
                         <td style="padding:9px 12px; border-bottom:1px solid #eee; text-align:right; color:#666;">—</td>
                         <td style="padding:9px 12px; border-bottom:1px solid #eee; text-align:right; font-weight:600; color:#6b1623;">₹${item.cost.toFixed(2)}</td>`;
@@ -1227,7 +1249,7 @@
                 });
 
                 if (items.length === 0) {
-                    itemsBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:20px; color:#888;">No reserved items found.</td></tr>`;
+                    itemsBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:20px; color:#888;">No reserved items found. / કોઈ બુક કરેલી આઇટમ્સ મળી નથી.</td></tr>`;
                 }
 
                 const discount = event.discount || 0;
@@ -1506,12 +1528,33 @@
             }
         }
 
+        // 📸 Photo Album
+        function renderEventPhotoAlbum(eventPhotos) {
+            const grid = document.getElementById("portal-photos-grid");
+            const placeholder = document.getElementById("portal-photos-placeholder");
+            if (!grid || !placeholder) return;
+            
+            if (eventPhotos && eventPhotos.length > 0) {
+                placeholder.style.display = "none";
+                grid.style.display = "grid";
+                grid.innerHTML = eventPhotos.map(url => `
+                    <div style="border-radius: 8px; overflow: hidden; border: 1px solid var(--border-glass); background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
+                        <img src="${url}" style="width: 100%; height: 160px; object-fit: cover; display: block;" alt="Event Photo">
+                    </div>
+                `).join("");
+            } else {
+                grid.style.display = "none";
+                placeholder.style.display = "block";
+            }
+        }
+
         // Attach to portal load
         const _origPortalInit = window.__portalInitDone;
         document.addEventListener("portalDataLoaded", (e) => {
             const data = e.detail;
             if (data.start_date) initCountdown(data.start_date);
             renderProgressTracker(data.progress_stage || 0);
+            renderEventPhotoAlbum(data.event_photos || []);
         });
     </script>
 

@@ -97,7 +97,7 @@ def bootstrap_collections():
             "attributes": [
                 {"type": "string", "key": "client_id", "size": 100, "required": True},
                 {"type": "string", "key": "client_name", "size": 255, "required": True},
-                {"type": "string", "key": "venue_address", "size": 500, "required": True},
+                {"type": "venue_address" if os.name == 'nt' else "string", "key": "venue_address", "size": 500, "required": True}, # Keep support for windows address type or fallback to string
                 {"type": "string", "key": "start_date", "size": 50, "required": True},
                 {"type": "string", "key": "end_date", "size": 50, "required": True},
                 {"type": "string", "key": "status", "size": 50, "required": True, "default": "Draft"},
@@ -109,7 +109,11 @@ def bootstrap_collections():
                 {"type": "string", "key": "crew_assignments", "size": 10000, "required": False, "default": "[]"},
                 {"type": "string", "key": "payment_history", "size": 10000, "required": False, "default": "[]"},
                 {"type": "integer", "key": "max_workforce_capacity", "required": False, "default": 4},
-                {"type": "string", "key": "notes", "size": 5000, "required": False, "default": ""}
+                {"type": "string", "key": "notes", "size": 5000, "required": False, "default": ""},
+                {"type": "float", "key": "tax_rate", "required": False, "default": 0.0},
+                {"type": "float", "key": "discount", "required": False, "default": 0.0},
+                {"type": "string", "key": "portal_token", "size": 100, "required": False, "default": ""},
+                {"type": "integer", "key": "progress_stage", "required": False, "default": 0}
             ],
             "indexes": []
         },
@@ -144,7 +148,8 @@ def bootstrap_collections():
                 {"type": "string", "key": "title", "size": 255, "required": True},
                 {"type": "string", "key": "category", "size": 100, "required": True},
                 {"type": "string", "key": "description", "size": 1000, "required": False, "default": ""},
-                {"type": "string", "key": "image_url", "size": 2048, "required": True}
+                {"type": "string", "key": "image_url", "size": 2048, "required": True},
+                {"type": "string", "key": "event_id", "size": 100, "required": False, "default": ""}
             ],
             "indexes": []
         },
@@ -174,6 +179,30 @@ def bootstrap_collections():
             "indexes": [
                 {"key": "date_index", "type": "key", "attributes": ["date"]}
             ]
+        },
+        "settings": {
+            "name": "Settings",
+            "attributes": [
+                {"type": "string", "key": "company_name", "size": 255, "required": False, "default": "Bhoomi Decoration"},
+                {"type": "string", "key": "company_address", "size": 500, "required": False, "default": "Mumbai, Maharashtra, India"},
+                {"type": "string", "key": "company_email", "size": 255, "required": False, "default": "hello@bhoomidecoration.com"},
+                {"type": "string", "key": "company_phone", "size": 100, "required": False, "default": "+91 99999 99999"},
+                {"type": "string", "key": "company_website", "size": 255, "required": False, "default": "www.bhoomidecoration.com"},
+                {"type": "float", "key": "default_tax_rate", "required": False, "default": 18.0},
+                {"type": "float", "key": "default_discount", "required": False, "default": 0.0},
+                {"type": "string", "key": "smtp_host", "size": 255, "required": False, "default": "smtp.gmail.com"},
+                {"type": "integer", "key": "smtp_port", "required": False, "default": 587},
+                {"type": "string", "key": "smtp_user", "size": 255, "required": False, "default": ""},
+                {"type": "string", "key": "smtp_pass", "size": 255, "required": False, "default": ""},
+                {"type": "string", "key": "email_subject", "size": 255, "required": False, "default": "Bhoomi Decoration Event Portal & Invoice — {client_name}"},
+                {"type": "string", "key": "email_body", "size": 1500, "required": False, "default": "Hi {client_name},\n\nThank you for choosing Bhoomi Decoration.\n\nHere is your Bhoomi Decoration Event Portal link to track payments, designs and invoices:\n{portal_url}\n\nInvoice Details:\n- Invoice Total: ₹{total}\n- Amount Paid: ₹{paid}\n- Remaining Balance: ₹{remaining}\n\nBest regards,\nBhoomi Decoration Team"},
+                {"type": "string", "key": "confirm_email_subject", "size": 255, "required": False, "default": "Event Booking Confirmed — Bhoomi Decoration"},
+                {"type": "string", "key": "confirm_email_body", "size": 1500, "required": False, "default": "Dear {client_name},\n\nWe are delighted to confirm your event booking with Bhoomi Decoration.\n\nBooking Details:\n- Event ID: {event_id}\n- Venue: {venue_address}\n- Dates: {start_date} to {end_date}\n\nYou can track the live progress and uploads here:\n{portal_url}\n\nThank you,\nBhoomi Decoration Team"},
+                {"type": "string", "key": "completed_email_subject", "size": 255, "required": False, "default": "Thank You from Bhoomi Decoration!"},
+                {"type": "string", "key": "completed_email_body", "size": 1500, "required": False, "default": "Dear {client_name},\n\nWe want to say a big thank you for choosing Bhoomi Decoration for your recent event.\n\nIt was our pleasure assisting you. You can review your final invoice and download a PDF copy from your portal: {portal_url}\n\nBest regards,\nBhoomi Decoration Team"},
+                {"type": "string", "key": "theme", "size": 50, "required": False, "default": "crimson_red"}
+            ],
+            "indexes": []
         }
     }
 
@@ -202,6 +231,14 @@ def bootstrap_collections():
     for coll_id, schema in collections_schema.items():
         name = schema["name"]
         print(f"\n[*] Processing collection '{name}' ({coll_id})...")
+
+        # Force-recreate settings collection to avoid row size limit conflicts
+        if coll_id == "settings":
+            try:
+                databases.delete_collection(database_id=DATABASE_ID, collection_id=coll_id)
+                print(f"  [!] Force-deleted existing Settings collection to refresh attributes schema.")
+            except Exception:
+                pass
 
         # 1. Create collection
         try:

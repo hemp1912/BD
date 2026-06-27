@@ -203,33 +203,33 @@ const TRANSLATIONS = {
         "inv_table_balance": "Balance",
         
         // Invoices print/PDF words
-        "pdf_invoice_title": "INVOICE",
-        "pdf_invoice_from": "FROM:",
-        "pdf_invoice_to": "BILLED TO:",
-        "pdf_event_details": "EVENT LOGISTICS:",
-        "pdf_venue": "Venue:",
-        "pdf_start_date": "Setup Start:",
-        "pdf_end_date": "Cleanup Deadline:",
-        "pdf_decor_item": "Reserved Catalog Item",
-        "pdf_category": "Category",
-        "pdf_qty": "Qty",
-        "pdf_rate": "Day Rate",
-        "pdf_subtotal": "Rental Subtotal:",
-        "pdf_discount": "Discount:",
-        "pdf_tax": "Tax Rate:",
-        "pdf_total": "Invoice Total:",
-        "pdf_amount_paid": "Amount Paid:",
-        "pdf_balance_due": "Balance Due:",
-        "pdf_terms_title": "TERMS & CONDITIONS",
-        "pdf_terms_text": "1. All reservation items are rental assets of Bhoomi Decoration.\n2. Payments should be made within the milestone dates.\n3. Any damage to physical property during the setup or event span is subject to replacement charges.",
-        "pdf_invoice_no": "Invoice No:",
-        "pdf_date_label": "Date:",
-        "pdf_auth_sign": "Authorized Signatory",
-        "pdf_client_sign": "Client Signature",
-        "pdf_agreement_accept": "Acceptance of Agreement",
-        "pdf_thank_you": "Thank you for choosing Bhoomi Decoration for your celebration!",
-        "pdf_no_items": "No reserved catalog items found.",
-        "pdf_custom_category": "Custom",
+        "pdf_invoice_title": "INVOICE / ઇન્વોઇસ",
+        "pdf_invoice_from": "FROM / તરફથી:",
+        "pdf_invoice_to": "BILLED TO / પ્રતિ:",
+        "pdf_event_details": "EVENT LOGISTICS / ઇવેન્ટ વિગતો:",
+        "pdf_venue": "Venue / સ્થળ:",
+        "pdf_start_date": "Setup Start / સેટઅપ શરૂઆત:",
+        "pdf_end_date": "Cleanup Deadline / ડેડલાઇન પૂર્ણ:",
+        "pdf_decor_item": "Reserved Catalog Item / બુક આઇટમ",
+        "pdf_category": "Category / શ્રેણી",
+        "pdf_qty": "Qty / જથ્થો",
+        "pdf_rate": "Day Rate / દૈનિક દર",
+        "pdf_subtotal": "Rental Subtotal / પેટા સરવાળો:",
+        "pdf_discount": "Discount / ડિસ્કાઉન્ટ:",
+        "pdf_tax": "Tax Rate / ટેક્સ:",
+        "pdf_total": "Invoice Total / કુલ રકમ:",
+        "pdf_amount_paid": "Amount Paid / ચૂકવેલ રકમ:",
+        "pdf_balance_due": "Balance Due / બાકી ચૂકવણી:",
+        "pdf_terms_title": "TERMS & CONDITIONS / નિયમો અને શરતો",
+        "pdf_terms_text": "1. All reservation items are rental assets of Bhoomi Decoration. / ૧. બધી બુકિંગ આઇટમો ભૂમિ ડેકોરેશનની ભાડાની સંપત્તિ છે.\n2. Payments should be made within milestone dates. / ૨. ચૂકવણી નિર્ધારિત સમય મર્યાદામાં થવી જોઈએ.\n3. Damage to physical property is subject to replacement charges. / ૩. સેટઅપ અથવા ઇવેન્ટ દરમિયાન સંપત્તિને નુકસાન થવાના કિસ્સામાં બદલી ખર્ચ લાગુ થશે.",
+        "pdf_invoice_no": "Invoice No / ઇન્વોઇસ નંબર:",
+        "pdf_date_label": "Date / તારીખ:",
+        "pdf_auth_sign": "Authorized Signatory / અધિકૃત સહી",
+        "pdf_client_sign": "Client Signature / ગ્રાહક સહી",
+        "pdf_agreement_accept": "Acceptance of Agreement / કરારની સ્વીકૃતિ",
+        "pdf_thank_you": "Thank you for choosing Bhoomi Decoration for your celebration! / તમારી ઉજવણી માટે ભૂમિ ડેકોરેશન પસંદ કરવા બદલ આભાર!",
+        "pdf_no_items": "No reserved catalog items found. / કોઈ બુક કરેલી આઇટમ્સ મળી નથી.",
+        "pdf_custom_category": "Custom / કસ્ટમ",
         "payout_modal_title": "Event Invoice Details",
         "payout_client_profile": "Client Profile:",
         "payout_venue": "Target Venue:",
@@ -250,21 +250,21 @@ const TRANSLATIONS = {
         "payout_btn_record": "Record Payment",
         "payout_btn_export": "Export Contract & Receipt",
         "payout_btn_close": "Close",
-        "receipt_contract_title": "EVENT DECORATION LOGISTICS CONTRACT",
-        "receipt_admin": "Business Administrator",
-        "receipt_client": "Customer Client:",
-        "receipt_address": "Setup Address:",
-        "receipt_dates": "Booked Dates:",
-        "receipt_ref_code": "Invoice Reference Code:",
-        "receipt_item": "Decor Item",
-        "receipt_qty": "Qty",
-        "receipt_rate": "Day Rate",
-        "receipt_subtotal": "Subtotal Amount:",
-        "receipt_discount": "Deducted Discount:",
-        "receipt_tax": "Applied Tax",
-        "receipt_invoice_total": "Total Invoice Amount:",
-        "receipt_total_paid": "Total Paid (Receipts):",
-        "receipt_remaining": "Remaining Accounts Balance:",
+        "receipt_contract_title": "EVENT DECORATION LOGISTICS CONTRACT / ઇવેન્ટ ડેકોરેશન લોજિસ્ટિક્સ કરાર",
+        "receipt_admin": "Business Administrator / બિઝનેસ એડમિનિસ્ટ્રેટર",
+        "receipt_client": "Customer Client / ગ્રાહકનું નામ:",
+        "receipt_address": "Setup Address / સેટઅપ સરનામું:",
+        "receipt_dates": "Booked Dates / બુક કરેલી તારીખો:",
+        "receipt_ref_code": "Invoice Reference Code / ઇન્વોઇસ સંદર્ભ કોડ:",
+        "receipt_item": "Decor Item / વિગત",
+        "receipt_qty": "Qty / જથ્થો",
+        "receipt_rate": "Day Rate / દૈનિક દર",
+        "receipt_subtotal": "Subtotal Amount / પેટા સરવાળો:",
+        "receipt_discount": "Deducted Discount / ડિસ્કાઉન્ટ બાદબાકી:",
+        "receipt_tax": "Applied Tax / ટેક્સ રકમ:",
+        "receipt_invoice_total": "Total Invoice Amount / કુલ ઇન્વોઇસ રકમ:",
+        "receipt_total_paid": "Total Paid (Receipts) / ચૂકવેલ રકમ:",
+        "receipt_remaining": "Remaining Accounts Balance / બાકી રહેતી રકમ:",
         
         // System Settings & Exports
         "settings_title": "System Settings",
@@ -644,6 +644,15 @@ function switchView(targetViewId) {
     } else if (targetViewId === "testimonials-subview") {
         document.getElementById("testimonials-subview").style.display = "block";
         loadTestimonialsData();
+    } else if (targetViewId === "analytics-subview") {
+        document.getElementById("analytics-subview").style.display = "block";
+        loadAnalyticsData();
+    } else if (targetViewId === "calendar-subview") {
+        document.getElementById("calendar-subview").style.display = "block";
+        loadCalendarData();
+    } else if (targetViewId === "expenses-subview") {
+        document.getElementById("expenses-subview").style.display = "block";
+        populateExpenseEventSelector();
     } else if (targetViewId === "settings-view") {
         document.getElementById("settings-subview").style.display = "block";
         loadSettingsData();
@@ -1193,6 +1202,7 @@ async function handleBookingSubmit(e) {
     const notes = document.getElementById("booking-notes").value;
     const discount = parseFloat(document.getElementById("booking-discount").value) || 0.0;
     const tax_rate = parseFloat(document.getElementById("booking-tax-rate").value) || 0.0;
+    const progress_stage = parseInt(document.getElementById("booking-progress-stage").value) || 0;
     
     // Build items_booked map
     const items_booked = {};
@@ -1215,7 +1225,8 @@ async function handleBookingSubmit(e) {
         notes,
         status: document.getElementById("booking-status").value,
         discount,
-        tax_rate
+        tax_rate,
+        progress_stage
     };
     
     const method = id ? "PUT" : "POST";
@@ -1297,6 +1308,7 @@ async function editEventBooking(eventId) {
     document.getElementById("booking-discount").value = evt.discount || 0;
     document.getElementById("booking-tax-rate").value = evt.tax_rate || 0;
     document.getElementById("booking-status").value = evt.status || "Confirmed";
+    document.getElementById("booking-progress-stage").value = evt.progress_stage || 0;
     
     // Select Client
     document.getElementById("booking-client").value = evt.client_id;
@@ -1325,6 +1337,14 @@ async function editEventBooking(eventId) {
             if (qtyInput) qtyInput.value = bookedMap[itemId];
         }
     });
+    
+    // Show and load Event Photo Album section
+    const photosSection = document.getElementById("booking-event-photos-section");
+    if (photosSection) {
+        photosSection.style.display = "block";
+        document.getElementById("booking-photo-file").value = "";
+        loadBookingEventPhotos(evt.id);
+    }
     
     openModal("modal-booking");
 }
@@ -1892,6 +1912,7 @@ async function handleGallerySubmit(e) {
     const title = document.getElementById("gallery-title").value;
     const category = document.getElementById("gallery-category").value;
     const description = document.getElementById("gallery-desc").value;
+    const event_id = document.getElementById("gallery-event-id").value;
     
     const saveBtn = document.getElementById("btn-gallery-save") || e.target.querySelector('button[type="submit"]');
     if (saveBtn) saveBtn.disabled = true;
@@ -1902,7 +1923,7 @@ async function handleGallerySubmit(e) {
             await apiFetch(`/api/gallery/${id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ title, category, description, image_url })
+                body: JSON.stringify({ title, category, description, image_url, event_id })
             });
             showToast("Gallery item details updated.");
             closeModal("modal-gallery");
@@ -1928,6 +1949,7 @@ async function handleGallerySubmit(e) {
             formData.append("title", title);
             formData.append("category", category);
             formData.append("description", description);
+            formData.append("event_id", event_id);
             formData.append("file", compressedFile, file.name);
             
             await apiFetch("/api/gallery", {
@@ -1960,7 +1982,7 @@ function editGalleryItem(photoId) {
     
     document.getElementById("gallery-file-group").style.display = "none";
     document.getElementById("gallery-url-group").style.display = "block";
-    
+    populateGalleryEventSelector(photo.event_id || "");
     openModal("modal-gallery");
 }
 
@@ -1977,6 +1999,21 @@ async function deleteGalleryItem(photoId) {
         }
     );
 }
+
+async function populateGalleryEventSelector(selectedEventId = "") {
+    const sel = document.getElementById("gallery-event-id");
+    if (!sel) return;
+    try {
+        const data = await apiFetch("/api/events?limit=1000");
+        const events = data.items || data || [];
+        sel.innerHTML = `<option value="">— Not associated with any event —</option>` + 
+            events.map(ev => `<option value="${ev.id}">${ev.client_name || "Unknown"} — ${ev.start_date || ""}</option>`).join("");
+        sel.value = selectedEventId;
+    } catch (err) {
+        console.warn("Could not load events for gallery selector:", err);
+    }
+}
+window.populateGalleryEventSelector = populateGalleryEventSelector;
 
 // 3. Crew Ledger
 async function loadCrewData(page) {
@@ -2993,7 +3030,8 @@ async function exportManualInvoiceToPDF(eventId, data) {
 
 // ─── Bind Event Listeners ────────────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
-    applyTheme();
+    // Load theme from Appwrite DB settings on startup
+    apiFetch("/api/admin/settings").then(s => applyTheme(s && s.theme ? s.theme : "crimson_red")).catch(() => applyTheme("crimson_red"));
 
     // 1. Navigation Button Actions (Hash SPA Router)
     document.getElementById("nav-btn-dashboard").addEventListener("click", () => window.location.hash = "dashboard");
@@ -3007,6 +3045,9 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("nav-btn-finance").addEventListener("click", () => window.location.hash = "finance");
     document.getElementById("nav-btn-invoice").addEventListener("click", () => window.location.hash = "invoice");
     document.getElementById("nav-btn-testimonials").addEventListener("click", () => window.location.hash = "testimonials");
+    document.getElementById("nav-btn-analytics")?.addEventListener("click", () => window.location.hash = "analytics");
+    document.getElementById("nav-btn-calendar")?.addEventListener("click", () => window.location.hash = "calendar");
+    document.getElementById("nav-btn-expenses")?.addEventListener("click", () => window.location.hash = "expenses");
     document.getElementById("nav-btn-settings").addEventListener("click", () => window.location.hash = "settings");
     
     // Hash routing listeners
@@ -3061,6 +3102,9 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("booking-modal-title").innerText = "Book New Event Project";
         document.getElementById("booking-id").value = "";
         document.getElementById("booking-form").reset();
+        document.getElementById("booking-progress-stage").value = "0";
+        const photosSection = document.getElementById("booking-event-photos-section");
+        if (photosSection) photosSection.style.display = "none";
         document.getElementById("booking-discount").value = localStorage.getItem("settings_default_discount") || 0;
         document.getElementById("booking-tax-rate").value = localStorage.getItem("settings_default_tax_rate") || 18;
         activeCrewAssignments = [];
@@ -3075,6 +3119,9 @@ document.addEventListener("DOMContentLoaded", () => {
             document.getElementById("booking-modal-title").innerText = "Book New Event Project";
             document.getElementById("booking-id").value = "";
             document.getElementById("booking-form").reset();
+            document.getElementById("booking-progress-stage").value = "0";
+            const photosSection = document.getElementById("booking-event-photos-section");
+            if (photosSection) photosSection.style.display = "none";
             document.getElementById("booking-discount").value = localStorage.getItem("settings_default_discount") || 0;
             document.getElementById("booking-tax-rate").value = localStorage.getItem("settings_default_tax_rate") || 18;
             activeCrewAssignments = [];
@@ -3101,6 +3148,7 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("gallery-form").reset();
         document.getElementById("gallery-file-group").style.display = "block";
         document.getElementById("gallery-url-group").style.display = "none";
+        populateGalleryEventSelector("");
         openModal("modal-gallery");
     });
 
@@ -3405,50 +3453,84 @@ async function handleAttendanceSubmit(e) {
 }
 
 // Settings View Controllers
-function loadSettingsData() {
-    document.getElementById("settings-default-tax-rate").value = localStorage.getItem("settings_default_tax_rate") || "18";
-    document.getElementById("settings-default-discount").value = localStorage.getItem("settings_default_discount") || "0";
-    
-    document.getElementById("settings-company-name").value = localStorage.getItem("settings_company_name") || "Bhoomi Decoration";
-    document.getElementById("settings-company-address").value = localStorage.getItem("settings_company_address") || "Mumbai, Maharashtra, India";
-    document.getElementById("settings-company-email").value = localStorage.getItem("settings_company_email") || "hello@bhoomidecoration.com";
-    document.getElementById("settings-company-phone").value = localStorage.getItem("settings_company_phone") || "+91 99999 99999";
-    document.getElementById("settings-company-website").value = localStorage.getItem("settings_company_website") || "www.bhoomidecoration.com";
-    
-    document.getElementById("settings-smtp-host").value = localStorage.getItem("settings_smtp_host") || "smtp.gmail.com";
-    document.getElementById("settings-smtp-port").value = localStorage.getItem("settings_smtp_port") || "587";
-    document.getElementById("settings-smtp-user").value = localStorage.getItem("settings_smtp_user") || "";
-    document.getElementById("settings-smtp-pass").value = localStorage.getItem("settings_smtp_pass") || "";
-    
-    document.getElementById("settings-theme").value = localStorage.getItem("settings_theme") || "crimson_red";
+async function loadSettingsData() {
+    try {
+        const s = await apiFetch("/api/admin/settings");
+        document.getElementById("settings-default-tax-rate").value = s.default_tax_rate ?? 18;
+        document.getElementById("settings-default-discount").value = s.default_discount ?? 0;
+        document.getElementById("settings-company-name").value = s.company_name || "Bhoomi Decoration";
+        document.getElementById("settings-company-address").value = s.company_address || "Mumbai, Maharashtra, India";
+        document.getElementById("settings-company-email").value = s.company_email || "hello@bhoomidecoration.com";
+        document.getElementById("settings-company-phone").value = s.company_phone || "+91 99999 99999";
+        document.getElementById("settings-company-website").value = s.company_website || "www.bhoomidecoration.com";
+        document.getElementById("settings-smtp-host").value = s.smtp_host || "smtp.gmail.com";
+        document.getElementById("settings-smtp-port").value = s.smtp_port || 587;
+        document.getElementById("settings-smtp-user").value = s.smtp_user || "";
+        document.getElementById("settings-smtp-pass").value = s.smtp_pass || "";
+        document.getElementById("settings-email-subject").value = s.email_subject || "Bhoomi Decoration Event Portal & Invoice — {client_name}";
+        document.getElementById("settings-email-body").value = s.email_body || "";
+        const confirmSubj = document.getElementById("settings-confirm-email-subject");
+        const confirmBody = document.getElementById("settings-confirm-email-body");
+        const completedSubj = document.getElementById("settings-completed-email-subject");
+        const completedBody = document.getElementById("settings-completed-email-body");
+        if (confirmSubj) confirmSubj.value = s.confirm_email_subject || "Event Booking Confirmed — Bhoomi Decoration";
+        if (confirmBody) confirmBody.value = s.confirm_email_body || "";
+        if (completedSubj) completedSubj.value = s.completed_email_subject || "Thank You from Bhoomi Decoration!";
+        if (completedBody) completedBody.value = s.completed_email_body || "";
+        document.getElementById("settings-theme").value = s.theme || "crimson_red";
+        applyTheme(s.theme || "crimson_red");
+    } catch (err) {
+        console.error("Failed to load settings from DB:", err);
+        showToast("Could not load settings from database.", "error");
+    }
 }
 
-function handleSettingsSubmit(e) {
+async function handleSettingsSubmit(e) {
     e.preventDefault();
-    
-    localStorage.setItem("settings_default_tax_rate", document.getElementById("settings-default-tax-rate").value);
-    localStorage.setItem("settings_default_discount", document.getElementById("settings-default-discount").value);
-    
-    localStorage.setItem("settings_company_name", document.getElementById("settings-company-name").value);
-    localStorage.setItem("settings_company_address", document.getElementById("settings-company-address").value);
-    localStorage.setItem("settings_company_email", document.getElementById("settings-company-email").value);
-    localStorage.setItem("settings_company_phone", document.getElementById("settings-company-phone").value);
-    localStorage.setItem("settings_company_website", document.getElementById("settings-company-website").value);
-    
-    localStorage.setItem("settings_smtp_host", document.getElementById("settings-smtp-host").value);
-    localStorage.setItem("settings_smtp_port", document.getElementById("settings-smtp-port").value);
-    localStorage.setItem("settings_smtp_user", document.getElementById("settings-smtp-user").value);
-    localStorage.setItem("settings_smtp_pass", document.getElementById("settings-smtp-pass").value);
-    
-    const selectedTheme = document.getElementById("settings-theme").value;
-    localStorage.setItem("settings_theme", selectedTheme);
-    
-    applyTheme();
-    showToast("System settings saved successfully.");
+
+    const payload = {
+        default_tax_rate: parseFloat(document.getElementById("settings-default-tax-rate").value) || 18,
+        default_discount: parseFloat(document.getElementById("settings-default-discount").value) || 0,
+
+        company_name: document.getElementById("settings-company-name").value,
+        company_address: document.getElementById("settings-company-address").value,
+        company_email: document.getElementById("settings-company-email").value,
+        company_phone: document.getElementById("settings-company-phone").value,
+        company_website: document.getElementById("settings-company-website").value,
+
+        smtp_host: document.getElementById("settings-smtp-host").value,
+        smtp_port: parseInt(document.getElementById("settings-smtp-port").value) || 587,
+        smtp_user: document.getElementById("settings-smtp-user").value,
+        smtp_pass: document.getElementById("settings-smtp-pass").value,
+
+        email_subject: document.getElementById("settings-email-subject").value,
+        email_body: document.getElementById("settings-email-body").value,
+
+        confirm_email_subject: document.getElementById("settings-confirm-email-subject").value,
+        confirm_email_body: document.getElementById("settings-confirm-email-body").value,
+
+        completed_email_subject: document.getElementById("settings-completed-email-subject").value,
+        completed_email_body: document.getElementById("settings-completed-email-body").value,
+
+        theme: document.getElementById("settings-theme").value
+    };
+
+    try {
+        await apiFetch("/api/admin/settings", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+        applyTheme(payload.theme);
+        showToast("\u2705 Settings saved to database successfully.");
+    } catch (err) {
+        console.error("Failed to save settings:", err);
+        showToast("Failed to save settings. Please try again.", "error");
+    }
 }
 
-function applyTheme() {
-    const theme = localStorage.getItem("settings_theme") || "crimson_red";
+function applyTheme(theme) {
+    theme = theme || "crimson_red";
     const root = document.documentElement;
     if (theme === "emerald_green") {
         root.style.setProperty("--maroon", "#1F4B43");
@@ -3865,8 +3947,20 @@ async function dispatchEmailInvoice(clientName, portalToken, total, paid, remain
     const smtpPass = localStorage.getItem("settings_smtp_pass") || "";
 
     const portalUrl = `${window.location.origin}/portal/${portalToken}`;
-    const subject = `Bhoomi Decoration Event Portal & Invoice — ${clientName}`;
-    const body = `Hi ${clientName},\n\nThank you for choosing Bhoomi Decoration.\n\nHere is your Bhoomi Decoration Event Portal link to track payments, designs and invoices:\n${portalUrl}\n\nInvoice Details:\n- Invoice Total: ₹${total}\n- Amount Paid: ₹${paid}\n- Remaining Balance: ₹${remaining}\n\nBest regards,\nBhoomi Decoration Team`;
+    const subjectTemplate = localStorage.getItem("settings_email_subject") || "Bhoomi Decoration Event Portal & Invoice — {client_name}";
+    const bodyTemplate = localStorage.getItem("settings_email_body") || "Hi {client_name},\n\nThank you for choosing Bhoomi Decoration.\n\nHere is your Bhoomi Decoration Event Portal link to track payments, designs and invoices:\n{portal_url}\n\nInvoice Details:\n- Invoice Total: ₹{total}\n- Amount Paid: ₹{paid}\n- Remaining Balance: ₹{remaining}\n\nBest regards,\nBhoomi Decoration Team";
+
+    function fillTemplate(text) {
+        return text
+            .replaceAll("{client_name}", clientName)
+            .replaceAll("{portal_url}", portalUrl)
+            .replaceAll("{total}", total)
+            .replaceAll("{paid}", paid)
+            .replaceAll("{remaining}", remaining);
+    }
+
+    const subject = fillTemplate(subjectTemplate);
+    const body = fillTemplate(bodyTemplate);
 
     if (!smtpUser || !smtpPass) {
         showToast("SMTP credentials not configured in settings. Falling back to local mail client...", "warning");
@@ -3949,6 +4043,9 @@ const HASH_VIEW_MAP = {
     "#finance": "finance-view",
     "#invoice": "invoice-view",
     "#testimonials": "testimonials-subview",
+    "#analytics": "analytics-subview",
+    "#calendar": "calendar-subview",
+    "#expenses": "expenses-subview",
     "#settings": "settings-view"
 };
 
@@ -4756,6 +4853,93 @@ async function deleteExpense(expId) {
     } catch (err) { showToast("Error: " + err.message, "error"); }
 }
 window.deleteExpense = deleteExpense;
+
+async function loadBookingEventPhotos(eventId) {
+    const grid = document.getElementById("booking-photos-preview-grid");
+    if (!grid) return;
+    grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); font-size: 0.8rem; padding: 0.5rem;">Loading photos...</div>`;
+    
+    try {
+        const photos = await apiFetch(`/api/gallery?event_id=${eventId}`);
+        if (photos && photos.length > 0) {
+            grid.innerHTML = photos.map(ph => `
+                <div style="position: relative; border-radius: 4px; overflow: hidden; border: 1px solid var(--border-glass); height: 60px;">
+                    <img src="${ph.image_url}" style="width: 100%; height: 100%; object-fit: cover;" alt="${ph.title}">
+                    <button type="button" onclick="deleteBookingEventPhoto('${ph.id}', '${eventId}')" style="position: absolute; top: 2px; right: 2px; background: rgba(220,38,38,0.85); color: white; border: none; border-radius: 50%; width: 16px; height: 16px; font-size: 9px; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1;">✕</button>
+                </div>
+            `).join("");
+        } else {
+            grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); font-size: 0.8rem; padding: 0.5rem; font-style: italic;">No photos in album.</div>`;
+        }
+    } catch (err) {
+        grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--status-danger); font-size: 0.8rem; padding: 0.5rem;">Error loading photos.</div>`;
+    }
+}
+window.loadBookingEventPhotos = loadBookingEventPhotos;
+
+async function uploadBookingEventPhoto() {
+    const eventId = document.getElementById("booking-id").value;
+    if (!eventId) {
+        showToast("Please save the event booking first before uploading photos.", "warning");
+        return;
+    }
+    const fileInput = document.getElementById("booking-photo-file");
+    const file = fileInput.files[0];
+    if (!file) {
+        showToast("Please choose an image file to upload.", "warning");
+        return;
+    }
+    
+    const uploadBtn = document.querySelector("#booking-event-photos-section button");
+    if (uploadBtn) {
+        uploadBtn.disabled = true;
+        uploadBtn.innerText = "Uploading...";
+    }
+    
+    try {
+        const compressedFile = await compressImageLocally(file);
+        const formData = new FormData();
+        formData.append("title", `Photo for Event ${eventId}`);
+        formData.append("category", "Custom");
+        formData.append("description", `Event photo album upload.`);
+        formData.append("event_id", eventId);
+        formData.append("file", compressedFile, file.name);
+        
+        await apiFetch("/api/gallery", {
+            method: "POST",
+            body: formData
+        });
+        showToast("Event photo uploaded successfully.", "success");
+        fileInput.value = ""; // clear input
+        await loadBookingEventPhotos(eventId);
+    } catch (err) {
+        console.error(err);
+        showToast("Failed to upload photo: " + err.message, "error");
+    } finally {
+        if (uploadBtn) {
+            uploadBtn.disabled = false;
+            uploadBtn.innerText = "Upload Photo";
+        }
+    }
+}
+window.uploadBookingEventPhoto = uploadBookingEventPhoto;
+
+async function deleteBookingEventPhoto(photoId, eventId) {
+    showConfirmation(
+        "Delete Photo",
+        "Are you sure you want to remove this photo from the event album?",
+        async () => {
+            try {
+                await apiFetch(`/api/gallery/${photoId}`, { method: "DELETE" });
+                showToast("Photo removed from event album.");
+                await loadBookingEventPhotos(eventId);
+            } catch (err) {
+                showToast("Failed to delete photo.", "error");
+            }
+        }
+    );
+}
+window.deleteBookingEventPhoto = deleteBookingEventPhoto;
 
 
 // Nav hooks for the 3 new admin sections

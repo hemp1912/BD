@@ -27,6 +27,7 @@
     <!-- Print Stylesheet Rules -->
     <style>
         @media print {
+
             /* Hide the main operations dashboard view, backdrops, loading skeletons and toast containers completely */
             #app-view,
             .sidebar-backdrop,
@@ -66,7 +67,7 @@
             }
 
             /* Hide interactive fields, buttons, forms, and headers in the modal during print */
-            .modal-overlay.active .modal-card > *:not(.print-receipt-only) {
+            .modal-overlay.active .modal-card>*:not(.print-receipt-only) {
                 display: none !important;
             }
 
@@ -204,17 +205,17 @@
                     </li>
                     <li>
                         <a class="nav-item" data-target="analytics-subview" id="nav-btn-analytics">
-                            <span>📊 Analytics</span>
+                            <span>Analytics</span>
                         </a>
                     </li>
                     <li>
                         <a class="nav-item" data-target="calendar-subview" id="nav-btn-calendar">
-                            <span>🗓️ Master Calendar</span>
+                            <span>Master Calendar</span>
                         </a>
                     </li>
                     <li>
                         <a class="nav-item" data-target="expenses-subview" id="nav-btn-expenses">
-                            <span>💸 Expense Tracker</span>
+                            <span>Expense Tracker</span>
                         </a>
                     </li>
                     <li>
@@ -489,42 +490,52 @@
             <section id="kanban-subview" class="app-subview" style="display: none;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
                     <div>
-                        <h2 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.8rem;" data-i18n="kanban_title">
+                        <h2 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.8rem;"
+                            data-i18n="kanban_title">
                             Booking Pipeline</h2>
-                        <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: var(--text-secondary);" data-i18n="kanban_subtitle">
+                        <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: var(--text-secondary);"
+                            data-i18n="kanban_subtitle">
                             Drag and drop bookings to transition them across event stages.
                         </p>
                     </div>
                 </div>
 
                 <div class="kanban-board">
-                    <div class="kanban-column" id="kanban-col-Quote" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'Quote')">
+                    <div class="kanban-column" id="kanban-col-Quote" ondragover="allowDrop(event)"
+                        ondrop="handleDrop(event, 'Quote')">
                         <div class="kanban-column-header">
                             <span data-i18n="status_quote">Quote</span>
                             <span class="kanban-card-count" id="count-kanban-Quote">0</span>
                         </div>
-                        <div class="kanban-cards-container" id="cards-kanban-Quote" style="display: flex; flex-direction: column; gap: 0.75rem; min-height: 450px;"></div>
+                        <div class="kanban-cards-container" id="cards-kanban-Quote"
+                            style="display: flex; flex-direction: column; gap: 0.75rem; min-height: 450px;"></div>
                     </div>
-                    <div class="kanban-column" id="kanban-col-Draft" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'Draft')">
+                    <div class="kanban-column" id="kanban-col-Draft" ondragover="allowDrop(event)"
+                        ondrop="handleDrop(event, 'Draft')">
                         <div class="kanban-column-header">
                             <span data-i18n="status_draft">Draft</span>
                             <span class="kanban-card-count" id="count-kanban-Draft">0</span>
                         </div>
-                        <div class="kanban-cards-container" id="cards-kanban-Draft" style="display: flex; flex-direction: column; gap: 0.75rem; min-height: 450px;"></div>
+                        <div class="kanban-cards-container" id="cards-kanban-Draft"
+                            style="display: flex; flex-direction: column; gap: 0.75rem; min-height: 450px;"></div>
                     </div>
-                    <div class="kanban-column" id="kanban-col-Confirmed" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'Confirmed')">
+                    <div class="kanban-column" id="kanban-col-Confirmed" ondragover="allowDrop(event)"
+                        ondrop="handleDrop(event, 'Confirmed')">
                         <div class="kanban-column-header">
                             <span data-i18n="status_confirmed">Confirmed</span>
                             <span class="kanban-card-count" id="count-kanban-Confirmed">0</span>
                         </div>
-                        <div class="kanban-cards-container" id="cards-kanban-Confirmed" style="display: flex; flex-direction: column; gap: 0.75rem; min-height: 450px;"></div>
+                        <div class="kanban-cards-container" id="cards-kanban-Confirmed"
+                            style="display: flex; flex-direction: column; gap: 0.75rem; min-height: 450px;"></div>
                     </div>
-                    <div class="kanban-column" id="kanban-col-Completed" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'Completed')">
+                    <div class="kanban-column" id="kanban-col-Completed" ondragover="allowDrop(event)"
+                        ondrop="handleDrop(event, 'Completed')">
                         <div class="kanban-column-header">
                             <span data-i18n="status_completed">Completed</span>
                             <span class="kanban-card-count" id="count-kanban-Completed">0</span>
                         </div>
-                        <div class="kanban-cards-container" id="cards-kanban-Completed" style="display: flex; flex-direction: column; gap: 0.75rem; min-height: 450px;"></div>
+                        <div class="kanban-cards-container" id="cards-kanban-Completed"
+                            style="display: flex; flex-direction: column; gap: 0.75rem; min-height: 450px;"></div>
                     </div>
                 </div>
             </section>
@@ -533,16 +544,20 @@
             <section id="callbacks-subview" class="app-subview" style="display: none;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
                     <div>
-                        <h2 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.8rem;" data-i18n="callbacks_title">
+                        <h2 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.8rem;"
+                            data-i18n="callbacks_title">
                             Callbacks CRM</h2>
-                        <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: var(--text-secondary);" data-i18n="callbacks_subtitle">
+                        <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: var(--text-secondary);"
+                            data-i18n="callbacks_subtitle">
                             Review and manage callback and lead enquiries.
                         </p>
                     </div>
                 </div>
 
-                <div class="glass-panel" style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-                    <input type="text" id="callbacks-search-input" placeholder="Search enquiries..." class="search-input" style="max-width: 250px; margin-bottom: 0;">
+                <div class="glass-panel"
+                    style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                    <input type="text" id="callbacks-search-input" placeholder="Search enquiries..."
+                        class="search-input" style="max-width: 250px; margin-bottom: 0;">
                 </div>
 
                 <div class="glass-panel">
@@ -746,34 +761,60 @@
                 </div>
 
                 <!-- Finance Hub Interactive SVG Charts -->
-                <div class="glass-panel animate-fade-in" style="margin-bottom: 2rem; display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 2rem;">
+                <div class="glass-panel animate-fade-in"
+                    style="margin-bottom: 2rem; display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 2rem;">
                     <!-- Chart 1: Sales vs Wages Bar Chart -->
                     <div>
-                        <h4 style="font-family: 'Marcellus', serif; color: var(--maroon); margin-bottom: 1.5rem;">Income vs. Wage Outflow Chart</h4>
-                        <div style="width: 100%; height: 180px; display: flex; align-items: flex-end; justify-content: space-around; padding-bottom: 20px; border-bottom: 2px solid var(--border-glass); position: relative;">
-                            <div style="display: flex; flex-direction: column; height: 100%; flex: 1; align-items: stretch; justify-content: flex-end; gap: 10px;">
-                                <div id="chart-bar-sales" style="background: var(--gold); border-radius: 4px 4px 0 0; width: 50px; margin: 0 auto; min-height: 20px; height: 0%; transition: height 0.8s ease; display: flex; align-items: flex-start; justify-content: center; color: #fff; font-size: 0.72rem; font-weight: 600; padding-top: 5px;"></div>
-                                <div style="text-align: center; font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);">Total Sales</div>
+                        <h4 style="font-family: 'Marcellus', serif; color: var(--maroon); margin-bottom: 1.5rem;">Income
+                            vs. Wage Outflow Chart</h4>
+                        <div
+                            style="width: 100%; height: 180px; display: flex; align-items: flex-end; justify-content: space-around; padding-bottom: 20px; border-bottom: 2px solid var(--border-glass); position: relative;">
+                            <div
+                                style="display: flex; flex-direction: column; height: 100%; flex: 1; align-items: stretch; justify-content: flex-end; gap: 10px;">
+                                <div id="chart-bar-sales"
+                                    style="background: var(--gold); border-radius: 4px 4px 0 0; width: 50px; margin: 0 auto; min-height: 20px; height: 0%; transition: height 0.8s ease; display: flex; align-items: flex-start; justify-content: center; color: #fff; font-size: 0.72rem; font-weight: 600; padding-top: 5px;">
+                                </div>
+                                <div
+                                    style="text-align: center; font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);">
+                                    Total Sales</div>
                             </div>
-                            <div style="display: flex; flex-direction: column; height: 100%; flex: 1; align-items: stretch; justify-content: flex-end; gap: 10px;">
-                                <div id="chart-bar-wages" style="background: var(--maroon); border-radius: 4px 4px 0 0; width: 50px; margin: 0 auto; min-height: 20px; height: 0%; transition: height 0.8s ease; display: flex; align-items: flex-start; justify-content: center; color: #fff; font-size: 0.72rem; font-weight: 600; padding-top: 5px;"></div>
-                                <div style="text-align: center; font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);">Crew Wages</div>
+                            <div
+                                style="display: flex; flex-direction: column; height: 100%; flex: 1; align-items: stretch; justify-content: flex-end; gap: 10px;">
+                                <div id="chart-bar-wages"
+                                    style="background: var(--maroon); border-radius: 4px 4px 0 0; width: 50px; margin: 0 auto; min-height: 20px; height: 0%; transition: height 0.8s ease; display: flex; align-items: flex-start; justify-content: center; color: #fff; font-size: 0.72rem; font-weight: 600; padding-top: 5px;">
+                                </div>
+                                <div
+                                    style="text-align: center; font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);">
+                                    Crew Wages</div>
                             </div>
-                            <div style="display: flex; flex-direction: column; height: 100%; flex: 1; align-items: stretch; justify-content: flex-end; gap: 10px;">
-                                <div id="chart-bar-profit" style="background: #10b981; border-radius: 4px 4px 0 0; width: 50px; margin: 0 auto; min-height: 20px; height: 0%; transition: height 0.8s ease; display: flex; align-items: flex-start; justify-content: center; color: #fff; font-size: 0.72rem; font-weight: 600; padding-top: 5px;"></div>
-                                <div style="text-align: center; font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);">Net Profit</div>
+                            <div
+                                style="display: flex; flex-direction: column; height: 100%; flex: 1; align-items: stretch; justify-content: flex-end; gap: 10px;">
+                                <div id="chart-bar-profit"
+                                    style="background: #10b981; border-radius: 4px 4px 0 0; width: 50px; margin: 0 auto; min-height: 20px; height: 0%; transition: height 0.8s ease; display: flex; align-items: flex-start; justify-content: center; color: #fff; font-size: 0.72rem; font-weight: 600; padding-top: 5px;">
+                                </div>
+                                <div
+                                    style="text-align: center; font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);">
+                                    Net Profit</div>
                             </div>
                         </div>
                     </div>
                     <!-- Chart 2: Margin Radial Gauge Chart -->
                     <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                        <h4 style="font-family: 'Marcellus', serif; color: var(--maroon); margin-bottom: 1.5rem; text-align: center;">Net Profit Margin Gauge</h4>
+                        <h4
+                            style="font-family: 'Marcellus', serif; color: var(--maroon); margin-bottom: 1.5rem; text-align: center;">
+                            Net Profit Margin Gauge</h4>
                         <div style="position: relative; width: 140px; height: 140px;">
                             <svg viewBox="0 0 36 36" style="width: 100%; height: 100%; transform: rotate(-90deg);">
-                                <path stroke="#eaeaea" stroke-width="3" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                                <path id="margin-gauge-circle" stroke="#10b981" stroke-width="3" stroke-dasharray="0, 100" stroke-linecap="round" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" style="transition: stroke-dasharray 0.8s ease;" />
+                                <path stroke="#eaeaea" stroke-width="3" fill="none"
+                                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                <path id="margin-gauge-circle" stroke="#10b981" stroke-width="3"
+                                    stroke-dasharray="0, 100" stroke-linecap="round" fill="none"
+                                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                    style="transition: stroke-dasharray 0.8s ease;" />
                             </svg>
-                            <div id="margin-gauge-text" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 700; color: var(--maroon-deep);">0%</div>
+                            <div id="margin-gauge-text"
+                                style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 700; color: var(--maroon-deep);">
+                                0%</div>
                         </div>
                     </div>
                 </div>
@@ -1004,8 +1045,10 @@
             <section id="testimonials-subview" class="app-subview" style="display: none;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
                     <div>
-                        <h2 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.8rem;">Clients Feedback Database</h2>
-                        <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #5a4a3d;">
+                        <h2 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.8rem;">
+                            Clients Feedback Database</h2>
+                        <p
+                            style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #5a4a3d;">
                             Review customer feedback and approve submissions to display on the public website.
                         </p>
                     </div>
@@ -1037,44 +1080,69 @@
             <!-- 📊 Analytics Dashboard                                      -->
             <!-- ═══════════════════════════════════════════════════════════ -->
             <section id="analytics-subview" class="app-subview" style="display: none;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
                     <div>
-                        <h2 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.8rem;">📊 Analytics Dashboard</h2>
-                        <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #5a4a3d;">
+                        <h2 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.8rem;">📊
+                            Analytics Dashboard</h2>
+                        <p
+                            style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #5a4a3d;">
                             Revenue, event performance, and top clients at a glance.
                         </p>
                     </div>
-                    <button class="btn btn-primary" onclick="loadAnalyticsData()" style="gap: 0.5rem;">↻ Refresh</button>
+                    <button class="btn btn-primary" onclick="loadAnalyticsData()" style="gap: 0.5rem;">↻
+                        Refresh</button>
                 </div>
 
                 <!-- KPI Cards Row -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;">
+                <div
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;">
                     <div class="glass-panel" style="text-align: center; padding: 1.5rem 1rem;">
-                        <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gold); margin-bottom: 0.5rem;">Total Revenue</div>
-                        <div id="kpi-total-revenue" style="font-size: 1.8rem; font-weight: 700; color: var(--maroon); font-family: 'Marcellus', serif;">₹0</div>
+                        <div
+                            style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gold); margin-bottom: 0.5rem;">
+                            Total Revenue</div>
+                        <div id="kpi-total-revenue"
+                            style="font-size: 1.8rem; font-weight: 700; color: var(--maroon); font-family: 'Marcellus', serif;">
+                            ₹0</div>
                     </div>
                     <div class="glass-panel" style="text-align: center; padding: 1.5rem 1rem;">
-                        <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gold); margin-bottom: 0.5rem;">Total Events</div>
-                        <div id="kpi-total-events" style="font-size: 1.8rem; font-weight: 700; color: var(--maroon); font-family: 'Marcellus', serif;">0</div>
+                        <div
+                            style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gold); margin-bottom: 0.5rem;">
+                            Total Events</div>
+                        <div id="kpi-total-events"
+                            style="font-size: 1.8rem; font-weight: 700; color: var(--maroon); font-family: 'Marcellus', serif;">
+                            0</div>
                     </div>
                     <div class="glass-panel" style="text-align: center; padding: 1.5rem 1rem;">
-                        <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gold); margin-bottom: 0.5rem;">Completed</div>
-                        <div id="kpi-completed" style="font-size: 1.8rem; font-weight: 700; color: #059669; font-family: 'Marcellus', serif;">0</div>
+                        <div
+                            style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gold); margin-bottom: 0.5rem;">
+                            Completed</div>
+                        <div id="kpi-completed"
+                            style="font-size: 1.8rem; font-weight: 700; color: #059669; font-family: 'Marcellus', serif;">
+                            0</div>
                     </div>
                     <div class="glass-panel" style="text-align: center; padding: 1.5rem 1rem;">
-                        <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gold); margin-bottom: 0.5rem;">Avg per Event</div>
-                        <div id="kpi-avg-event" style="font-size: 1.8rem; font-weight: 700; color: var(--maroon); font-family: 'Marcellus', serif;">₹0</div>
+                        <div
+                            style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gold); margin-bottom: 0.5rem;">
+                            Avg per Event</div>
+                        <div id="kpi-avg-event"
+                            style="font-size: 1.8rem; font-weight: 700; color: var(--maroon); font-family: 'Marcellus', serif;">
+                            ₹0</div>
                     </div>
                 </div>
 
                 <!-- Charts Row -->
                 <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
                     <div class="glass-panel" style="padding: 1.5rem;">
-                        <h3 style="font-family: 'Marcellus', serif; color: var(--maroon); margin-bottom: 1rem; font-size: 1rem;">Monthly Revenue (Last 6 Months)</h3>
+                        <h3
+                            style="font-family: 'Marcellus', serif; color: var(--maroon); margin-bottom: 1rem; font-size: 1rem;">
+                            Monthly Revenue (Last 6 Months)</h3>
                         <canvas id="chart-revenue" height="200"></canvas>
                     </div>
                     <div class="glass-panel" style="padding: 1.5rem;">
-                        <h3 style="font-family: 'Marcellus', serif; color: var(--maroon); margin-bottom: 1rem; font-size: 1rem;">Events by Status</h3>
+                        <h3
+                            style="font-family: 'Marcellus', serif; color: var(--maroon); margin-bottom: 1rem; font-size: 1rem;">
+                            Events by Status</h3>
                         <canvas id="chart-status" height="200"></canvas>
                     </div>
                 </div>
@@ -1082,15 +1150,21 @@
                 <!-- Top Tables Row -->
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
                     <div class="glass-panel" style="padding: 1.5rem;">
-                        <h3 style="font-family: 'Marcellus', serif; color: var(--maroon); margin-bottom: 1rem; font-size: 1rem;">🏆 Top Clients by Revenue</h3>
+                        <h3
+                            style="font-family: 'Marcellus', serif; color: var(--maroon); margin-bottom: 1rem; font-size: 1rem;">
+                            🏆 Top Clients by Revenue</h3>
                         <div id="analytics-top-clients">
-                            <p style="color: var(--text-muted); font-size: 0.9rem; text-align: center; padding: 2rem;">Loading...</p>
+                            <p style="color: var(--text-muted); font-size: 0.9rem; text-align: center; padding: 2rem;">
+                                Loading...</p>
                         </div>
                     </div>
                     <div class="glass-panel" style="padding: 1.5rem;">
-                        <h3 style="font-family: 'Marcellus', serif; color: var(--maroon); margin-bottom: 1rem; font-size: 1rem;">📦 Most Used Items</h3>
+                        <h3
+                            style="font-family: 'Marcellus', serif; color: var(--maroon); margin-bottom: 1rem; font-size: 1rem;">
+                            📦 Most Used Items</h3>
                         <div id="analytics-top-items">
-                            <p style="color: var(--text-muted); font-size: 0.9rem; text-align: center; padding: 2rem;">Loading...</p>
+                            <p style="color: var(--text-muted); font-size: 0.9rem; text-align: center; padding: 2rem;">
+                                Loading...</p>
                         </div>
                     </div>
                 </div>
@@ -1100,40 +1174,60 @@
             <!-- 🗓️ Master Calendar                                         -->
             <!-- ═══════════════════════════════════════════════════════════ -->
             <section id="calendar-subview" class="app-subview" style="display: none;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
                     <div>
-                        <h2 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.8rem;">🗓️ Master Calendar</h2>
-                        <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #5a4a3d;">
-                            View all events on a calendar. Click any date to block or unblock it for public availability.
+                        <h2 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.8rem;">🗓️
+                            Master Calendar</h2>
+                        <p
+                            style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #5a4a3d;">
+                            View all events on a calendar. Click any date to block or unblock it for public
+                            availability.
                         </p>
                     </div>
                 </div>
 
                 <!-- Legend -->
                 <div style="display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; align-items: center;">
-                    <span style="display: flex; align-items: center; gap: 6px; font-size: 0.82rem;"><span style="width: 14px; height: 14px; border-radius: 3px; background: #059669; display: inline-block;"></span> Confirmed/Completed</span>
-                    <span style="display: flex; align-items: center; gap: 6px; font-size: 0.82rem;"><span style="width: 14px; height: 14px; border-radius: 3px; background: #f59e0b; display: inline-block;"></span> Draft/Quote</span>
-                    <span style="display: flex; align-items: center; gap: 6px; font-size: 0.82rem;"><span style="width: 14px; height: 14px; border-radius: 3px; background: #ef4444; display: inline-block;"></span> Manually Blocked</span>
-                    <span style="display: flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--text-muted);">Click a date to toggle admin block</span>
+                    <span style="display: flex; align-items: center; gap: 6px; font-size: 0.82rem;"><span
+                            style="width: 14px; height: 14px; border-radius: 3px; background: #059669; display: inline-block;"></span>
+                        Confirmed/Completed</span>
+                    <span style="display: flex; align-items: center; gap: 6px; font-size: 0.82rem;"><span
+                            style="width: 14px; height: 14px; border-radius: 3px; background: #f59e0b; display: inline-block;"></span>
+                        Draft/Quote</span>
+                    <span style="display: flex; align-items: center; gap: 6px; font-size: 0.82rem;"><span
+                            style="width: 14px; height: 14px; border-radius: 3px; background: #ef4444; display: inline-block;"></span>
+                        Manually Blocked</span>
+                    <span
+                        style="display: flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--text-muted);">Click
+                        a date to toggle admin block</span>
                 </div>
 
                 <!-- Calendar Navigation -->
-                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; justify-content: center;">
-                    <button class="btn btn-ghost" onclick="calendarNavMonth(-1)" style="padding: 0.4rem 0.9rem;">◀</button>
-                    <h3 id="calendar-month-label" style="font-family: 'Marcellus', serif; color: var(--maroon); font-size: 1.3rem; min-width: 180px; text-align: center;">—</h3>
-                    <button class="btn btn-ghost" onclick="calendarNavMonth(1)" style="padding: 0.4rem 0.9rem;">▶</button>
+                <div
+                    style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; justify-content: center;">
+                    <button class="btn btn-ghost" onclick="calendarNavMonth(-1)"
+                        style="padding: 0.4rem 0.9rem;">◀</button>
+                    <h3 id="calendar-month-label"
+                        style="font-family: 'Marcellus', serif; color: var(--maroon); font-size: 1.3rem; min-width: 180px; text-align: center;">
+                        —</h3>
+                    <button class="btn btn-ghost" onclick="calendarNavMonth(1)"
+                        style="padding: 0.4rem 0.9rem;">▶</button>
                 </div>
 
                 <!-- Calendar Grid -->
                 <div class="glass-panel" style="padding: 1.5rem; overflow-x: auto;">
-                    <div id="calendar-grid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; min-width: 560px;">
+                    <div id="calendar-grid"
+                        style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; min-width: 560px;">
                         <!-- Populated by JS -->
                     </div>
                 </div>
 
                 <!-- Blocked Dates Manager -->
                 <div class="glass-panel" style="padding: 1.5rem; margin-top: 1.5rem;">
-                    <h3 style="font-family: 'Marcellus', serif; color: var(--maroon); margin-bottom: 1rem; font-size: 1rem;">🔒 Admin Blocked Dates</h3>
+                    <h3
+                        style="font-family: 'Marcellus', serif; color: var(--maroon); margin-bottom: 1rem; font-size: 1rem;">
+                        🔒 Admin Blocked Dates</h3>
                     <div id="admin-blocked-dates-list">
                         <p style="color: var(--text-muted); font-size: 0.9rem;">No manual blocks set.</p>
                     </div>
@@ -1144,10 +1238,13 @@
             <!-- 💸 Expense Tracker                                          -->
             <!-- ═══════════════════════════════════════════════════════════ -->
             <section id="expenses-subview" class="app-subview" style="display: none;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
                     <div>
-                        <h2 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.8rem;">💸 Expense Tracker</h2>
-                        <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #5a4a3d;">
+                        <h2 style="font-family: 'Marcellus', serif; color: var(--maroon-deep); font-size: 1.8rem;">💸
+                            Expense Tracker</h2>
+                        <p
+                            style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: #5a4a3d;">
                             Log expenses per event and track your actual net profit.
                         </p>
                     </div>
@@ -1156,7 +1253,9 @@
                 <!-- Event Selector + Profit Summary -->
                 <div class="glass-panel" style="padding: 1.5rem; margin-bottom: 1.5rem;">
                     <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
-                        <label style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; color: var(--maroon);">Select Event</label>
+                        <label
+                            style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; color: var(--maroon);">Select
+                            Event</label>
                         <select id="expense-event-selector" onchange="loadExpensesForEvent()"
                             style="flex: 1; padding: 0.5rem 0.75rem; border-radius: 4px; border: 1px solid var(--border-glass); font-family: inherit; font-size: 0.9rem; min-width: 220px; background: white;">
                             <option value="">— Choose an event —</option>
@@ -1164,37 +1263,59 @@
                     </div>
 
                     <!-- Profit Summary Cards -->
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;" id="profit-summary" style="display: none;">
-                        <div style="background: rgba(107,22,35,0.06); border-radius: 8px; padding: 1rem; text-align: center;">
-                            <div style="font-size: 0.72rem; text-transform: uppercase; color: var(--gold); margin-bottom: 4px;">Invoice Total</div>
-                            <div id="ps-invoice" style="font-size: 1.4rem; font-weight: 700; color: var(--maroon);">₹0</div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;"
+                        id="profit-summary" style="display: none;">
+                        <div
+                            style="background: rgba(107,22,35,0.06); border-radius: 8px; padding: 1rem; text-align: center;">
+                            <div
+                                style="font-size: 0.72rem; text-transform: uppercase; color: var(--gold); margin-bottom: 4px;">
+                                Invoice Total</div>
+                            <div id="ps-invoice" style="font-size: 1.4rem; font-weight: 700; color: var(--maroon);">₹0
+                            </div>
                         </div>
-                        <div style="background: rgba(239,68,68,0.06); border-radius: 8px; padding: 1rem; text-align: center;">
-                            <div style="font-size: 0.72rem; text-transform: uppercase; color: #ef4444; margin-bottom: 4px;">Total Expenses</div>
+                        <div
+                            style="background: rgba(239,68,68,0.06); border-radius: 8px; padding: 1rem; text-align: center;">
+                            <div
+                                style="font-size: 0.72rem; text-transform: uppercase; color: #ef4444; margin-bottom: 4px;">
+                                Total Expenses</div>
                             <div id="ps-expenses" style="font-size: 1.4rem; font-weight: 700; color: #ef4444;">₹0</div>
                         </div>
-                        <div style="background: rgba(5,150,105,0.06); border-radius: 8px; padding: 1rem; text-align: center;">
-                            <div style="font-size: 0.72rem; text-transform: uppercase; color: #059669; margin-bottom: 4px;">Net Profit</div>
+                        <div
+                            style="background: rgba(5,150,105,0.06); border-radius: 8px; padding: 1rem; text-align: center;">
+                            <div
+                                style="font-size: 0.72rem; text-transform: uppercase; color: #059669; margin-bottom: 4px;">
+                                Net Profit</div>
                             <div id="ps-profit" style="font-size: 1.4rem; font-weight: 700; color: #059669;">₹0</div>
                         </div>
-                        <div style="background: rgba(5,150,105,0.06); border-radius: 8px; padding: 1rem; text-align: center;">
-                            <div style="font-size: 0.72rem; text-transform: uppercase; color: #059669; margin-bottom: 4px;">Margin</div>
+                        <div
+                            style="background: rgba(5,150,105,0.06); border-radius: 8px; padding: 1rem; text-align: center;">
+                            <div
+                                style="font-size: 0.72rem; text-transform: uppercase; color: #059669; margin-bottom: 4px;">
+                                Margin</div>
                             <div id="ps-margin" style="font-size: 1.4rem; font-weight: 700; color: #059669;">—</div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Add Expense Form -->
-                <div class="glass-panel" style="padding: 1.5rem; margin-bottom: 1.5rem;" id="add-expense-panel" style="display: none;">
-                    <h3 style="font-family: 'Marcellus', serif; color: var(--maroon); margin-bottom: 1rem; font-size: 1rem;">+ Add Expense</h3>
-                    <form id="add-expense-form" onsubmit="submitAddExpense(event)" style="display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 0.75rem; align-items: end; flex-wrap: wrap;">
+                <div class="glass-panel" style="padding: 1.5rem; margin-bottom: 1.5rem;" id="add-expense-panel"
+                    style="display: none;">
+                    <h3
+                        style="font-family: 'Marcellus', serif; color: var(--maroon); margin-bottom: 1rem; font-size: 1rem;">
+                        + Add Expense</h3>
+                    <form id="add-expense-form" onsubmit="submitAddExpense(event)"
+                        style="display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 0.75rem; align-items: end; flex-wrap: wrap;">
                         <div>
-                            <label style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--maroon); display: block; margin-bottom: 4px;">Description</label>
-                            <input type="text" id="exp-description" required placeholder="e.g., Fresh marigold flowers" style="width: 100%; padding: 0.5rem 0.75rem; border-radius: 4px; border: 1px solid var(--border-glass); font-family: inherit;">
+                            <label
+                                style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--maroon); display: block; margin-bottom: 4px;">Description</label>
+                            <input type="text" id="exp-description" required placeholder="e.g., Fresh marigold flowers"
+                                style="width: 100%; padding: 0.5rem 0.75rem; border-radius: 4px; border: 1px solid var(--border-glass); font-family: inherit;">
                         </div>
                         <div>
-                            <label style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--maroon); display: block; margin-bottom: 4px;">Category</label>
-                            <select id="exp-category" style="width: 100%; padding: 0.5rem 0.75rem; border-radius: 4px; border: 1px solid var(--border-glass); font-family: inherit; background: white;">
+                            <label
+                                style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--maroon); display: block; margin-bottom: 4px;">Category</label>
+                            <select id="exp-category"
+                                style="width: 100%; padding: 0.5rem 0.75rem; border-radius: 4px; border: 1px solid var(--border-glass); font-family: inherit; background: white;">
                                 <option value="Flowers">🌸 Flowers</option>
                                 <option value="Transport">🚛 Transport</option>
                                 <option value="Labor">👷 Labor</option>
@@ -1203,16 +1324,22 @@
                             </select>
                         </div>
                         <div>
-                            <label style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--maroon); display: block; margin-bottom: 4px;">Amount (₹)</label>
-                            <input type="number" id="exp-amount" required min="1" step="0.01" placeholder="0.00" style="width: 100%; padding: 0.5rem 0.75rem; border-radius: 4px; border: 1px solid var(--border-glass); font-family: inherit;">
+                            <label
+                                style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--maroon); display: block; margin-bottom: 4px;">Amount
+                                (₹)</label>
+                            <input type="number" id="exp-amount" required min="1" step="0.01" placeholder="0.00"
+                                style="width: 100%; padding: 0.5rem 0.75rem; border-radius: 4px; border: 1px solid var(--border-glass); font-family: inherit;">
                         </div>
-                        <button type="submit" class="btn btn-primary" style="white-space: nowrap; padding: 0.5rem 1.25rem;">Add</button>
+                        <button type="submit" class="btn btn-primary"
+                            style="white-space: nowrap; padding: 0.5rem 1.25rem;">Add</button>
                     </form>
                 </div>
 
                 <!-- Expenses Table -->
                 <div class="glass-panel" style="padding: 1.5rem;">
-                    <h3 style="font-family: 'Marcellus', serif; color: var(--maroon); margin-bottom: 1rem; font-size: 1rem;">Expense Ledger</h3>
+                    <h3
+                        style="font-family: 'Marcellus', serif; color: var(--maroon); margin-bottom: 1rem; font-size: 1rem;">
+                        Expense Ledger</h3>
                     <div class="table-wrapper">
                         <table>
                             <thead>
@@ -1225,7 +1352,10 @@
                                 </tr>
                             </thead>
                             <tbody id="expenses-table-body">
-                                <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Select an event above to see its expenses.</td></tr>
+                                <tr>
+                                    <td colspan="5" style="text-align: center; color: var(--text-muted);">Select an
+                                        event above to see its expenses.</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -1293,7 +1423,8 @@
                             <input type="text" id="settings-company-website" placeholder="www.bhoomidecoration.com">
                         </div>
 
-                        <h3 style="font-family: 'Marcellus', serif; color: var(--maroon); margin-bottom: 1rem;">Outgoing SMTP Email Server (For Invoice Dispatch)</h3>
+                        <h3 style="font-family: 'Marcellus', serif; color: var(--maroon); margin-bottom: 1rem;">Outgoing
+                            SMTP Email Server (For Invoice Dispatch)</h3>
                         <div class="row2" style="margin-bottom: 1rem;">
                             <div class="field">
                                 <label for="settings-smtp-host">SMTP Host</label>
@@ -1313,6 +1444,39 @@
                                 <label for="settings-smtp-pass">SMTP Password / App Secret</label>
                                 <input type="password" id="settings-smtp-pass" placeholder="••••••••••••••••">
                             </div>
+                        </div>
+
+                        <h3 style="font-family: 'Marcellus', serif; color: var(--maroon); margin-bottom: 1rem;">1. Initial Portal Dispatch Email</h3>
+                        <div class="field" style="margin-bottom: 1rem;">
+                            <label for="settings-email-subject">Subject Template</label>
+                            <input type="text" id="settings-email-subject" placeholder="Bhoomi Decoration Event Portal & Invoice — {client_name}">
+                        </div>
+                        <div class="field" style="margin-bottom: 1.5rem;">
+                            <label for="settings-email-body">Body Template</label>
+                            <textarea id="settings-email-body" rows="4" placeholder="Hi {client_name},..." style="width: 100%; padding: 0.5rem 0.75rem; border-radius: 4px; border: 1px solid var(--border-glass); font-family: inherit; font-size: 0.9rem; resize: vertical; box-sizing: border-box;"></textarea>
+                            <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">Placeholders: <code>{client_name}</code>, <code>{portal_url}</code>, <code>{total}</code>, <code>{paid}</code>, <code>{remaining}</code></p>
+                        </div>
+
+                        <h3 style="font-family: 'Marcellus', serif; color: var(--maroon); margin-bottom: 1rem;">2. Booking Confirmation Email</h3>
+                        <div class="field" style="margin-bottom: 1rem;">
+                            <label for="settings-confirm-email-subject">Subject Template</label>
+                            <input type="text" id="settings-confirm-email-subject" placeholder="Event Booking Confirmed — Bhoomi Decoration">
+                        </div>
+                        <div class="field" style="margin-bottom: 1.5rem;">
+                            <label for="settings-confirm-email-body">Body Template</label>
+                            <textarea id="settings-confirm-email-body" rows="4" placeholder="Dear {client_name},..." style="width: 100%; padding: 0.5rem 0.75rem; border-radius: 4px; border: 1px solid var(--border-glass); font-family: inherit; font-size: 0.9rem; resize: vertical; box-sizing: border-box;"></textarea>
+                            <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">Placeholders: <code>{client_name}</code>, <code>{portal_url}</code>, <code>{event_id}</code>, <code>{venue_address}</code>, <code>{start_date}</code>, <code>{end_date}</code></p>
+                        </div>
+
+                        <h3 style="font-family: 'Marcellus', serif; color: var(--maroon); margin-bottom: 1rem;">3. Event Completed (Thank You) Email</h3>
+                        <div class="field" style="margin-bottom: 1rem;">
+                            <label for="settings-completed-email-subject">Subject Template</label>
+                            <input type="text" id="settings-completed-email-subject" placeholder="Thank You from Bhoomi Decoration!">
+                        </div>
+                        <div class="field" style="margin-bottom: 1.5rem;">
+                            <label for="settings-completed-email-body">Body Template</label>
+                            <textarea id="settings-completed-email-body" rows="4" placeholder="Dear {client_name},..." style="width: 100%; padding: 0.5rem 0.75rem; border-radius: 4px; border: 1px solid var(--border-glass); font-family: inherit; font-size: 0.9rem; resize: vertical; box-sizing: border-box;"></textarea>
+                            <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">Placeholders: <code>{client_name}</code>, <code>{portal_url}</code>, <code>{total}</code></p>
                         </div>
 
                         <h3 style="font-family: 'Marcellus', serif; color: var(--maroon); margin-bottom: 1rem;"
@@ -1417,7 +1581,7 @@
                     </div>
                 </div>
 
-                <div class="row2">
+                <div class="row3">
                     <div class="form-group">
                         <label for="booking-discount">Discount (₹)</label>
                         <input type="number" id="booking-discount" min="0" value="0" step="1">
@@ -1426,11 +1590,32 @@
                         <label for="booking-tax-rate">Tax Rate (%)</label>
                         <input type="number" id="booking-tax-rate" min="0" value="0" step="0.1">
                     </div>
+                    <div class="form-group">
+                        <label for="booking-progress-stage">Progress Stage</label>
+                        <select id="booking-progress-stage">
+                            <option value="0">Booking Confirmed</option>
+                            <option value="1">Design Approved</option>
+                            <option value="2">Materials Sourced</option>
+                            <option value="3">Setup Day</option>
+                            <option value="4">Event Completed</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="form-group">
                     <label for="booking-notes">Special Setup Notes</label>
                     <textarea id="booking-notes" rows="2" placeholder="Configure lighting to warm yellow..."></textarea>
+                </div>
+
+                <div class="form-group" id="booking-event-photos-section" style="display: none; border-top: 1px solid var(--border-glass); padding-top: 1.25rem; margin-top: 1.25rem;">
+                    <label style="font-weight: 600; color: var(--maroon); margin-bottom: 0.5rem; display: block;">📸 Event Photo Album</label>
+                    <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 1rem;">
+                        <input type="file" id="booking-photo-file" accept="image/*" style="flex: 1; font-size: 0.85rem; padding: 0.25rem;">
+                        <button type="button" class="btn btn-secondary" onclick="uploadBookingEventPhoto()" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; white-space: nowrap;">Upload Photo</button>
+                    </div>
+                    <div id="booking-photos-preview-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 0.5rem; max-height: 150px; overflow-y: auto; padding: 0.25rem; border: 1px solid var(--border-glass); border-radius: 4px; background: rgba(255,255,255,0.02);">
+                        <!-- Dynamic event photos -->
+                    </div>
                 </div>
 
                 <div class="form-group"
@@ -1944,6 +2129,12 @@
                     <textarea id="gallery-desc" rows="2"
                         placeholder="Brief description of the decoration..."></textarea>
                 </div>
+                <div class="form-group">
+                    <label for="gallery-event-id">Tag to Event (Optional)</label>
+                    <select id="gallery-event-id">
+                        <option value="">— Not associated with any event —</option>
+                    </select>
+                </div>
                 <div class="form-group" id="gallery-file-group">
                     <label for="gallery-file">Select Showcase Image</label>
                     <input type="file" id="gallery-file" accept="image/*">
@@ -2051,22 +2242,26 @@
             </div>
             <div style="margin-bottom: 1rem;">
                 <label>Item Name:</label>
-                <span id="availability-item-name" style="font-weight: 600; font-size: 1.1rem; margin-left: 0.5rem;">-</span>
+                <span id="availability-item-name"
+                    style="font-weight: 600; font-size: 1.1rem; margin-left: 0.5rem;">-</span>
             </div>
-            
+
             <div class="availability-calendar-container">
                 <div class="availability-calendar-header">
-                    <button type="button" class="btn btn-secondary" style="padding: 0.25rem 0.5rem;" onclick="changeCalendarMonth(-1)">←</button>
+                    <button type="button" class="btn btn-secondary" style="padding: 0.25rem 0.5rem;"
+                        onclick="changeCalendarMonth(-1)">←</button>
                     <span id="calendar-month-year" style="font-weight: 600;">June 2026</span>
-                    <button type="button" class="btn-secondary" style="padding: 0.25rem 0.5rem;" onclick="changeCalendarMonth(1)">→</button>
+                    <button type="button" class="btn-secondary" style="padding: 0.25rem 0.5rem;"
+                        onclick="changeCalendarMonth(1)">→</button>
                 </div>
                 <div class="availability-calendar-grid" id="availability-calendar-grid">
                     <!-- Loaded dynamically via JS -->
                 </div>
             </div>
-            
+
             <div style="margin-top: 1.5rem; display: flex; justify-content: flex-end;">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('modal-item-availability')">Close</button>
+                <button type="button" class="btn btn-secondary"
+                    onclick="closeModal('modal-item-availability')">Close</button>
             </div>
         </div>
     </div>
@@ -2079,11 +2274,11 @@
                 <button class="btn btn-secondary" onclick="closeModal('modal-payroll-release')"
                     style="padding: 0.25rem 0.5rem; border-radius: 4px;">✕</button>
             </div>
-            
+
             <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.5rem;">
                 Summarizes active wages, days worked, and payouts due for all team members.
             </p>
-            
+
             <div class="table-wrapper" style="margin-bottom: 1.5rem; max-height: 350px; overflow-y: auto;">
                 <table>
                     <thead>
@@ -2103,7 +2298,8 @@
 
             <!-- Print Payroll Summary block -->
             <div id="print-payroll-section" class="print-receipt-only">
-                <div style="text-align: center; border-bottom: 2px solid #000000; padding-bottom: 1rem; margin-bottom: 1rem;">
+                <div
+                    style="text-align: center; border-bottom: 2px solid #000000; padding-bottom: 1rem; margin-bottom: 1rem;">
                     <h2>BHOOMI DECORATION - PAYROLL SUMMARY</h2>
                     <p>Mumbai, Maharashtra, India</p>
                 </div>
@@ -2119,11 +2315,12 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="form-group"
                 style="flex-direction: row; justify-content: space-between; align-items: center; margin-top: 1.5rem;">
                 <button type="button" class="btn btn-secondary" id="btn-export-payroll-pdf">Export Payroll PDF</button>
-                <button type="button" class="btn btn-secondary" onclick="closeModal('modal-payroll-release')">Close</button>
+                <button type="button" class="btn btn-secondary"
+                    onclick="closeModal('modal-payroll-release')">Close</button>
             </div>
         </div>
     </div>

@@ -18,16 +18,26 @@ class GalleryUpdateSchema(BaseModel):
     category: str
     description: Optional[str] = ""
     image_url: str
+    event_id: Optional[str] = ""
 
 @router.get("/gallery")
 async def get_gallery(
     page: Optional[int] = None,
     limit: int = 10,
-    search: Optional[str] = None
+    search: Optional[str] = None,
+    event_id: Optional[str] = None
 ):
     if page is not None:
-        return await db_client.get_gallery(page=page, limit=limit, search=search)
-    return await db_client.get_gallery()
+        res = await db_client.get_gallery(page=page, limit=limit, search=search)
+        if event_id:
+            res["items"] = [item for item in res["items"] if item.get("event_id") == event_id]
+            res["total"] = len(res["items"])
+        return res
+    
+    res = await db_client.get_gallery()
+    if event_id:
+        res = [item for item in res if item.get("event_id") == event_id]
+    return res
 
 @router.post("/gallery")
 async def create_gallery_item(
@@ -35,6 +45,7 @@ async def create_gallery_item(
     title: str = Form(...),
     category: str = Form(...),
     description: str = Form(""),
+    event_id: str = Form(""),
     file: UploadFile = File(...)
 ):
     await require_admin(request)
@@ -67,7 +78,8 @@ async def create_gallery_item(
         "title": title.strip(),
         "category": category.strip(),
         "description": description.strip(),
-        "image_url": image_url
+        "image_url": image_url,
+        "event_id": event_id.strip()
     }
     return await db_client.create_gallery_item(item_data)
 
