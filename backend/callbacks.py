@@ -15,8 +15,10 @@ class CallbackSchema(BaseModel):
     name: str
     phone: str
     date: Optional[str] = ""
+    event_date: Optional[str] = ""
     venue: Optional[str] = ""
     service: Optional[str] = ""
+    budget: Optional[str] = ""
     message: Optional[str] = ""
 
 class CallbackUpdateSchema(BaseModel):
@@ -108,29 +110,53 @@ async def send_whatsapp_confirmation(to_phone: str, client_name: str, event_date
 @router.post("")
 async def create_callback(callback: CallbackSchema):
     callback_data = callback.model_dump()
-    created = await db_client.create_callback(callback_data)
+    
+    # Map event_date -> date if event_date is provided and date is empty
+    if not callback_data.get("date") and callback_data.get("event_date"):
+        callback_data["date"] = callback_data["event_date"]
+        
+    # Append budget to message if provided
+    if callback_data.get("budget"):
+        budget_str = f"[Budget: {callback_data['budget']}]"
+        if callback_data.get("message"):
+            callback_data["message"] = f"{budget_str} {callback_data['message']}"
+        else:
+            callback_data["message"] = budget_str
+            
+    # Clean model output to match Appwrite attributes
+    db_payload = {
+        "name": callback_data.get("name"),
+        "phone": callback_data.get("phone"),
+        "date": callback_data.get("date", ""),
+        "venue": callback_data.get("venue", ""),
+        "service": callback_data.get("service", ""),
+        "message": callback_data.get("message", ""),
+        "status": callback_data.get("status", "Pending")
+    }
+    
+    created = await db_client.create_callback(db_payload)
     
     # 1. Dispatch Telegram message notification
     await send_telegram_notification(
-        name=callback.name,
-        phone=callback.phone,
-        date=callback.date,
-        venue=callback.venue,
-        service=callback.service,
-        message=callback.message
+        name=db_payload["name"],
+        phone=db_payload["phone"],
+        date=db_payload["date"],
+        venue=db_payload["venue"],
+        service=db_payload["service"],
+        message=db_payload["message"]
     )
     
     # 2. Dispatch WhatsApp acknowledgement confirmation
     await send_whatsapp_confirmation(
-        to_phone=callback.phone,
-        client_name=callback.name,
-        event_date=callback.date,
-        service=callback.service
+        to_phone=db_payload["phone"],
+        client_name=db_payload["name"],
+        event_date=db_payload["date"],
+        service=db_payload["service"]
     )
     
     # 3. Generate WhatsApp deep link for the client redirection on frontend
     business_number = "919876543210" # Default WhatsApp support line
-    whatsapp_text = f"Hi Bhoomi Decoration, I submitted an enquiry for {callback.date or 'my event'} at {callback.venue or 'my venue'}."
+    whatsapp_text = f"Hi Bhoomi Decoration, I submitted an enquiry for {db_payload['date'] or 'my event'} at {db_payload['venue'] or 'my venue'}."
     encoded_text = urllib.parse.quote(whatsapp_text)
     wa_link = f"https://wa.me/{business_number}?text={encoded_text}"
     

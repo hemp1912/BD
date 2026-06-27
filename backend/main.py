@@ -1,16 +1,17 @@
 import os
+from pydantic import BaseModel
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse, FileResponse, RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
-from backend import auth, inventory, finance, alerts, gallery, crew, callbacks
+from backend import auth, inventory, finance, alerts, gallery, crew, callbacks, testimonials, expenses
 
 app = FastAPI(
     title="Event Decoration & Logistics Management API",
     version="1.5",
     description="Backend services for tracking warehouse stocks, event crew scheduling, and client invoices.",
-    docs_url=None,
-    redoc_url=None,
-    openapi_url=None
+    # docs_url=None,
+    # redoc_url=None,
+    # openapi_url=None
 )
 
 # Enable CORS for development
@@ -30,6 +31,8 @@ app.include_router(alerts.router)
 app.include_router(gallery.router)
 app.include_router(crew.router)
 app.include_router(callbacks.router)
+app.include_router(testimonials.router)
+app.include_router(expenses.router)
 
 
 # Define file paths
@@ -71,6 +74,26 @@ async def get_admin_js():
 @app.get("/crew.js")
 async def get_crew_js():
     return FileResponse(os.path.join(FRONTEND_DIR, "crew.js"))
+
+@app.get("/robots.txt")
+async def get_robots():
+    content = "User-agent: *\nAllow: /\n\nSitemap: https://www.bhoomidecoration.com/sitemap.xml\n"
+    from fastapi.responses import Response
+    return Response(content=content, media_type="text/plain")
+
+@app.get("/sitemap.xml")
+async def get_sitemap():
+    content = """<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://www.bhoomidecoration.com/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>"""
+    from fastapi.responses import Response
+    return Response(content=content, media_type="application/xml")
 
 # Direct uploads access path
 @app.get("/static/uploads/{filename}")
@@ -245,8 +268,227 @@ async def get_portal_data(token: str):
         "discount": target_event.get("discount", 0.0),
         "payment_history": target_event.get("payment_history", "[]"),
         "resolved_items": resolved_items,
-        "rental_days": days
+        "rental_days": days,
+        "progress_stage": int(target_event.get("progress_stage") or 0),
     }
     
     return public_event
+
+@app.get("/api/availability")
+async def get_availability():
+    from datetime import datetime, timedelta
+    from backend.db_client import db_client
+    
+    events = await db_client.get_events()
+    booked_dates = set()
+    
+    for event in events:
+        status = event.get("status")
+        if status in ("Confirmed", "Completed"):
+            start_str = event.get("start_date", "")
+            end_str = event.get("end_date", "")
+            if start_str and end_str:
+                try:
+                    start_date = datetime.strptime(start_str, "%Y-%m-%d").date()
+                    end_date = datetime.strptime(end_str, "%Y-%m-%d").date()
+                    curr = start_date
+                    while curr <= end_date:
+                        booked_dates.add(curr.strftime("%Y-%m-%d"))
+                        curr += timedelta(days=1)
+                except Exception as e:
+                    print(f"[!] Error parsing event dates: {e}")
+
+    # Also include admin manual overrides
+    try:
+        overrides = await db_client.get_availability_overrides()
+        for ov in overrides:
+            if ov.get("blocked", True):
+                booked_dates.add(ov.get("date", ""))
+            else:
+                booked_dates.discard(ov.get("date", ""))
+    except Exception as e:
+        print(f"[!] Error loading availability overrides: {e}")
+                    
+    return {"booked_dates": sorted(list(booked_dates))}
+
+
+# ─── Admin Analytics Endpoint ─────────────────────────────────────────────────
+@app.get("/api/admin/analytics")
+async def get_admin_analytics(request: Request):
+    from backend.auth import require_admin
+    from backend.db_client import db_client
+    from datetime import datetime
+    import json
+    await require_admin(request)
+
+    events = await db_client.get_events()
+    inventory_items = await db_client.get_inventory()
+    inv_map = {item.get("id"): item for item in inventory_items if item.get("id")}
+
+    # Monthly revenue (last 6 months)
+    now = datetime.now()
+    monthly_revenue = {}
+    for i in range(5, -1, -1):
+        from datetime import date as dt_date
+        import calendar
+        m = (now.month - i - 1) % 12 + 1
+        y = now.year if (now.month - i) > 0 else now.year - 1
+        label = datetime(y, m, 1).strftime("%b %Y")
+        monthly_revenue[label] = 0.0
+
+    # Status counts
+    status_counts = {"Draft": 0, "Quote": 0, "Confirmed": 0, "Completed": 0}
+
+    # Item usage counts
+    item_usage = {}
+
+    # Client revenue
+    client_revenue = {}
+
+    total_revenue = 0.0
+    completed_count = 0
+
+    for event in events:
+        status = event.get("status", "Draft")
+        if status in status_counts:
+            status_counts[status] += 1
+
+        invoice = float(event.get("total_invoice_amount") or 0)
+        total_revenue += invoice
+        if status == "Completed":
+            completed_count += 1
+
+        # Monthly revenue from start_date
+        start_str = event.get("start_date", "")
+        if start_str and invoice > 0:
+            try:
+                ev_date = datetime.strptime(start_str, "%Y-%m-%d")
+                label = ev_date.strftime("%b %Y")
+                if label in monthly_revenue:
+                    monthly_revenue[label] += invoice
+            except Exception:
+                pass
+
+        # Client revenue
+        cname = event.get("client_name", "Unknown")
+        client_revenue[cname] = client_revenue.get(cname, 0.0) + invoice
+
+        # Item usage
+        try:
+            items_booked = json.loads(event.get("items_booked", "{}"))
+            for item_id, qty in items_booked.items():
+                item_name = inv_map.get(item_id, {}).get("name", item_id)
+                item_usage[item_name] = item_usage.get(item_name, 0) + int(qty)
+        except Exception:
+            pass
+
+    # Top 5 clients by revenue
+    top_clients = sorted(client_revenue.items(), key=lambda x: x[1], reverse=True)[:5]
+    # Top 5 items by usage
+    top_items = sorted(item_usage.items(), key=lambda x: x[1], reverse=True)[:5]
+
+    avg_per_event = round(total_revenue / len(events), 2) if events else 0.0
+
+    return {
+        "total_revenue": round(total_revenue, 2),
+        "total_events": len(events),
+        "completed_events": completed_count,
+        "avg_per_event": avg_per_event,
+        "monthly_revenue": monthly_revenue,
+        "status_counts": status_counts,
+        "top_clients": [{ "name": n, "revenue": round(r, 2) } for n, r in top_clients],
+        "top_items": [{ "name": n, "usage": u } for n, u in top_items],
+    }
+
+
+# ─── Admin Availability Overrides ─────────────────────────────────────────────
+@app.get("/api/admin/availability-overrides")
+async def list_availability_overrides(request: Request):
+    from backend.auth import require_admin
+    from backend.db_client import db_client
+    await require_admin(request)
+    return await db_client.get_availability_overrides()
+
+
+class AvailabilityOverrideSchema(BaseModel):
+    date: str
+    reason: str = ""
+    blocked: bool = True
+
+
+@app.post("/api/admin/availability-overrides")
+async def create_availability_override(payload: AvailabilityOverrideSchema, request: Request):
+    from backend.auth import require_admin
+    from backend.db_client import db_client
+    await require_admin(request)
+    data = payload.model_dump()
+    result = await db_client.create_availability_override(data)
+    return {"status": "success", "override": result}
+
+
+@app.delete("/api/admin/availability-overrides/{override_id}")
+async def delete_availability_override(override_id: str, request: Request):
+    from backend.auth import require_admin
+    from backend.db_client import db_client
+    await require_admin(request)
+    await db_client.delete_availability_override(override_id)
+    return {"status": "success"}
+
+
+# ─── Admin: Update Event Progress Stage ───────────────────────────────────────
+class ProgressStageSchema(BaseModel):
+    progress_stage: int  # 0=Pending, 1=Design Approved, 2=Materials Sourced, 3=Setup Day, 4=Completed
+
+@app.put("/api/admin/events/{event_id}/progress")
+async def update_event_progress(event_id: str, payload: ProgressStageSchema, request: Request):
+    from backend.auth import require_admin
+    from backend.db_client import db_client
+    await require_admin(request)
+    event = await db_client.get_event(event_id)
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found.")
+    event["progress_stage"] = payload.progress_stage
+    updated = await db_client.update_event(event_id, event)
+    return {"status": "success", "event": updated}
+
+class EmailRequestSchema(BaseModel):
+    to_email: str
+    subject: str
+    body: str
+    smtp_host: str
+    smtp_port: int
+    smtp_user: str
+    smtp_pass: str
+
+@app.post("/api/send-email")
+async def send_email_api(payload: EmailRequestSchema):
+    import smtplib
+    from email.mime.text import MIMEText
+    from email.mime.multipart import MIMEMultipart
+    
+    if not payload.smtp_host or not payload.smtp_user or not payload.smtp_pass:
+        raise HTTPException(status_code=400, detail="SMTP Configuration (host, user, pass) is incomplete. Please configure it in System Settings.")
+        
+    try:
+        # Create message container
+        msg = MIMEMultipart()
+        msg['From'] = payload.smtp_user
+        msg['To'] = payload.to_email
+        msg['Subject'] = payload.subject
+        
+        # Attach message body
+        msg.attach(MIMEText(payload.body, 'plain'))
+        
+        # Connect to SMTP server
+        server = smtplib.SMTP(payload.smtp_host, payload.smtp_port)
+        server.starttls()
+        server.login(payload.smtp_user, payload.smtp_pass)
+        
+        # Send mail
+        server.sendmail(payload.smtp_user, payload.to_email, msg.as_string())
+        server.quit()
+        
+        return {"status": "success", "message": f"Email successfully sent to {payload.to_email}!"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to send email: {str(e)}")
 

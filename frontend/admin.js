@@ -641,6 +641,9 @@ function switchView(targetViewId) {
     } else if (targetViewId === "invoice-view") {
         document.getElementById("invoice-subview").style.display = "block";
         loadInvoicesData();
+    } else if (targetViewId === "testimonials-subview") {
+        document.getElementById("testimonials-subview").style.display = "block";
+        loadTestimonialsData();
     } else if (targetViewId === "settings-view") {
         document.getElementById("settings-subview").style.display = "block";
         loadSettingsData();
@@ -670,6 +673,7 @@ async function refreshActiveView() {
         { id: "crew-subview", load: () => loadCrewData() },
         { id: "finance-subview", load: () => loadFinanceData() },
         { id: "invoice-subview", load: () => loadInvoicesData() },
+        { id: "testimonials-subview", load: () => loadTestimonialsData() },
         { id: "settings-subview", load: () => loadSettingsData() }
     ];
     
@@ -2230,36 +2234,50 @@ function exportCrewPayoutPDF(crewId, paymentIndex) {
     printArea.querySelector("#pdf-payout-amount").innerText = `₹${pay.amount.toFixed(2)}`;
     printArea.querySelector("#pdf-payout-remaining").innerText = `₹${member.amount_owed.toFixed(2)}`;
     
-    const wrapper = document.createElement('div');
-    wrapper.style.position = 'fixed';
-    wrapper.style.left = '-9999px';
-    wrapper.style.top = '0';
-    wrapper.style.zIndex = '9999';
-    wrapper.style.width = '210mm';
-    wrapper.style.background = 'white';
-    wrapper.style.overflow = 'visible';
-    // Remove duplicate ID on the clone to prevent selector confusion in html2canvas
+    // Remove duplicate ID on the clone
     printArea.removeAttribute("id");
-    wrapper.appendChild(printArea);
-    document.body.appendChild(wrapper);
 
-    const opt = {
-        margin:       [10, 10, 10, 10],
-        filename:     `Bhoomi_Payout_${member.name.replace(/\s+/g, '_')}_${pay.date.split('T')[0]}.pdf`,
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, letterRendering: true, scrollY: 0, windowWidth: 794 },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) {
+        showToast("Popup blocked! Please allow popups to view/print.", "error");
+        return;
+    }
+
+    printWindow.document.write(`
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Payout Receipt - ${member.name}</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Marcellus&family=Poppins:wght@300;400;500;600;700&display=swap');
+  * { 
+    box-sizing: border-box; 
+    margin: 0; 
+    padding: 0; 
+    -webkit-print-color-adjust: exact; 
+    print-color-adjust: exact; 
+  }
+  body { font-family: 'Poppins', Arial, sans-serif; color: #333; background: #fff; padding: 40px; }
+  h1,h2,h3,h4 { font-family: 'Marcellus', Georgia, serif; font-weight: 400; }
+  @media print {
+    body { padding: 0; }
+  }
+</style>
+</head>
+<body>
+  ${printArea.outerHTML}
+  <script>
+    window.onload = function() {
+      window.print();
+      setTimeout(() => { window.close(); }, 500);
     };
-    
-    showToast("Generating Payout PDF Receipt...");
-    html2pdf().from(wrapper).set(opt).save().then(() => {
-        document.body.removeChild(wrapper);
-        showToast("Payout receipt exported successfully.", "success");
-    }).catch(err => {
-        if (document.body.contains(wrapper)) document.body.removeChild(wrapper);
-        console.error("PDF generation failed:", err);
-        showToast("Failed to generate payout PDF.", "error");
-    });
+  <\/script>
+</body>
+</html>
+    `);
+    printWindow.document.close();
+    showToast("Payout receipt printed/exported.", "success");
 }
 
 // ─── 4. Finance Hub ──────────────────────────────────────────────────────────
@@ -2312,6 +2330,43 @@ async function loadFinanceData(filterType = "All", page) {
                 const profitVal = fmt(stats.net_profit);
                 const marginVal = stats.net_margin_percentage !== undefined ? stats.net_margin_percentage : "0";
                 profitEl.innerHTML = `${profitVal} (<span id="finance-stat-margin">${marginVal}</span>%)`;
+            }
+
+            // Update SVG Bar charts dynamically
+            const salesVal = stats.total_sales || 0.0;
+            const wagesVal = stats.total_wages || 0.0;
+            const netProfitVal = stats.net_profit || 0.0;
+            const marginPercentage = stats.net_margin_percentage || 0.0;
+
+            const maxVal = Math.max(salesVal, wagesVal, Math.abs(netProfitVal), 1.0);
+            
+            const setBarHeight = (id, val) => {
+                const bar = document.getElementById(id);
+                if (bar) {
+                    const pct = Math.min(100, Math.max(0, (val / maxVal) * 100));
+                    bar.style.height = `${pct}%`;
+                    bar.innerText = val > 0 ? `₹${Math.round(val / 1000)}k` : `₹0`;
+                }
+            };
+            setBarHeight("chart-bar-sales", salesVal);
+            setBarHeight("chart-bar-wages", wagesVal);
+            setBarHeight("chart-bar-profit", Math.max(0, netProfitVal));
+
+            // Update Margin Radial Gauge Chart
+            const gaugeCircle = document.getElementById("margin-gauge-circle");
+            const gaugeText = document.getElementById("margin-gauge-text");
+            if (gaugeCircle && gaugeText) {
+                const roundedMargin = Math.round(marginPercentage);
+                gaugeText.innerText = `${roundedMargin}%`;
+                const dashPct = Math.min(100, Math.max(0, roundedMargin));
+                gaugeCircle.setAttribute("stroke-dasharray", `${dashPct}, 100`);
+                if (roundedMargin < 0) {
+                    gaugeCircle.setAttribute("stroke", "#e53e3e");
+                } else if (roundedMargin < 20) {
+                    gaugeCircle.setAttribute("stroke", "#dd6b20");
+                } else {
+                    gaugeCircle.setAttribute("stroke", "#10b981");
+                }
             }
         }
 
@@ -2612,17 +2667,35 @@ async function exportInvoiceToPDF(eventId) {
 </body>
 </html>`;
 
-        const opt = {
-            margin:      [0, 0, 0, 0],
-            filename:    `Bhoomi_Invoice_${evt.id}.pdf`,
-            image:       { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true },
-            jsPDF:       { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
+        const printWindow = window.open("", "_blank");
+        if (!printWindow) {
+            showToast("Popup blocked! Please allow popups to view/print.", "error");
+            return;
+        }
 
-        showToast("Generating PDF Invoice...");
-        await html2pdf().from(invoiceHTML).set(opt).save();
-        showToast("Invoice exported successfully!", "success");
+        const printHtmlWithScript = invoiceHTML.replace("</style>", `
+  * { 
+    box-sizing: border-box; 
+    margin: 0; 
+    padding: 0; 
+    -webkit-print-color-adjust: exact; 
+    print-color-adjust: exact; 
+  }
+  @media print {
+    body { padding: 0; }
+  }
+</style>`).replace("</body>", `
+  <script>
+    window.onload = function() {
+      window.print();
+      setTimeout(() => { window.close(); }, 500);
+    };
+  <\/script>
+</body>`);
+
+        printWindow.document.write(printHtmlWithScript);
+        printWindow.document.close();
+        showToast("Invoice printed/exported.", "success");
 
     } catch (err) {
         console.error("Error exporting PDF:", err);
@@ -2872,36 +2945,50 @@ async function exportManualInvoiceToPDF(eventId, data) {
     printArea.querySelector("#pdf-paid").innerText = `₹${(data.amount_paid || 0).toFixed(2)}`;
     printArea.querySelector("#pdf-balance").innerText = `₹${balance.toFixed(2)}`;
 
-    const wrapper = document.createElement('div');
-    wrapper.style.position = 'fixed';
-    wrapper.style.left = '-9999px';
-    wrapper.style.top = '0';
-    wrapper.style.zIndex = '9999';
-    wrapper.style.width = '210mm';
-    wrapper.style.background = 'white';
-    wrapper.style.overflow = 'visible';
-    // Remove duplicate ID on the clone to prevent selector confusion in html2canvas
+    // Remove duplicate ID on the clone
     printArea.removeAttribute("id");
-    wrapper.appendChild(printArea);
-    document.body.appendChild(wrapper);
 
-    const opt = {
-        margin: [10, 10, 10, 10],
-        filename: `Bhoomi_ManualInvoice_${eventId}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, letterRendering: true, scrollY: 0, windowWidth: 794 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) {
+        showToast("Popup blocked! Please allow popups to view/print.", "error");
+        return;
+    }
+
+    printWindow.document.write(`
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Invoice - ${eventId}</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Marcellus&family=Poppins:wght@300;400;500;600;700&display=swap');
+  * { 
+    box-sizing: border-box; 
+    margin: 0; 
+    padding: 0; 
+    -webkit-print-color-adjust: exact; 
+    print-color-adjust: exact; 
+  }
+  body { font-family: 'Poppins', Arial, sans-serif; color: #333; background: #fff; padding: 40px; }
+  h1,h2,h3,h4 { font-family: 'Marcellus', Georgia, serif; font-weight: 400; }
+  @media print {
+    body { padding: 0; }
+  }
+</style>
+</head>
+<body>
+  ${printArea.outerHTML}
+  <script>
+    window.onload = function() {
+      window.print();
+      setTimeout(() => { window.close(); }, 500);
     };
-
-    showToast("Generating PDF Invoice...");
-    html2pdf().from(wrapper).set(opt).save().then(() => {
-        document.body.removeChild(wrapper);
-        showToast("PDF invoice exported successfully.");
-    }).catch(err => {
-        document.body.removeChild(wrapper);
-        console.error("PDF generation failed:", err);
-        showToast("Failed to generate PDF.", "error");
-    });
+  <\/script>
+</body>
+</html>
+    `);
+    printWindow.document.close();
+    showToast("PDF invoice printed/exported.", "success");
 }
 
 // ─── Bind Event Listeners ────────────────────────────────────────────────────
@@ -2919,6 +3006,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("nav-btn-crew").addEventListener("click", () => window.location.hash = "crew");
     document.getElementById("nav-btn-finance").addEventListener("click", () => window.location.hash = "finance");
     document.getElementById("nav-btn-invoice").addEventListener("click", () => window.location.hash = "invoice");
+    document.getElementById("nav-btn-testimonials").addEventListener("click", () => window.location.hash = "testimonials");
     document.getElementById("nav-btn-settings").addEventListener("click", () => window.location.hash = "settings");
     
     // Hash routing listeners
@@ -3327,6 +3415,11 @@ function loadSettingsData() {
     document.getElementById("settings-company-phone").value = localStorage.getItem("settings_company_phone") || "+91 99999 99999";
     document.getElementById("settings-company-website").value = localStorage.getItem("settings_company_website") || "www.bhoomidecoration.com";
     
+    document.getElementById("settings-smtp-host").value = localStorage.getItem("settings_smtp_host") || "smtp.gmail.com";
+    document.getElementById("settings-smtp-port").value = localStorage.getItem("settings_smtp_port") || "587";
+    document.getElementById("settings-smtp-user").value = localStorage.getItem("settings_smtp_user") || "";
+    document.getElementById("settings-smtp-pass").value = localStorage.getItem("settings_smtp_pass") || "";
+    
     document.getElementById("settings-theme").value = localStorage.getItem("settings_theme") || "crimson_red";
 }
 
@@ -3341,6 +3434,11 @@ function handleSettingsSubmit(e) {
     localStorage.setItem("settings_company_email", document.getElementById("settings-company-email").value);
     localStorage.setItem("settings_company_phone", document.getElementById("settings-company-phone").value);
     localStorage.setItem("settings_company_website", document.getElementById("settings-company-website").value);
+    
+    localStorage.setItem("settings_smtp_host", document.getElementById("settings-smtp-host").value);
+    localStorage.setItem("settings_smtp_port", document.getElementById("settings-smtp-port").value);
+    localStorage.setItem("settings_smtp_user", document.getElementById("settings-smtp-user").value);
+    localStorage.setItem("settings_smtp_pass", document.getElementById("settings-smtp-pass").value);
     
     const selectedTheme = document.getElementById("settings-theme").value;
     localStorage.setItem("settings_theme", selectedTheme);
@@ -3418,34 +3516,50 @@ function exportSectionToPDF(title, subtitle, headers, rows, filename) {
         </div>
     `;
 
-    const container = document.createElement('div');
-    container.innerHTML = pdfHTML;
-    container.style.position = 'fixed';
-    container.style.left = '-9999px';
-    container.style.top = '0';
-    container.style.zIndex = '9999';
-    container.style.width = '297mm';
-    container.style.background = 'white';
-    container.style.overflow = 'visible';
-    document.body.appendChild(container);
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) {
+        showToast("Popup blocked! Please allow popups to view/print.", "error");
+        return;
+    }
 
-    const opt = {
-        margin: [8, 8, 8, 8],
-        filename: filename,
-        image: { type: 'jpeg', quality: 0.97 },
-        html2canvas: { scale: 2, useCORS: true, letterRendering: true, scrollY: 0 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+    printWindow.document.write(`
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>${title}</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Marcellus&family=Poppins:wght@300;400;500;600;700&display=swap');
+  * { 
+    box-sizing: border-box; 
+    margin: 0; 
+    padding: 0; 
+    -webkit-print-color-adjust: exact; 
+    print-color-adjust: exact; 
+  }
+  body { font-family: 'Poppins', Arial, sans-serif; color: #333; background: #fff; padding: 20px; }
+  h1,h2,h3,h4 { font-family: 'Marcellus', Georgia, serif; font-weight: 400; }
+  @page {
+    size: landscape;
+  }
+  @media print {
+    body { padding: 0; }
+  }
+</style>
+</head>
+<body>
+  ${pdfHTML}
+  <script>
+    window.onload = function() {
+      window.print();
+      setTimeout(() => { window.close(); }, 500);
     };
-
-    showToast("Generating PDF export...");
-    html2pdf().from(container).set(opt).save().then(() => {
-        document.body.removeChild(container);
-        showToast(`PDF exported successfully — ${rows.length} records.`);
-    }).catch(err => {
-        document.body.removeChild(container);
-        console.error("PDF export failed:", err);
-        showToast("Failed to generate PDF export.", "error");
-    });
+  <\/script>
+</body>
+</html>
+    `);
+    printWindow.document.close();
+    showToast(`Data printed/exported successfully — ${rows.length} records.`, "success");
 }
 
 async function exportWarehousePDF() {
@@ -3712,6 +3826,12 @@ async function openEventDetailsViewModal(eventId) {
                     </div>
                 </div>
 
+                <div class="glass-panel" style="padding:1rem;margin-top:1rem;display:flex;gap:1rem;justify-content:center;align-items:center;background:rgba(16,185,129,0.05);border:1px solid rgba(16,185,129,0.2);">
+                    <h5 style="margin:0;font-family:'Marcellus',serif;color:var(--maroon);font-size:0.9rem;">Dispatch Invoice:</h5>
+                    <button class="btn btn-secondary" style="padding:0.4rem 0.8rem;font-size:0.8rem;border-color:#25d366;color:#25d366;background:transparent;cursor:pointer;" onclick="dispatchWhatsAppInvoice('${evt.client_name || ''}', '${evt.start_date || ''}', '${evt.remaining_balance || 0}', '${evt.portal_token || ''}', '${client.phone || ''}')">💬 Send to WhatsApp</button>
+                    <button class="btn btn-secondary" style="padding:0.4rem 0.8rem;font-size:0.8rem;border-color:var(--maroon);color:var(--maroon);background:transparent;cursor:pointer;" onclick="dispatchEmailInvoice('${evt.client_name || ''}', '${evt.portal_token || ''}', '${evt.total_invoice_amount || 0}', '${evt.amount_paid || 0}', '${evt.remaining_balance || 0}', '${client.email || ''}')">✉️ Send to Email</button>
+                </div>
+
                 <div class="glass-panel" style="padding:1rem;margin-top:1rem;">
                     <h4 style="font-family:'Marcellus',serif;color:var(--maroon);margin:0 0 0.5rem 0;">Layout Blueprint Sketch</h4>
                     ${layoutHtml}
@@ -3726,6 +3846,59 @@ async function openEventDetailsViewModal(eventId) {
     }
 }
 window.openEventDetailsViewModal = openEventDetailsViewModal;
+
+function dispatchWhatsAppInvoice(clientName, startDate, remainingBalance, portalToken, phone) {
+    const portalUrl = `${window.location.origin}/portal/${portalToken}`;
+    const message = `Hi ${clientName}, here is the link to your Bhoomi Decoration Event Portal for your wedding starting on ${startDate}: ${portalUrl}\n\nOutstanding balance: ₹${remainingBalance}.\n\nBest regards,\nBhoomi Decoration Team`;
+    const encodedMsg = encodeURIComponent(message);
+    const cleanPhone = phone.replace(/\D/g, "");
+    const waPhone = cleanPhone.length === 10 ? "91" + cleanPhone : cleanPhone;
+    const url = `https://wa.me/${waPhone || '919876543210'}?text=${encodedMsg}`;
+    window.open(url, "_blank");
+}
+window.dispatchWhatsAppInvoice = dispatchWhatsAppInvoice;
+
+async function dispatchEmailInvoice(clientName, portalToken, total, paid, remaining, email) {
+    const smtpHost = localStorage.getItem("settings_smtp_host") || "smtp.gmail.com";
+    const smtpPort = parseInt(localStorage.getItem("settings_smtp_port") || "587");
+    const smtpUser = localStorage.getItem("settings_smtp_user") || "";
+    const smtpPass = localStorage.getItem("settings_smtp_pass") || "";
+
+    const portalUrl = `${window.location.origin}/portal/${portalToken}`;
+    const subject = `Bhoomi Decoration Event Portal & Invoice — ${clientName}`;
+    const body = `Hi ${clientName},\n\nThank you for choosing Bhoomi Decoration.\n\nHere is your Bhoomi Decoration Event Portal link to track payments, designs and invoices:\n${portalUrl}\n\nInvoice Details:\n- Invoice Total: ₹${total}\n- Amount Paid: ₹${paid}\n- Remaining Balance: ₹${remaining}\n\nBest regards,\nBhoomi Decoration Team`;
+
+    if (!smtpUser || !smtpPass) {
+        showToast("SMTP credentials not configured in settings. Falling back to local mail client...", "warning");
+        const mailtoUrl = `mailto:${email || ''}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        window.location.href = mailtoUrl;
+        return;
+    }
+
+    showToast("Sending dispatch email via SMTP server...", "info");
+    try {
+        const res = await apiFetch("/api/send-email", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                to_email: email,
+                subject: subject,
+                body: body,
+                smtp_host: smtpHost,
+                smtp_port: smtpPort,
+                smtp_user: smtpUser,
+                smtp_pass: smtpPass
+            })
+        });
+        showToast("Invoice email successfully dispatched via SMTP!", "success");
+    } catch (err) {
+        console.error(err);
+        showToast("Error dispatching email: " + err.message, "error");
+    }
+}
+window.dispatchEmailInvoice = dispatchEmailInvoice;
 
 // ─── Global Window Exports ──────────────────────────────────────────────────
 window.editInventoryItem = editInventoryItem;
@@ -3775,6 +3948,7 @@ const HASH_VIEW_MAP = {
     "#crew": "crew-view",
     "#finance": "finance-view",
     "#invoice": "invoice-view",
+    "#testimonials": "testimonials-subview",
     "#settings": "settings-view"
 };
 
@@ -4160,36 +4334,49 @@ function exportPayrollPDF() {
     const element = document.getElementById("print-payroll-section");
     if (!element) return;
     
-    const wrapper = element.cloneNode(true);
-    wrapper.style.display = "block";
-    wrapper.style.position = 'fixed';
-    wrapper.style.left = '-9999px';
-    wrapper.style.top = '0';
-    wrapper.style.zIndex = '9999';
-    wrapper.style.padding = "20px";
-    wrapper.style.background = "#ffffff";
-    wrapper.style.width = "210mm";
-    wrapper.style.overflow = 'visible';
-    wrapper.style.fontFamily = "'Poppins', sans-serif";
-    document.body.appendChild(wrapper);
-    
-    const opt = {
-        margin: [10, 10, 10, 10],
-        filename: `Bhoomi_Payroll_${new Date().toISOString().slice(0, 10)}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) {
+        showToast("Popup blocked! Please allow popups to view/print.", "error");
+        return;
+    }
+
+    printWindow.document.write(`
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Payroll Export</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Marcellus&family=Poppins:wght@300;400;500;600;700&display=swap');
+  * { 
+    box-sizing: border-box; 
+    margin: 0; 
+    padding: 0; 
+    -webkit-print-color-adjust: exact; 
+    print-color-adjust: exact; 
+  }
+  body { font-family: 'Poppins', Arial, sans-serif; color: #333; background: #fff; padding: 30px; }
+  h1,h2,h3,h4 { font-family: 'Marcellus', Georgia, serif; font-weight: 400; }
+  @media print {
+    body { padding: 0; }
+  }
+</style>
+</head>
+<body>
+  <div style="font-family:'Poppins',sans-serif;color:#333;background:#fff;padding:20px;max-width:800px;margin:0 auto;box-sizing:border-box;">
+    ${element.innerHTML}
+  </div>
+  <script>
+    window.onload = function() {
+      window.print();
+      setTimeout(() => { window.close(); }, 500);
     };
-    
-    showToast("Generating Payroll PDF...");
-    html2pdf().from(wrapper).set(opt).save().then(() => {
-        document.body.removeChild(wrapper);
-        showToast("Payroll PDF exported successfully.");
-    }).catch(err => {
-        document.body.removeChild(wrapper);
-        console.error("Payroll PDF generation failed:", err);
-        showToast("Failed to generate PDF.", "error");
-    });
+  <\/script>
+</body>
+</html>
+    `);
+    printWindow.document.close();
+    showToast("Payroll printed/exported.", "success");
 }
 
 function copyPortalLink(token) {
@@ -4232,3 +4419,348 @@ async function getFullInventoryList() {
 }
 window.getFullInventoryList = getFullInventoryList;
 
+async function loadTestimonialsData() {
+    const tbody = document.getElementById("testimonials-table-body");
+    if (!tbody) return;
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:1.2rem;color:var(--text-muted);">Fetching reviews...</td></tr>`;
+
+    try {
+        const testimonials = await apiFetch("/api/admin/testimonials");
+        tbody.innerHTML = "";
+        
+        if (!testimonials || testimonials.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--text-muted);">No customer reviews submitted yet.</td></tr>`;
+            return;
+        }
+
+        testimonials.forEach(item => {
+            const tr = document.createElement("tr");
+            
+            const ratingStars = "★".repeat(item.rating) + "☆".repeat(5 - item.rating);
+            const statusBadge = item.approved 
+                ? `<span class="badge badge-confirmed" style="background:rgba(16,185,129,0.1);color:#10b981;border:1px solid rgba(16,185,129,0.2);">✓ Approved</span>` 
+                : `<span class="badge badge-draft" style="background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.2);">Pending</span>`;
+
+            tr.innerHTML = `
+                <td><strong>${item.name}</strong></td>
+                <td style="color:#ff9f43;font-size:1.1rem;font-weight:600;">${ratingStars}</td>
+                <td><p style="margin:0;max-width:350px;white-space:normal;word-break:break-word;">${item.review}</p></td>
+                <td>${statusBadge}</td>
+                <td>
+                    <div style="display:flex;gap:0.5rem;">
+                        <button class="btn btn-ghost" style="padding:4px 8px;font-size:0.75rem;cursor:pointer;" onclick="toggleTestimonialApproval('${item.id}')">
+                            ${item.approved ? 'Hide' : 'Approve'}
+                        </button>
+                        <button class="btn btn-ghost" style="padding:4px 8px;font-size:0.75rem;color:var(--maroon);border-color:var(--maroon);cursor:pointer;" onclick="deleteTestimonial('${item.id}')">
+                            Delete
+                        </button>
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    } catch (err) {
+        console.error("Testimonials fetch error:", err);
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:1.5rem;color:var(--maroon);">⚠️ Failed to load feedback datasets.</td></tr>`;
+    }
+}
+window.loadTestimonialsData = loadTestimonialsData;
+
+async function toggleTestimonialApproval(id) {
+    try {
+        await apiFetch(`/api/admin/testimonials/${id}/approve`, { method: "PUT" });
+        showToast("Testimonial display status updated!");
+        loadTestimonialsData();
+    } catch (err) {
+        showToast("Error updating testimonial: " + err.message, "error");
+    }
+}
+window.toggleTestimonialApproval = toggleTestimonialApproval;
+
+async function deleteTestimonial(id) {
+    if (!confirm("Are you sure you want to permanently delete this feedback review?")) return;
+    try {
+        await apiFetch(`/api/admin/testimonials/${id}`, { method: "DELETE" });
+        showToast("Testimonial deleted successfully.");
+        loadTestimonialsData();
+    } catch (err) {
+        showToast("Error deleting feedback: " + err.message, "error");
+    }
+}
+window.deleteTestimonial = deleteTestimonial;
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 📊 ANALYTICS DASHBOARD
+// ═══════════════════════════════════════════════════════════════════════════
+
+let revenueChartInstance = null;
+let statusChartInstance = null;
+
+async function loadAnalyticsData() {
+    try {
+        const data = await apiFetch("/api/admin/analytics");
+        document.getElementById("kpi-total-revenue").textContent = "₹" + Number(data.total_revenue).toLocaleString("en-IN");
+        document.getElementById("kpi-total-events").textContent = data.total_events;
+        document.getElementById("kpi-completed").textContent = data.completed_events;
+        document.getElementById("kpi-avg-event").textContent = "₹" + Number(data.avg_per_event).toLocaleString("en-IN");
+
+        const revenueCtx = document.getElementById("chart-revenue");
+        if (revenueCtx) {
+            if (revenueChartInstance) revenueChartInstance.destroy();
+            revenueChartInstance = new Chart(revenueCtx, {
+                type: "bar",
+                data: {
+                    labels: Object.keys(data.monthly_revenue),
+                    datasets: [{ label: "Revenue (₹)", data: Object.values(data.monthly_revenue), backgroundColor: "rgba(107,22,35,0.7)", borderColor: "#6B1623", borderWidth: 1, borderRadius: 6 }]
+                },
+                options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { callback: v => "₹" + Number(v).toLocaleString("en-IN") } } } }
+            });
+        }
+
+        const statusCtx = document.getElementById("chart-status");
+        if (statusCtx) {
+            if (statusChartInstance) statusChartInstance.destroy();
+            const sc = data.status_counts;
+            statusChartInstance = new Chart(statusCtx, {
+                type: "doughnut",
+                data: { labels: Object.keys(sc), datasets: [{ data: Object.values(sc), backgroundColor: ["#94a3b8","#f59e0b","#059669","#6B1623"], borderWidth: 2, borderColor: "#fff" }] },
+                options: { responsive: true, plugins: { legend: { position: "bottom", labels: { font: { size: 11 } } } } }
+            });
+        }
+
+        const clientsEl = document.getElementById("analytics-top-clients");
+        if (data.top_clients && data.top_clients.length > 0) {
+            const maxRev = data.top_clients[0].revenue || 1;
+            clientsEl.innerHTML = data.top_clients.map((c, i) => `<div style="margin-bottom:.75rem;"><div style="display:flex;justify-content:space-between;font-size:.88rem;margin-bottom:3px;"><span style="font-weight:600;">${i+1}. ${c.name}</span><span style="color:var(--maroon);font-weight:600;">₹${Number(c.revenue).toLocaleString("en-IN")}</span></div><div style="background:rgba(107,22,35,.1);border-radius:4px;height:6px;overflow:hidden;"><div style="background:var(--maroon);height:100%;width:${Math.round((c.revenue/maxRev)*100)}%;border-radius:4px;"></div></div></div>`).join("");
+        } else { clientsEl.innerHTML = `<p style="color:var(--text-muted);text-align:center;padding:2rem;">No event data yet.</p>`; }
+
+        const itemsEl = document.getElementById("analytics-top-items");
+        if (data.top_items && data.top_items.length > 0) {
+            const maxU = data.top_items[0].usage || 1;
+            itemsEl.innerHTML = data.top_items.map((item, i) => `<div style="margin-bottom:.75rem;"><div style="display:flex;justify-content:space-between;font-size:.88rem;margin-bottom:3px;"><span style="font-weight:600;">${i+1}. ${item.name}</span><span style="color:var(--gold);font-weight:600;">${item.usage}×</span></div><div style="background:rgba(201,148,31,.15);border-radius:4px;height:6px;overflow:hidden;"><div style="background:var(--gold);height:100%;width:${Math.round((item.usage/maxU)*100)}%;border-radius:4px;"></div></div></div>`).join("");
+        } else { itemsEl.innerHTML = `<p style="color:var(--text-muted);text-align:center;padding:2rem;">No item data yet.</p>`; }
+
+    } catch (err) { showToast("Error loading analytics: " + err.message, "error"); }
+}
+window.loadAnalyticsData = loadAnalyticsData;
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 🗓️ MASTER CALENDAR
+// ═══════════════════════════════════════════════════════════════════════════
+
+let calendarYear = new Date().getFullYear();
+let calendarMonth = new Date().getMonth();
+let calendarEvents = [];
+let calendarOverrides = [];
+
+async function loadCalendarData() {
+    try {
+        const [evts, overrides] = await Promise.all([apiFetch("/api/events"), apiFetch("/api/admin/availability-overrides")]);
+        calendarEvents = evts.items || evts || [];
+        calendarOverrides = overrides || [];
+        renderCalendar();
+        renderBlockedDatesList();
+    } catch (err) { showToast("Error loading calendar: " + err.message, "error"); }
+}
+window.loadCalendarData = loadCalendarData;
+
+function calendarNavMonth(dir) {
+    calendarMonth += dir;
+    if (calendarMonth < 0) { calendarMonth = 11; calendarYear--; }
+    if (calendarMonth > 11) { calendarMonth = 0; calendarYear++; }
+    renderCalendar();
+}
+window.calendarNavMonth = calendarNavMonth;
+
+function renderCalendar() {
+    const DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+    const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    const grid = document.getElementById("calendar-grid");
+    const label = document.getElementById("calendar-month-label");
+    if (!grid || !label) return;
+    label.textContent = `${MONTHS[calendarMonth]} ${calendarYear}`;
+
+    const dateEventMap = {};
+    calendarEvents.forEach(ev => {
+        if (!ev.start_date) return;
+        const start = new Date(ev.start_date), end = ev.end_date ? new Date(ev.end_date) : new Date(ev.start_date);
+        let cur = new Date(start);
+        while (cur <= end) {
+            const key = cur.toISOString().split("T")[0];
+            if (!dateEventMap[key]) dateEventMap[key] = [];
+            dateEventMap[key].push(ev);
+            cur.setDate(cur.getDate() + 1);
+        }
+    });
+
+    const overrideMap = {};
+    calendarOverrides.forEach(ov => { overrideMap[ov.date] = ov; });
+
+    const firstDay = new Date(calendarYear, calendarMonth, 1).getDay();
+    const daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
+    const today = new Date().toISOString().split("T")[0];
+
+    let html = DAYS.map(d => `<div style="text-align:center;font-size:.72rem;font-weight:600;text-transform:uppercase;color:var(--text-muted);padding:6px 0;">${d}</div>`).join("");
+    for (let i = 0; i < firstDay; i++) html += `<div></div>`;
+
+    for (let d = 1; d <= daysInMonth; d++) {
+        const dateStr = `${calendarYear}-${String(calendarMonth+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+        const eventsOnDay = dateEventMap[dateStr] || [];
+        const override = overrideMap[dateStr];
+        const isToday = dateStr === today;
+        const isBlocked = override && override.blocked;
+        let borderColor = isToday ? "var(--gold)" : "rgba(107,22,35,0.12)";
+        let bg = "#fff";
+        let pillHtml = "", lockHtml = "";
+
+        if (isBlocked) { bg = "rgba(239,68,68,0.08)"; borderColor = "#ef4444"; lockHtml = `<div style="font-size:.65rem;color:#ef4444;">🔒 Blocked</div>`; }
+        else if (eventsOnDay.length > 0) {
+            const hasConfirmed = eventsOnDay.some(e => e.status === "Confirmed" || e.status === "Completed");
+            borderColor = hasConfirmed ? "#059669" : "#f59e0b";
+            bg = hasConfirmed ? "rgba(5,150,105,0.08)" : "rgba(245,158,11,0.08)";
+            const pillBg = hasConfirmed ? "#059669" : "#f59e0b";
+            const pillTxt = hasConfirmed ? "#fff" : "#92400e";
+            pillHtml = `<div style="font-size:.65rem;background:${pillBg};color:${pillTxt};border-radius:10px;padding:1px 5px;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${eventsOnDay[0].client_name||"Event"}${eventsOnDay.length>1?` +${eventsOnDay.length-1}`:""}</div>`;
+        }
+
+        html += `<div onclick="adminToggleDate('${dateStr}')" title="Click to toggle block" style="min-height:72px;border-radius:6px;border:1.5px solid ${borderColor};background:${bg};padding:6px 6px 4px;cursor:pointer;transition:transform .15s;" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'"><div style="font-size:.82rem;font-weight:${isToday?"700":"500"};color:${isToday?"var(--gold)":"var(--ink)"};">${d}</div>${pillHtml}${lockHtml}</div>`;
+    }
+    grid.innerHTML = html;
+}
+
+async function adminToggleDate(dateStr) {
+    const existing = calendarOverrides.find(ov => ov.date === dateStr && ov.blocked);
+    try {
+        if (existing) {
+            await apiFetch(`/api/admin/availability-overrides/${existing.id}`, { method: "DELETE" });
+            calendarOverrides = calendarOverrides.filter(ov => ov.id !== existing.id);
+            showToast(`${dateStr} unblocked.`);
+        } else {
+            const hasEvent = calendarEvents.some(ev => { if (!ev.start_date) return false; const s = new Date(ev.start_date), e = ev.end_date ? new Date(ev.end_date) : s, d = new Date(dateStr); return d >= s && d <= e; });
+            if (hasEvent) { showToast("This date has a real event — edit the event to change it.", "info"); return; }
+            const reason = prompt(`Block ${dateStr}? Enter a reason (optional):`);
+            if (reason === null) return;
+            const result = await apiFetch("/api/admin/availability-overrides", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ date: dateStr, reason: reason || "", blocked: true }) });
+            calendarOverrides.push(result.override);
+            showToast(`${dateStr} blocked.`);
+        }
+        renderCalendar();
+        renderBlockedDatesList();
+    } catch (err) { showToast("Error toggling date: " + err.message, "error"); }
+}
+window.adminToggleDate = adminToggleDate;
+
+function renderBlockedDatesList() {
+    const el = document.getElementById("admin-blocked-dates-list");
+    if (!el) return;
+    const blocked = calendarOverrides.filter(ov => ov.blocked);
+    if (!blocked.length) { el.innerHTML = `<p style="color:var(--text-muted);font-size:.9rem;">No manual blocks set.</p>`; return; }
+    el.innerHTML = `<div style="display:flex;flex-wrap:wrap;gap:.75rem;">` + blocked.sort((a,b) => a.date.localeCompare(b.date)).map(ov => `<div style="display:flex;align-items:center;gap:.5rem;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.3);border-radius:20px;padding:4px 12px;font-size:.82rem;"><span style="color:#ef4444;font-weight:600;">🔒 ${ov.date}</span>${ov.reason?`<span style="color:var(--text-muted);">— ${ov.reason}</span>`:""}<button onclick="adminUnblockDate('${ov.id}')" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:.9rem;padding:0 2px;">✕</button></div>`).join("") + `</div>`;
+}
+
+async function adminUnblockDate(overrideId) {
+    try {
+        await apiFetch(`/api/admin/availability-overrides/${overrideId}`, { method: "DELETE" });
+        calendarOverrides = calendarOverrides.filter(ov => ov.id !== overrideId);
+        showToast("Date unblocked.");
+        renderCalendar();
+        renderBlockedDatesList();
+    } catch (err) { showToast("Error: " + err.message, "error"); }
+}
+window.adminUnblockDate = adminUnblockDate;
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 💸 EXPENSE TRACKER
+// ═══════════════════════════════════════════════════════════════════════════
+
+let currentExpenseEventId = null;
+let currentExpenseEventInvoice = 0;
+
+async function populateExpenseEventSelector() {
+    const sel = document.getElementById("expense-event-selector");
+    if (!sel) return;
+    try {
+        const data = await apiFetch("/api/events");
+        const events = data.items || data || [];
+        sel.innerHTML = `<option value="">— Choose an event —</option>` + events.map(ev => `<option value="${ev.id}" data-invoice="${ev.total_invoice_amount || 0}">${ev.client_name || "Unknown"} — ${ev.start_date || ""} (${ev.status || ""})</option>`).join("");
+    } catch (err) { console.warn("Could not load events:", err); }
+}
+
+async function loadExpensesForEvent() {
+    const sel = document.getElementById("expense-event-selector");
+    if (!sel || !sel.value) {
+        currentExpenseEventId = null;
+        document.getElementById("expenses-table-body").innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--text-muted);">Select an event above.</td></tr>`;
+        return;
+    }
+    const selectedOpt = sel.options[sel.selectedIndex];
+    currentExpenseEventId = sel.value;
+    currentExpenseEventInvoice = parseFloat(selectedOpt.dataset.invoice || 0);
+    try {
+        const expenses = await apiFetch(`/api/admin/expenses?event_id=${currentExpenseEventId}`);
+        renderExpensesTable(expenses);
+        updateProfitSummary(expenses);
+        document.getElementById("add-expense-panel").style.display = "";
+    } catch (err) { showToast("Error loading expenses: " + err.message, "error"); }
+}
+window.loadExpensesForEvent = loadExpensesForEvent;
+
+function renderExpensesTable(expenses) {
+    const tbody = document.getElementById("expenses-table-body");
+    if (!expenses || !expenses.length) { tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--text-muted);">No expenses logged yet. Add one above.</td></tr>`; return; }
+    const ICONS = { Flowers:"🌸", Transport:"🚛", Labor:"👷", Materials:"🪵", Other:"📦" };
+    tbody.innerHTML = expenses.map(exp => `<tr><td style="color:var(--text-muted);font-size:.85rem;">${exp.date||"—"}</td><td>${ICONS[exp.category]||"📦"} ${exp.category}</td><td>${exp.description}</td><td style="text-align:right;font-weight:600;color:var(--maroon);">₹${Number(exp.amount).toLocaleString("en-IN")}</td><td><button onclick="deleteExpense('${exp.id}')" class="btn btn-secondary" style="padding:2px 8px;font-size:.78rem;color:#ef4444;border-color:#ef4444;">Delete</button></td></tr>`).join("");
+}
+
+function updateProfitSummary(expenses) {
+    const totalExp = expenses.reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
+    const netProfit = currentExpenseEventInvoice - totalExp;
+    const margin = currentExpenseEventInvoice > 0 ? ((netProfit / currentExpenseEventInvoice) * 100).toFixed(1) + "%" : "—";
+    document.getElementById("ps-invoice").textContent = "₹" + Number(currentExpenseEventInvoice).toLocaleString("en-IN");
+    document.getElementById("ps-expenses").textContent = "₹" + Number(totalExp).toLocaleString("en-IN");
+    const profEl = document.getElementById("ps-profit");
+    profEl.textContent = "₹" + Number(netProfit).toLocaleString("en-IN");
+    profEl.style.color = netProfit >= 0 ? "#059669" : "#ef4444";
+    document.getElementById("ps-margin").textContent = margin;
+    document.getElementById("ps-margin").style.color = netProfit >= 0 ? "#059669" : "#ef4444";
+    document.getElementById("profit-summary").style.display = "";
+}
+
+async function submitAddExpense(e) {
+    e.preventDefault();
+    if (!currentExpenseEventId) { showToast("Please select an event first.", "error"); return; }
+    const desc = document.getElementById("exp-description").value.trim();
+    const category = document.getElementById("exp-category").value;
+    const amount = parseFloat(document.getElementById("exp-amount").value);
+    if (!desc || isNaN(amount) || amount <= 0) { showToast("Please fill in all fields correctly.", "error"); return; }
+    const sel = document.getElementById("expense-event-selector");
+    const eventName = sel.options[sel.selectedIndex]?.textContent?.split("—")[0]?.trim() || "";
+    try {
+        await apiFetch("/api/admin/expenses", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ event_id: currentExpenseEventId, event_name: eventName, description: desc, category, amount }) });
+        document.getElementById("add-expense-form").reset();
+        showToast("Expense added.");
+        loadExpensesForEvent();
+    } catch (err) { showToast("Error adding expense: " + err.message, "error"); }
+}
+window.submitAddExpense = submitAddExpense;
+
+async function deleteExpense(expId) {
+    if (!confirm("Delete this expense?")) return;
+    try {
+        await apiFetch(`/api/admin/expenses/${expId}`, { method: "DELETE" });
+        showToast("Expense deleted.");
+        loadExpensesForEvent();
+    } catch (err) { showToast("Error: " + err.message, "error"); }
+}
+window.deleteExpense = deleteExpense;
+
+
+// Nav hooks for the 3 new admin sections
+document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("nav-btn-analytics")?.addEventListener("click", loadAnalyticsData);
+    document.getElementById("nav-btn-calendar")?.addEventListener("click", loadCalendarData);
+    document.getElementById("nav-btn-expenses")?.addEventListener("click", populateExpenseEventSelector);
+});

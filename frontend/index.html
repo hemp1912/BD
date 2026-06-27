@@ -178,6 +178,7 @@
                     <a href="#services">Services</a>
                     <a href="#process">Process</a>
                     <a href="#gallery">Gallery</a>
+                    <a href="#availability">Availability</a>
                     <a href="#testimonials">Reviews</a>
                 </div>
                 <div style="display: flex; align-items: center;">
@@ -198,6 +199,7 @@
                 <a href="#services">Services</a>
                 <a href="#process">Process</a>
                 <a href="#gallery">Gallery</a>
+                <a href="#availability">Availability</a>
                 <a href="#testimonials">Reviews</a>
                 <a href="#" onclick="event.preventDefault(); openModal('gateway-view');"
                     style="color: var(--gold);">Login →</a>
@@ -525,7 +527,7 @@
                     <span class="eyebrow">Families We've Worked With</span>
                     <h2>What couples and parents tell us</h2>
                 </div>
-                <div class="testi-grid reveal">
+                <div class="testi-grid reveal" id="testimonials-scroll-container">
                     <div class="testi-card">
                         <div class="testi-quote">"They turned a banquet hall in Ahmedabad into something that looked
                             like
@@ -550,6 +552,52 @@
             </div>
         </section>
 
+
+
+        <!-- AVAILABILITY CALENDAR -->
+        <section id="availability" class="interactive-section" style="padding: 80px 0; background: var(--ivory); border-top: 1px solid rgba(107, 22, 35, 0.15);">
+            <div class="wrap" style="max-width: 800px; margin: 0 auto;">
+                <div class="section-title reveal" style="text-align: center; margin-bottom: 2.5rem;">
+                    <span class="eyebrow" style="justify-content: center;">Check Dates</span>
+                    <h2>Live Booking Calendar</h2>
+                    <p style="max-width: 600px; margin: 0.5rem auto 0 auto;">Check if your wedding date is available. Select a month below to view booked and available dates in real-time.</p>
+                </div>
+                
+                <div class="glass-panel-light" style="background: #ffffff; padding: 2rem; border-radius: 4px; border: 1px solid rgba(107, 22, 35, 0.12); box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
+                    <div class="calendar-controls" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <button id="prev-month-btn" class="btn btn-ghost" style="padding: 8px 16px; font-size: 0.9rem; cursor: pointer;">← Prev</button>
+                        <h3 id="calendar-month-year" style="font-family: 'Marcellus', serif; color: var(--maroon); font-size: 1.3rem; margin: 0;">June 2026</h3>
+                        <button id="next-month-btn" class="btn btn-ghost" style="padding: 8px 16px; font-size: 0.9rem; cursor: pointer;">Next →</button>
+                    </div>
+                    
+                    <div class="calendar-grid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; text-align: center;">
+                        <!-- Day headers -->
+                        <div style="font-weight: 600; color: var(--maroon); font-size: 0.8rem; padding: 4px 0;">Sun</div>
+                        <div style="font-weight: 600; color: var(--maroon); font-size: 0.8rem; padding: 4px 0;">Mon</div>
+                        <div style="font-weight: 600; color: var(--maroon); font-size: 0.8rem; padding: 4px 0;">Tue</div>
+                        <div style="font-weight: 600; color: var(--maroon); font-size: 0.8rem; padding: 4px 0;">Wed</div>
+                        <div style="font-weight: 600; color: var(--maroon); font-size: 0.8rem; padding: 4px 0;">Thu</div>
+                        <div style="font-weight: 600; color: var(--maroon); font-size: 0.8rem; padding: 4px 0;">Fri</div>
+                        <div style="font-weight: 600; color: var(--maroon); font-size: 0.8rem; padding: 4px 0;">Sat</div>
+                        
+                        <!-- Days container -->
+                        <div id="calendar-days-container" style="display: contents;"></div>
+                    </div>
+                    
+                    <div class="calendar-legend" style="display: flex; gap: 20px; justify-content: center; margin-top: 1.5rem; font-size: 0.85rem;">
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span style="display: inline-block; width: 12px; height: 12px; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 2px;"></span>
+                            <span>Available</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span style="display: inline-block; width: 12px; height: 12px; background: rgba(185, 28, 28, 0.12); border: 1.5px solid rgba(185, 28, 28, 0.4); border-radius: 2px;"></span>
+                            <span>Fully Booked</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- CONTACT -->
         <section id="contact" class="alt-bg">
             <div class="wrap contact-grid">
@@ -568,32 +616,54 @@
                         <div><b>Studio</b>Bayad, Gujarat — visits by appointment</div>
                     </div>
                 </div>
-                <form class="reveal" id="contact-form">
+                <form class="reveal" id="callback-form" novalidate>
                     <div class="row2">
-                        <div class="field"><label for="name">Your Name</label><input id="name" type="text" required>
+                        <div class="field">
+                            <label for="name">Your Name</label>
+                            <input id="name" type="text" required>
+                            <span class="error-msg" id="error-name" style="color: #e53e3e; font-size: 0.75rem; margin-top: 4px; display: none;"></span>
                         </div>
-                        <div class="field"><label for="phone">Phone Number</label><input id="phone" type="tel" required>
+                        <div class="field">
+                            <label for="phone">Phone Number</label>
+                            <input id="phone" type="tel" required>
+                            <span class="error-msg" id="error-phone" style="color: #e53e3e; font-size: 0.75rem; margin-top: 4px; display: none;"></span>
                         </div>
                     </div>
                     <div class="row2">
-                        <div class="field"><label for="date">Wedding Date</label><input id="date" type="date"></div>
-                        <div class="field"><label for="venue">Venue / Area</label><input id="venue" type="text"
-                                placeholder="e.g. Ahmedabad, Mumbai"></div>
+                        <div class="field">
+                            <label for="date">Wedding Date</label>
+                            <input id="date" type="date" required>
+                            <span class="error-msg" id="error-date" style="color: #e53e3e; font-size: 0.75rem; margin-top: 4px; display: none;"></span>
+                        </div>
+                        <div class="field">
+                            <label for="venue">Venue / Area</label>
+                            <input id="venue" type="text" placeholder="e.g. Ahmedabad, Mumbai">
+                        </div>
+                    </div>
+                    <div class="row2">
+                        <div class="field">
+                            <label for="service">What do you need?</label>
+                            <select id="service" required>
+                                <option value="">-- Select Service --</option>
+                                <option value="Mandap + Full Decor">Mandap + Full Decor</option>
+                                <option value="Flowers Only">Flowers Only</option>
+                                <option value="Lighting & Stage">Lighting & Stage</option>
+                                <option value="Haldi / Mehendi / Sangeet Theme">Haldi / Mehendi / Sangeet Theme</option>
+                                <option value="Not Sure Yet">Not Sure Yet</option>
+                            </select>
+                            <span class="error-msg" id="error-service" style="color: #e53e3e; font-size: 0.75rem; margin-top: 4px; display: none;"></span>
+                        </div>
+                        <div class="field">
+                            <label for="budget">Estimated Budget</label>
+                            <input id="budget" type="text" placeholder="e.g. ₹1,50,000">
+                        </div>
                     </div>
                     <div class="field">
-                        <label for="service">What do you need?</label>
-                        <select id="service">
-                            <option>Mandap + Full Decor</option>
-                            <option>Flowers Only</option>
-                            <option>Lighting & Stage</option>
-                            <option>Haldi / Mehendi / Sangeet Theme</option>
-                            <option>Not Sure Yet</option>
-                        </select>
+                        <label for="msg">Anything else we should know?</label>
+                        <textarea id="msg" rows="3"></textarea>
                     </div>
-                    <div class="field"><label for="msg">Anything else we should know?</label><textarea id="msg"
-                            rows="3"></textarea></div>
-                    <button class="btn btn-primary submit-btn" type="submit" id="contact-submit-btn">Request a
-                        Callback</button>
+                    <button class="btn btn-primary submit-btn" type="submit" id="contact-submit-btn">Request a Callback</button>
+                    <p style="font-size: 0.8rem; color: #7a6a5d; margin-top: 10px; text-align: center;">We call back within 2 hours, Mon–Sat 10am–7pm.</p>
                 </form>
 
             </div>
@@ -734,40 +804,83 @@
             }, { threshold: 0.15 });
             reveals.forEach(el => revealObserver.observe(el));
 
-            // 4. Contact Form submit JSON logic + Phone Validation
-            const contactForm = document.getElementById("contact-form");
+            // 4. Contact Form submit JSON logic + Validation
+            const contactForm = document.getElementById("callback-form");
             const submitBtn = document.getElementById("contact-submit-btn");
 
             if (contactForm && submitBtn) {
                 contactForm.addEventListener("submit", (e) => {
                     e.preventDefault();
 
-                    const name = document.getElementById("name").value;
-                    const phone = document.getElementById("phone").value;
-                    const date = document.getElementById("date").value;
-                    const venue = document.getElementById("venue").value;
-                    const service = document.getElementById("service").value;
-                    const msg = document.getElementById("msg").value;
+                    const nameInput = document.getElementById("name");
+                    const phoneInput = document.getElementById("phone");
+                    const dateInput = document.getElementById("date");
+                    const venueInput = document.getElementById("venue");
+                    const serviceSelect = document.getElementById("service");
+                    const budgetInput = document.getElementById("budget");
+                    const msgInput = document.getElementById("msg");
 
-                    // Clean phone number and validate length
-                    const digits = phone.replace(/\D/g, "");
-                    if (digits.length < 10) {
-                        showToast("Please enter a valid phone number containing at least 10 digits.", "warning");
-                        return;
+                    const errName = document.getElementById("error-name");
+                    const errPhone = document.getElementById("error-phone");
+                    const errDate = document.getElementById("error-date");
+                    const errService = document.getElementById("error-service");
+
+                    // Hide previous error messages
+                    [errName, errPhone, errDate, errService].forEach(el => {
+                        if (el) {
+                            el.style.display = "none";
+                            el.innerText = "";
+                        }
+                    });
+
+                    let isValid = true;
+
+                    // 1. Name validation (min 2 chars)
+                    if (nameInput.value.trim().length < 2) {
+                        errName.innerText = "Name must be at least 2 characters.";
+                        errName.style.display = "block";
+                        isValid = false;
                     }
 
-                    // Disable button to prevent duplicate submissions
+                    // 2. Phone validation (exactly 10 digits)
+                    const cleanPhone = phoneInput.value.trim().replace(/\D/g, "");
+                    if (cleanPhone.length !== 10) {
+                        errPhone.innerText = "Phone number must be exactly 10 digits.";
+                        errPhone.style.display = "block";
+                        isValid = false;
+                    }
+
+                    // 3. Date validation (must be future date)
+                    const chosenDate = new Date(dateInput.value);
+                    const today = new Date();
+                    today.setHours(0,0,0,0);
+                    if (!dateInput.value || chosenDate <= today) {
+                        errDate.innerText = "Please select a future date.";
+                        errDate.style.display = "block";
+                        isValid = false;
+                    }
+
+                    // 4. Service validation (required)
+                    if (!serviceSelect.value) {
+                        errService.innerText = "Please select a service.";
+                        errService.style.display = "block";
+                        isValid = false;
+                    }
+
+                    if (!isValid) return;
+
+                    // Disable button and set text to Sending...
                     submitBtn.disabled = true;
-                    const originalText = submitBtn.innerText;
-                    submitBtn.innerText = "Submitting...";
+                    submitBtn.innerText = "Sending...";
 
                     const payload = {
-                        name: name.trim(),
-                        phone: phone.trim(),
-                        date: date,
-                        venue: venue.trim(),
-                        service: service,
-                        message: msg.trim()
+                        name: nameInput.value.trim(),
+                        phone: cleanPhone,
+                        event_date: dateInput.value,
+                        venue: venueInput.value.trim(),
+                        service: serviceSelect.value,
+                        budget: budgetInput.value.trim(),
+                        message: msgInput.value.trim()
                     };
 
                     fetch("/api/callbacks", {
@@ -776,14 +889,20 @@
                         body: JSON.stringify(payload)
                     })
                         .then(res => {
-                            if (!res.ok) throw new Error("Could not process request. Please try again.");
+                            if (!res.ok) throw new Error("Please call us directly at +91 98765 43210");
                             return res.json();
                         })
                         .then(data => {
-                            showToast("Thank you! Your enquiry has been received.", "success");
+                            showToast("We'll call you within 2 hours ✓", "success");
+                            submitBtn.innerText = "Sent!";
                             contactForm.reset();
+                            
+                            // Re-enable after 3 seconds
+                            setTimeout(() => {
+                                submitBtn.disabled = false;
+                                submitBtn.innerText = "Request a Callback";
+                            }, 3000);
 
-                            // Wait briefly before opening WhatsApp support channel
                             setTimeout(() => {
                                 if (data.whatsapp_link) {
                                     window.open(data.whatsapp_link, "_blank");
@@ -791,11 +910,9 @@
                             }, 1200);
                         })
                         .catch(err => {
-                            showToast(err.message, "danger");
-                        })
-                        .finally(() => {
+                            showToast("Error: " + err.message, "danger");
                             submitBtn.disabled = false;
-                            submitBtn.innerText = originalText;
+                            submitBtn.innerText = "Request a Callback";
                         });
                 });
             }
@@ -897,9 +1014,127 @@
                         galleryGrid.appendChild(div);
                     });
                 }
+            // 6. Live Availability Calendar Rendering
+            const daysContainer = document.getElementById("calendar-days-container");
+            const monthYearHeader = document.getElementById("calendar-month-year");
+            const prevMonthBtn = document.getElementById("prev-month-btn");
+            const nextMonthBtn = document.getElementById("next-month-btn");
+
+            let bookedDates = [];
+            let currentCalendarDate = new Date(); // Start at today
+
+            // Fetch booked dates from backend API
+            const fetchBookedDates = async () => {
+                try {
+                    const res = await fetch("/api/availability");
+                    if (res.ok) {
+                        const data = await res.json();
+                        bookedDates = data.booked_dates || [];
+                    }
+                } catch (err) {
+                    console.warn("Failed to fetch availability:", err);
+                }
+                renderCalendar();
+            };
+
+            const renderCalendar = () => {
+                if (!daysContainer) return;
+                daysContainer.innerHTML = "";
+
+                const year = currentCalendarDate.getFullYear();
+                const month = currentCalendarDate.getMonth();
+
+                // Format header
+                const monthNames = [
+                    "January", "February", "March", "April", "May", "June",
+                    "July", "August", "September", "October", "November", "December"
+                ];
+                monthYearHeader.innerText = `${monthNames[month]} ${year}`;
+
+                // Get first day of month and total days in month
+                const firstDayIndex = new Date(year, month, 1).getDay();
+                const totalDays = new Date(year, month + 1, 0).getDate();
+
+                // Render blank empty days for offset
+                for (let i = 0; i < firstDayIndex; i++) {
+                    const emptyDiv = document.createElement("div");
+                    emptyDiv.className = "calendar-day empty";
+                    daysContainer.appendChild(emptyDiv);
+                }
+
+                // Render active month days
+                for (let day = 1; day <= totalDays; day++) {
+                    const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+                    const isBooked = bookedDates.includes(dateStr);
+
+                    const dayDiv = document.createElement("div");
+                    dayDiv.className = `calendar-day ${isBooked ? "booked" : "available"}`;
+                    dayDiv.innerText = day;
+
+                    // Click day handler to autofill callback date
+                    dayDiv.style.cursor = "pointer";
+                    dayDiv.title = isBooked ? "Fully Booked" : "Available — Click to choose this date";
+                    dayDiv.addEventListener("click", () => {
+                        if (!isBooked) {
+                            const dateInput = document.getElementById("date");
+                            if (dateInput) {
+                                dateInput.value = dateStr;
+                                dateInput.scrollIntoView({ behavior: "smooth" });
+                                showToast(`Selected date: ${dateStr} for callback request`, "success");
+                            }
+                        } else {
+                            showToast(`Sorry, ${dateStr} is fully booked. Please select an available date.`, "warning");
+                        }
+                    });
+
+                    daysContainer.appendChild(dayDiv);
+                }
+            };
+
+            if (prevMonthBtn && nextMonthBtn) {
+                prevMonthBtn.addEventListener("click", () => {
+                    currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+                    renderCalendar();
+                });
+
+                nextMonthBtn.addEventListener("click", () => {
+                    currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+                    renderCalendar();
+                });
             }
-        });
-    </script>
+
+            fetchBookedDates();
+
+            // 7. Dynamic Testimonials Loader
+            const testiContainer = document.getElementById("testimonials-scroll-container");
+            if (testiContainer) {
+                fetch("/api/testimonials")
+                    .then(res => {
+                        if (!res.ok) throw new Error("API fail");
+                        return res.json();
+                    })
+                    .then(data => {
+                        if (data && data.length > 0) {
+                            testiContainer.innerHTML = "";
+                            data.forEach(item => {
+                                const card = document.createElement("div");
+                                card.className = "testi-card";
+                                const starsStr = "★".repeat(item.rating) + "☆".repeat(5 - item.rating);
+                                card.innerHTML = `
+                                    <div style="color:#ff9f43; font-size:1.1rem; margin-bottom:8px;">${starsStr}</div>
+                                    <div class="testi-quote">"${item.review}"</div>
+                                    <div class="testi-name">${item.name}</div>
+                                    <div class="testi-loc">Client Review</div>
+                                `;
+                                testiContainer.appendChild(card);
+                            });
+                        }
+                    })
+                    .catch(err => console.warn("Using static testimonials fallback:", err));
+            }
+        }
+    });
+</script>
 </body>
 
 </html>

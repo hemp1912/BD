@@ -60,6 +60,22 @@ class BaseDB:
     # Inventory date-blocking
     async def check_availability(self, item_id: str, start_date: str, end_date: str, qty_needed: int) -> bool: raise NotImplementedError
 
+    # Testimonials
+    async def get_testimonials(self): raise NotImplementedError
+    async def create_testimonial(self, data: dict): raise NotImplementedError
+    async def update_testimonial(self, test_id: str, data: dict): raise NotImplementedError
+    async def delete_testimonial(self, test_id: str): raise NotImplementedError
+
+    # Expenses (per event)
+    async def get_expenses(self, event_id: str = None): raise NotImplementedError
+    async def create_expense(self, data: dict): raise NotImplementedError
+    async def delete_expense(self, expense_id: str): raise NotImplementedError
+
+    # Availability Overrides (admin manual blocks)
+    async def get_availability_overrides(self): raise NotImplementedError
+    async def create_availability_override(self, data: dict): raise NotImplementedError
+    async def delete_availability_override(self, override_id: str): raise NotImplementedError
+
 
 # Factory to get database client
 from backend.db.appwrite_db import AppwriteDB

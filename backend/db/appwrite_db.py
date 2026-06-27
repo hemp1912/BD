@@ -236,6 +236,41 @@ class AppwriteDB(BaseDB):
                     {"type": "string", "key": "status", "size": 50, "required": False, "default": "Pending"}
                 ],
                 "indexes": []
+            },
+            config.APPWRITE_TESTIMONIALS_COLLECTION_ID: {
+                "name": "Testimonials",
+                "attributes": [
+                    {"type": "string", "key": "name", "size": 255, "required": True},
+                    {"type": "integer", "key": "rating", "required": True},
+                    {"type": "string", "key": "review", "size": 1000, "required": True},
+                    {"type": "boolean", "key": "approved", "required": False, "default": False}
+                ],
+                "indexes": []
+            },
+            config.APPWRITE_EXPENSES_COLLECTION_ID: {
+                "name": "Expenses",
+                "attributes": [
+                    {"type": "string", "key": "event_id", "size": 100, "required": True},
+                    {"type": "string", "key": "event_name", "size": 255, "required": False, "default": ""},
+                    {"type": "string", "key": "description", "size": 500, "required": True},
+                    {"type": "string", "key": "category", "size": 100, "required": True},
+                    {"type": "float", "key": "amount", "required": True},
+                    {"type": "string", "key": "date", "size": 50, "required": False, "default": ""},
+                ],
+                "indexes": [
+                    {"key": "event_id_idx", "type": "key", "attributes": ["event_id"]}
+                ]
+            },
+            config.APPWRITE_AVAIL_OVERRIDES_COLLECTION_ID: {
+                "name": "AvailabilityOverrides",
+                "attributes": [
+                    {"type": "string", "key": "date", "size": 50, "required": True},
+                    {"type": "string", "key": "reason", "size": 500, "required": False, "default": ""},
+                    {"type": "boolean", "key": "blocked", "required": False, "default": True},
+                ],
+                "indexes": [
+                    {"key": "date_idx", "type": "key", "attributes": ["date"]}
+                ]
             }
         }
 
@@ -1225,4 +1260,121 @@ class AppwriteDB(BaseDB):
             
         return True
 
+    async def get_testimonials(self):
+        try:
+            res = await asyncio.to_thread(
+                self.databases.list_documents,
+                self.db_id,
+                config.APPWRITE_TESTIMONIALS_COLLECTION_ID
+            )
+            return [self._clean_doc(d) for d in self._get_documents_list(res)]
+        except Exception as e:
+            print(f"[!] Error fetching testimonials: {e}")
+            return []
 
+    async def create_testimonial(self, data: dict):
+        doc_id = "test_" + str(uuid.uuid4())[:8]
+        data.setdefault("approved", False)
+        doc = await asyncio.to_thread(
+            self.databases.create_document,
+            self.db_id,
+            config.APPWRITE_TESTIMONIALS_COLLECTION_ID,
+            doc_id,
+            data
+        )
+        return self._clean_doc(doc)
+
+    async def update_testimonial(self, test_id: str, data: dict):
+        clean_data = {k: v for k, v in data.items() if k != "id"}
+        doc = await asyncio.to_thread(
+            self.databases.update_document,
+            self.db_id,
+            config.APPWRITE_TESTIMONIALS_COLLECTION_ID,
+            test_id,
+            clean_data
+        )
+        return self._clean_doc(doc)
+
+    async def delete_testimonial(self, test_id: str):
+        await asyncio.to_thread(
+            self.databases.delete_document,
+            self.db_id,
+            config.APPWRITE_TESTIMONIALS_COLLECTION_ID,
+            test_id
+        )
+        return True
+
+    # ──────────────────────────────────────────────────────────────────────────
+    # Expenses
+    # ──────────────────────────────────────────────────────────────────────────
+    async def get_expenses(self, event_id: str = None):
+        try:
+            queries = []
+            if event_id:
+                from appwrite.query import Query
+                queries = [Query.equal("event_id", event_id)]
+            res = await asyncio.to_thread(
+                self.databases.list_documents,
+                self.db_id,
+                config.APPWRITE_EXPENSES_COLLECTION_ID,
+                queries
+            )
+            return [self._clean_doc(d) for d in self._get_documents_list(res)]
+        except Exception as e:
+            print(f"[!] Error fetching expenses: {e}")
+            return []
+
+    async def create_expense(self, data: dict):
+        doc_id = "exp_" + str(uuid.uuid4())[:8]
+        doc = await asyncio.to_thread(
+            self.databases.create_document,
+            self.db_id,
+            config.APPWRITE_EXPENSES_COLLECTION_ID,
+            doc_id,
+            data
+        )
+        return self._clean_doc(doc)
+
+    async def delete_expense(self, expense_id: str):
+        await asyncio.to_thread(
+            self.databases.delete_document,
+            self.db_id,
+            config.APPWRITE_EXPENSES_COLLECTION_ID,
+            expense_id
+        )
+        return True
+
+    # ──────────────────────────────────────────────────────────────────────────
+    # Availability Overrides
+    # ──────────────────────────────────────────────────────────────────────────
+    async def get_availability_overrides(self):
+        try:
+            res = await asyncio.to_thread(
+                self.databases.list_documents,
+                self.db_id,
+                config.APPWRITE_AVAIL_OVERRIDES_COLLECTION_ID
+            )
+            return [self._clean_doc(d) for d in self._get_documents_list(res)]
+        except Exception as e:
+            print(f"[!] Error fetching availability overrides: {e}")
+            return []
+
+    async def create_availability_override(self, data: dict):
+        doc_id = "avail_" + str(uuid.uuid4())[:8]
+        doc = await asyncio.to_thread(
+            self.databases.create_document,
+            self.db_id,
+            config.APPWRITE_AVAIL_OVERRIDES_COLLECTION_ID,
+            doc_id,
+            data
+        )
+        return self._clean_doc(doc)
+
+    async def delete_availability_override(self, override_id: str):
+        await asyncio.to_thread(
+            self.databases.delete_document,
+            self.db_id,
+            config.APPWRITE_AVAIL_OVERRIDES_COLLECTION_ID,
+            override_id
+        )
+        return True
