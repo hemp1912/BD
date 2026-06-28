@@ -294,7 +294,8 @@ class AppwriteDB(BaseDB):
                     {"type": "string", "key": "confirm_email_body", "size": 1500, "required": False, "default": "Dear {client_name},\n\nWe are delighted to confirm your event booking with Bhoomi Decoration.\n\nBooking Details:\n- Event ID: {event_id}\n- Venue: {venue_address}\n- Dates: {start_date} to {end_date}\n\nYou can track the live progress and uploads here:\n{portal_url}\n\nThank you,\nBhoomi Decoration Team"},
                     {"type": "string", "key": "completed_email_subject", "size": 255, "required": False, "default": "Thank You from Bhoomi Decoration!"},
                     {"type": "string", "key": "completed_email_body", "size": 1500, "required": False, "default": "Dear {client_name},\n\nWe want to say a big thank you for choosing Bhoomi Decoration for your recent event.\n\nIt was our pleasure assisting you. You can review your final invoice and download a PDF copy from your portal: {portal_url}\n\nBest regards,\nBhoomi Decoration Team"},
-                    {"type": "string", "key": "theme", "size": 50, "required": False, "default": "crimson_red"}
+                    {"type": "string", "key": "theme", "size": 50, "required": False, "default": "crimson_red"},
+                    {"type": "boolean", "key": "enable_auto_emails", "required": False, "default": True}
                 ],
                 "indexes": []
             }
@@ -1450,7 +1451,8 @@ class AppwriteDB(BaseDB):
                     "confirm_email_body": "Dear {client_name},\n\nYour booking is confirmed!\n\nVenue: {venue_address}\nDates: {start_date} to {end_date}\n\nTrack here: {portal_url}\n\nThank you,\nBhoomi Decoration Team",
                     "completed_email_subject": "Thank You from Bhoomi Decoration!",
                     "completed_email_body": "Dear {client_name},\n\nThank you for choosing Bhoomi Decoration!\n\nView your invoice: {portal_url}\n\nBest regards,\nBhoomi Decoration Team",
-                    "theme": "crimson_red"
+                    "theme": "crimson_red",
+                    "enable_auto_emails": True
                 }
                 new_doc = await asyncio.to_thread(
                     self.databases.create_document,
@@ -1481,7 +1483,8 @@ class AppwriteDB(BaseDB):
                 "confirm_email_body": "Dear {client_name},\n\nYour booking is confirmed!\n\nBhoomi Decoration Team",
                 "completed_email_subject": "Thank You from Bhoomi Decoration!",
                 "completed_email_body": "Dear {client_name},\n\nThank you for choosing us!\n\nBhoomi Decoration Team",
-                "theme": "crimson_red"
+                "theme": "crimson_red",
+                "enable_auto_emails": True
             }
 
     async def update_settings(self, data: dict):

@@ -10,6 +10,7 @@ from appwrite.exception import AppwriteException
 from backend import config
 from backend.db_client import db_client
 import time
+from backend.limiter import limiter
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
@@ -306,7 +307,8 @@ async def require_admin_or_labor(request: Request, token: Optional[str] = None):
 
 
 @router.post("/login")
-async def login(req: LoginRequest):
+@limiter.limit("5/minute")
+async def login(request: Request, req: LoginRequest):
     fallback_users = {
             "hello@bhoomidecoration.com": {"password": "admin123", "role": "admin", "full_name": "Admin Manager", "id": "usr_admin"}
          }
@@ -462,6 +464,7 @@ async def logout(token: str):
     return {"status": "success"}
 
 @router.post("/onboard")
+@limiter.limit("10/minute")
 async def onboard_user(request: Request, req: OnboardRequest):
     await require_admin(request)
     

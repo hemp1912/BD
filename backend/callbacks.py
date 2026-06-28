@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from backend.db_client import db_client
 from backend.auth import require_admin
 from backend import config
+from backend.limiter import limiter
 
 router = APIRouter(prefix="/api/callbacks", tags=["callbacks"])
 
@@ -108,7 +109,8 @@ async def send_whatsapp_confirmation(to_phone: str, client_name: str, event_date
         print(f"[!] WhatsApp Auto-Reply failed to dispatch: {e}")
 
 @router.post("")
-async def create_callback(callback: CallbackSchema):
+@limiter.limit("3/minute")
+async def create_callback(request: Request, callback: CallbackSchema):
     callback_data = callback.model_dump()
     
     # Map event_date -> date if event_date is provided and date is empty

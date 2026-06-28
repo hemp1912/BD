@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from typing import List
 from backend.db_client import db_client
 from backend.auth import require_admin
+from backend.limiter import limiter
 
 router = APIRouter(prefix="/api", tags=["testimonials"])
 
@@ -13,7 +14,8 @@ class TestimonialSchema(BaseModel):
     approved: bool = False
 
 @router.post("/testimonials")
-async def create_testimonial(payload: TestimonialSchema):
+@limiter.limit("3/minute")
+async def create_testimonial(request: Request, payload: TestimonialSchema):
     if not payload.name or not payload.review:
         raise HTTPException(status_code=400, detail="Name and review message are required.")
     if not (1 <= payload.rating <= 5):

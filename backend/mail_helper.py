@@ -41,7 +41,19 @@ async def send_system_email(to_email: str, email_type: str, context: dict):
         settings = await db_client.get_settings()
     except Exception as e:
         print(f"Error fetching settings from database: {e}")
-        return False
+        settings = {}
+
+    # Check if automatic emails are disabled (for confirmation and completed emails only)
+    if email_type in ["confirmation", "completed"]:
+        enable_auto_emails = settings.get("enable_auto_emails")
+        if enable_auto_emails is False:
+            print(f"Automatic emails are disabled. Skipping {email_type} email to {to_email}.")
+            return False
+
+    import os
+    if os.getenv("TESTING") == "true" or os.getenv("DISABLE_EMAIL") == "true":
+        print(f"[TESTING] Mock SMTP: Simulated sending {email_type} email to {to_email}.")
+        return True
         
     smtp_host = settings.get("smtp_host")
     smtp_port = settings.get("smtp_port") or 587

@@ -3675,6 +3675,10 @@ async function loadSettingsData() {
         if (completedSubj) completedSubj.value = s.completed_email_subject || "Thank You from Bhoomi Decoration!";
         if (completedBody) completedBody.value = s.completed_email_body || "";
         document.getElementById("settings-theme").value = s.theme || "crimson_red";
+        const enableAutoEmailsInput = document.getElementById("settings-enable-auto-emails");
+        if (enableAutoEmailsInput) {
+            enableAutoEmailsInput.checked = s.enable_auto_emails !== false;
+        }
         applyTheme(s.theme || "crimson_red");
     } catch (err) {
         console.error("Failed to load settings from DB:", err);
@@ -3709,7 +3713,8 @@ async function handleSettingsSubmit(e) {
         completed_email_subject: document.getElementById("settings-completed-email-subject").value,
         completed_email_body: document.getElementById("settings-completed-email-body").value,
 
-        theme: document.getElementById("settings-theme").value
+        theme: document.getElementById("settings-theme").value,
+        enable_auto_emails: document.getElementById("settings-enable-auto-emails") ? document.getElementById("settings-enable-auto-emails").checked : true
     };
 
     try {

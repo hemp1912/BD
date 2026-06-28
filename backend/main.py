@@ -5,6 +5,9 @@ from fastapi import FastAPI, HTTPException, Request, BackgroundTasks
 from fastapi.responses import HTMLResponse, FileResponse, RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from backend import auth, inventory, finance, alerts, gallery, crew, callbacks, testimonials, expenses
+from backend.limiter import limiter
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 
 app = FastAPI(
     title="Event Decoration & Logistics Management API",
@@ -14,6 +17,9 @@ app = FastAPI(
     # redoc_url=None,
     # openapi_url=None
 )
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # Enable CORS for development
 app.add_middleware(
@@ -543,7 +549,12 @@ class SettingsSchema(BaseModel):
     smtp_pass: Optional[str] = ""
     email_subject: Optional[str] = "Bhoomi Decoration Event Portal & Invoice — {client_name}"
     email_body: Optional[str] = ""
+    confirm_email_subject: Optional[str] = "Event Booking Confirmed — Bhoomi Decoration"
+    confirm_email_body: Optional[str] = ""
+    completed_email_subject: Optional[str] = "Thank You from Bhoomi Decoration!"
+    completed_email_body: Optional[str] = ""
     theme: Optional[str] = "crimson_red"
+    enable_auto_emails: Optional[bool] = True
 
 @app.get("/api/admin/settings")
 async def get_system_settings(request: Request):
@@ -569,6 +580,11 @@ async def send_email_api(payload: EmailRequestSchema, request: Request):
     from backend.auth import require_admin
     await require_admin(request)
     
+    import os
+    if os.getenv("TESTING") == "true" or os.getenv("DISABLE_EMAIL") == "true":
+        print(f"[TESTING] Mock SMTP: Simulated sending custom email to {payload.to_email}.")
+        return {"status": "success", "message": f"[TESTING] Simulated email successfully sent to {payload.to_email}!"}
+        
     from backend.db_client import db_client
     settings = await db_client.get_settings()
     

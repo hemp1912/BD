@@ -1,5 +1,6 @@
 import sys
 import os
+os.environ["TESTING"] = "true"
 import json
 import uuid
 
