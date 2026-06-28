@@ -1,7 +1,7 @@
 import os
 from typing import Optional
 from pydantic import BaseModel
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, BackgroundTasks
 from fastapi.responses import HTMLResponse, FileResponse, RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from backend import auth, inventory, finance, alerts, gallery, crew, callbacks, testimonials, expenses
@@ -287,6 +287,70 @@ async def get_portal_data(token: str):
     }
     
     return public_event
+
+class PortalActionSchema(BaseModel):
+    action: str
+    feedback: Optional[str] = ""
+
+@app.post("/api/portal/{token}/action")
+async def handle_portal_action(token: str, payload: PortalActionSchema, request: Request, background_tasks: BackgroundTasks):
+    from backend.db_client import db_client
+    import datetime
+    from backend.alerts import dispatch_telegram_alert
+    
+    events = await db_client.get_events()
+    target_event = None
+    for e in events:
+        if e.get("portal_token") == token:
+            target_event = e
+            break
+            
+    if not target_event:
+        raise HTTPException(status_code=404, detail="Booking not found or invalid link.")
+        
+    client_name = target_event.get("client_name") or "Valued Client"
+    venue = target_event.get("venue_address") or "N/A"
+    event_id = target_event.get("id")
+    
+    if payload.action == "approve":
+        if target_event.get("status") == "Confirmed":
+            return {"status": "success", "message": "Booking is already confirmed."}
+            
+        await db_client.update_event(event_id, {"status": "Confirmed", "progress_stage": 1})
+        
+        try:
+            from backend.mail_helper import get_event_email_context, send_system_email
+            updated_event = await db_client.get_event(event_id)
+            client_email, email_context = await get_event_email_context(updated_event, request)
+            if client_email:
+                background_tasks.add_task(send_system_email, client_email, "confirmation", email_context)
+        except Exception as mail_err:
+            print(f"[!] Error scheduling confirmation email from portal approval: {mail_err}")
+            
+        alert_text = f"<b>✓ Portal Booking Approved by Client!</b>\nClient: {client_name}\nVenue: {venue}\nEvent ID: {event_id}"
+        background_tasks.add_task(dispatch_telegram_alert, alert_text)
+        
+        return {"status": "success", "message": "Booking successfully confirmed!"}
+        
+    elif payload.action == "reject":
+        feedback_text = payload.feedback.strip() if payload.feedback else ""
+        if not feedback_text:
+            raise HTTPException(status_code=400, detail="Feedback is required when requesting changes.")
+            
+        old_notes = target_event.get("notes") or ""
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+        new_feedback_entry = f"\n[{timestamp} Client Feedback]: {feedback_text}\n"
+        
+        updated_notes = old_notes + new_feedback_entry
+        await db_client.update_event(event_id, {"notes": updated_notes})
+        
+        alert_text = f"<b>⚠️ Portal Change Requested by Client!</b>\nClient: {client_name}\nVenue: {venue}\nFeedback: {feedback_text}"
+        background_tasks.add_task(dispatch_telegram_alert, alert_text)
+        
+        return {"status": "success", "message": "Change request submitted successfully."}
+        
+    else:
+        raise HTTPException(status_code=400, detail="Invalid action. Must be 'approve' or 'reject'.")
 
 @app.get("/api/availability")
 async def get_availability():

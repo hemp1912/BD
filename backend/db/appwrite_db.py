@@ -695,6 +695,18 @@ class AppwriteDB(BaseDB):
         else:
             return all_clients
 
+    async def get_client(self, client_id: str):
+        try:
+            doc = await asyncio.to_thread(
+                self.databases.get_document,
+                self.db_id,
+                config.APPWRITE_CLIENTS_COLLECTION_ID,
+                client_id
+            )
+            return self._clean_doc(doc)
+        except Exception:
+            return None
+
     async def create_client(self, client: dict):
         doc_id = "cli_" + str(uuid.uuid4())[:8]
         doc = await asyncio.to_thread(

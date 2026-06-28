@@ -320,6 +320,55 @@ async def get_event_portal_link(request: Request, event_id: str):
         raise HTTPException(status_code=500, detail="Failed to generate portal token.")
     return {"portal_token": token, "portal_link": f"/portal/{token}"}
 
+@router.post("/events/{event_id}/send-reminder")
+async def send_event_payment_reminder(request: Request, event_id: str, background_tasks: BackgroundTasks):
+    await require_admin(request)
+    event_data = await db_client.get_event(event_id)
+    if not event_data:
+        raise HTTPException(status_code=404, detail="Event not found")
+    
+    event_data = await ensure_portal_token(event_data)
+    event_data = add_payment_status(event_data)
+    
+    from backend.mail_helper import get_event_email_context, send_system_email
+    client_email, email_context = await get_event_email_context(event_data, request)
+    if not client_email:
+        raise HTTPException(status_code=400, detail="Client email address is missing or invalid for this booking.")
+        
+    if (event_data.get("remaining_balance") or 0.0) <= 0:
+        raise HTTPException(status_code=400, detail="This booking has no outstanding remaining balance due.")
+        
+    background_tasks.add_task(send_system_email, client_email, "reminder", email_context)
+    return {"status": "success", "message": f"Payment reminder scheduled for client {event_data.get('client_name')}."}
+
+@router.post("/finance/send-bulk-reminders")
+async def send_bulk_payment_reminders(request: Request, background_tasks: BackgroundTasks):
+    await require_admin(request)
+    events = await db_client.get_events()
+    
+    from backend.mail_helper import get_event_email_context, send_system_email
+    
+    sent_count = 0
+    skipped_count = 0
+    for evt in events:
+        evt_status = evt.get("status", "")
+        if evt_status in ["Cancelled", "Completed"]:
+            continue
+            
+        remaining = evt.get("remaining_balance") or 0.0
+        if remaining <= 0:
+            continue
+            
+        evt = await ensure_portal_token(evt)
+        client_email, email_context = await get_event_email_context(evt, request)
+        if client_email:
+            background_tasks.add_task(send_system_email, client_email, "reminder", email_context)
+            sent_count += 1
+        else:
+            skipped_count += 1
+            
+    return {"status": "success", "sent_count": sent_count, "skipped_count": skipped_count}
+
 @router.get("/events/{event_id}")
 async def get_event(request: Request, event_id: str):
     session = await require_admin_or_labor(request)

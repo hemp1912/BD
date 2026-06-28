@@ -143,6 +143,8 @@
                     </option>
                     <option value="gu" style="background: var(--bg-primary); color: var(--text-primary);">ગુજરાતી
                         (Gujarati)</option>
+                    <option value="hi" style="background: var(--bg-primary); color: var(--text-primary);">हिन्दी
+                        (Hindi)</option>
                 </select>
             </div>
 
@@ -726,9 +728,14 @@
                             Filter sales, calculate receivables, and view payment transaction logs.
                         </p>
                     </div>
-                    <button class="btn btn-ghost" id="btn-export-finance">
-                        <span data-i18n="export_pdf">📄 Export PDF</span>
-                    </button>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn btn-secondary" onclick="sendAllPaymentReminders()" style="color: var(--maroon); border-color: var(--maroon); font-weight: 600; font-size: 0.85rem; padding: 0.5rem 1rem;">
+                            ✉ Bulk Reminders
+                        </button>
+                        <button class="btn btn-ghost" id="btn-export-finance">
+                            <span data-i18n="export_pdf">📄 Export PDF</span>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Finance Analytics Board -->

@@ -536,6 +536,190 @@ const TRANSLATIONS = {
         "nav_settings": "સિસ્ટમ સેટિંગ્સ",
         "export_pdf": "PDF નિકાસ",
         "details_btn": "વિગતો"
+    },
+    hi: {
+        // Sidebar & General
+        "nav_dashboard": "ऑपरेशन्स डैशबोर्ड",
+        "nav_events": "इवेंट प्रोजेक्ट्स",
+        "nav_warehouse": "गोदाम सूची",
+        "nav_clients": "ग्राहक संबंध प्रबंधन",
+        "nav_kanban": "बुकिंग पाइपलाइन",
+        "nav_callbacks": "कॉल बैक सीआरएम",
+        "nav_gallery": "पोर्टफोलियो गैलरी",
+        "nav_crew": "क्रू खाता",
+        "callbacks_title": "कॉल बैक सीआरएम",
+        "callbacks_subtitle": "कॉल बैक और लीड पूछताछ की समीक्षा और प्रबंधन करें।",
+        "callbacks_table_name": "नाम",
+        "callbacks_table_phone": "फ़ोन",
+        "callbacks_table_date": "तारीख",
+        "callbacks_table_service": "अनुरोधित सेवा",
+        "callbacks_table_msg": "संदेश",
+        "callbacks_table_status": "स्थिति",
+        "callbacks_action_contacted": "संपर्क किया गया",
+        "status_quote": "कोट",
+        "status_draft": "ड्राफ्ट",
+        "status_confirmed": "कन्फर्म",
+        "status_completed": "पूर्ण किया गया",
+        "nav_finance": "वित्त हब",
+        "nav_invoices": "इनवॉइस हब",
+        "nav_signout": "सुरक्षित लॉग आउट",
+        "role_admin": "व्यवसाय व्यवस्थापक",
+        "edit": "संपादित करें",
+        "delete": "हटाएं",
+        "save": "सहेजें",
+        "cancel": "रद्द करें",
+        "actions": "कार्रवाई",
+        "status": "स्थिति",
+
+        // Dashboard
+        "dash_title": "ऑपरेशन्स डैशबोर्ड",
+        "dash_subtitle": "शेड्यूलिंग स्थिति, भुगतान और नेट इवेंट शेष राशि को ट्रैक करें।",
+        "dash_btn_quote": "ऑन-वॉक कोट बिल्डर",
+        "dash_btn_onboard": "क्रू शामिल करें",
+        "dash_btn_booking": "इवेंट बुकिंग बनाएं",
+        "dash_stat_active": "सक्रिय बुकिंग",
+        "dash_stat_tasks": "लंबित कार्य",
+        "dash_stat_crew": "ड्यूटी पर क्रू",
+        "dash_stat_lowstock": "कम स्टॉक वाली वस्तुएं",
+        "dash_upcoming_title": "आगामी इवेंट्स",
+        "dash_upcoming_sub": "निकटतम तिथि के अनुसार क्रमबद्ध · पूर्ण इवेंट्स इवेंट प्रोजेक्ट्स अनुभाग में दिखाई देते हैं।",
+        "dash_search_placeholder": "ग्राहक / स्थान खोजें...",
+        "dash_table_client": "ग्राहक / स्थान",
+        "dash_table_dates": "तिथियां",
+        "dash_table_total": "इनवॉइस कुल",
+        "dash_table_paid": "भुगतान किया गया",
+        "dash_table_balance": "शेष राशि",
+
+        // Events Projects
+        "events_title": "इवेंट प्रोजेक्ट्स",
+        "events_subtitle": "सभी बुक किए गए सजावट प्रोजेक्ट्स को ट्रैक, फ़िल्टर, खोजें और प्रबंधित करें।",
+        "events_btn_booking": "नया इवेंट प्रोजेक्ट बुक करें",
+        "events_stat_total": "कुल बुकिंग",
+        "events_stat_confirmed": "पुष्टि की गई बुकिंग",
+        "events_stat_draft": "ड्राफ्ट बुकिंग",
+        "events_filter_status": "स्थिति फ़िल्टर:",
+        "events_filter_all": "सभी",
+        "events_filter_draft": "ड्राफ्ट",
+        "events_filter_confirmed": "कन्फर्म",
+        "events_filter_completed": "पूर्ण किया गया",
+        "events_search_placeholder": "ग्राहक / स्थान खोजें...",
+
+        // Warehouse Catalog
+        "wh_title": "गोदाम सूची सूची",
+        "wh_subtitle": "भौतिक इवेंट संपत्तियों को बनाएं, अपडेट करें और प्रबंधित करें।",
+        "wh_btn_register": "कैटलॉग संपत्ति पंजीकृत करें",
+        "wh_stat_unique": "कुल अद्वितीय वस्तुएं",
+        "wh_stat_stock": "कुल इकाई स्टॉक",
+        "wh_stat_low": "कम स्टॉक अलर्ट",
+        "wh_search_placeholder": "कैटलॉग वस्तुएं खोजें...",
+        "wh_table_id": "आईडी",
+        "wh_table_name": "नाम",
+        "wh_table_category": "श्रेणी",
+        "wh_table_stock": "स्टॉक स्तर",
+        "wh_table_rate": "दैनिक दर",
+
+        // Clients CRM
+        "cli_title": "ग्राहक डेटाबेस",
+        "cli_subtitle": "ग्राहक प्रोफाइल प्रबंधित करें और नए खाते पंजीकृत करें।",
+        "cli_btn_intake": "नया ग्राहक शामिल करें",
+        "cli_stat_total": "कुल ग्राहक",
+        "cli_stat_active": "सक्रिय ग्राहक",
+        "cli_stat_new": "नए लीड (YTD)",
+        "cli_search_placeholder": "ग्राहक खोजें...",
+        "cli_table_id": "आईडी",
+        "cli_table_name": "नाम",
+        "cli_table_email": "ईमेल",
+        "cli_table_phone": "फ़ोन",
+        "cli_table_address": "पता",
+
+        // Portfolio Gallery
+        "gal_title": "पोर्टफोलियो गैलरी",
+        "gal_subtitle": "वेबसाइट पर प्रदर्शित होने वाली तस्वीरों को अपलोड और प्रबंधित करें।",
+        "gal_btn_upload": "तस्वीर प्रविष्टि अपलोड करें",
+        "gal_search_placeholder": "गैलरी प्रविष्टियां खोजें...",
+        "gal_table_photo": "फोटो",
+        "gal_table_title": "शीर्षक",
+        "gal_table_category": "श्रेणी",
+        "gal_table_desc": "विवरण",
+
+        // Crew Ledger
+        "crew_title": "क्रू वेतन और बहीखाता",
+        "crew_subtitle": "आंतरिक क्रू प्रोफाइल, दैनिक दर, भुगतान लॉग और बकाया राशि ट्रैक करें।",
+        "crew_btn_attendance": "दैनिक उपस्थिति रजिस्टर",
+        "crew_btn_add": "टीम प्रोफाइल जोड़ें",
+        "crew_stat_strength": "रोस्टर ताकत",
+        "crew_stat_owed": "देय वेतन",
+        "crew_stat_active": "सक्रिय असाइनमेंट",
+        "crew_search_placeholder": "टीम के सदस्यों को खोजें...",
+        "crew_table_id": "आईडी",
+        "crew_table_name": "नाम",
+        "crew_table_role": "भूमिका",
+        "crew_table_contact": "संपर्क",
+        "crew_table_rate": "मूल दर (₹)",
+        "crew_table_days": "कार्य दिवस",
+        "crew_table_owed": "देय वेतन (₹)",
+
+        // Finance Hub
+        "fin_title": "वित्त हब",
+        "fin_subtitle": "बिक्री फ़िल्टर करें, प्राप्य राशि की गणना करें, और भुगतान लेनदेन लॉग देखें।",
+        "fin_stat_sales": "कुल बिक्री",
+        "fin_stat_receivables": "प्राप्य शेष राशि",
+        "fin_stat_wages": "कुल क्रू वेतन",
+        "fin_stat_profit": "शुद्ध लाभ मार्जिन",
+        "fin_filter_payment": "भुगतान स्थिति फ़िल्टर करें:",
+        "fin_filter_all": "सभी",
+        "fin_filter_fully": "पूर्ण भुगतान",
+        "fin_filter_partially": "आंशिक भुगतान",
+        "fin_filter_unpaid": "अवैतनिक",
+        "fin_search_placeholder": "ग्राहक / स्थान खोजें...",
+        "fin_table_client": "ग्राहक / स्थान",
+        "fin_table_date": "इवेंट तिथि",
+        "fin_table_total": "इनवॉइस कुल",
+        "fin_table_paid": "भुगतान किया गया",
+        "fin_table_balance": "शेष राशि",
+        "fin_table_status": "भुगतान स्थिति",
+        "fin_table_action": "कार्रवाई",
+
+        // Invoices Hub
+        "inv_title": "इनवॉइस हब",
+        "inv_subtitle": "बिलिंग प्रबंधित करें, भुगतान संग्रह ट्रैक करें और उच्च-गुणवत्ता वाले पीडीएफ इनवॉइस निर्यात करें।",
+        "inv_btn_manual": "मैन्युअल इनवॉइस बनाएं",
+        "inv_stat_total": "कुल इनवॉइस राशि",
+        "inv_stat_collected": "कुल संग्रहीत",
+        "inv_stat_remaining": "कुल शेष",
+        "inv_filter_status": "स्थिति फ़िल्टर करें:",
+        "inv_filter_all": "सभी",
+        "inv_filter_paid": "भुगतान किया गया",
+        "inv_filter_remaining": "शेष",
+        "inv_filter_unpaid": "अवैतनिक",
+        "inv_search_placeholder": "ग्राहक / स्थान खोजें...",
+        "inv_table_client": "ग्राहक / स्थान",
+        "inv_table_date": "इनवॉइस तिथि",
+        "inv_table_status": "स्थिति",
+        "inv_table_total": "इनवॉइस कुल",
+        "inv_table_paid": "भुगतान किया गया",
+        "inv_table_balance": "शेष",
+        
+        // System Settings
+        "settings_title": "सिस्टम सेटिंग्स",
+        "settings_subtitle": "बुकिंग डिफ़ॉल्ट, कंपनी प्रोफाइल विवरण और थीम रंग कॉन्फ़िगर करें।",
+        "settings_sec_defaults": "बुकिंग डिफ़ॉल्ट",
+        "settings_tax_rate": "डिफ़ॉल्ट टैक्स दर (%)",
+        "settings_discount": "डिफ़ॉल्ट छूट (₹)",
+        "settings_sec_profile": "कंपनी व्यवसाय प्रोफ़ाइल",
+        "settings_company_name": "कंपनी का नाम",
+        "settings_company_address": "व्यावसायिक पता",
+        "settings_company_email": "व्यावसायिक ईमेल",
+        "settings_company_phone": "संपर्क फ़ोन",
+        "settings_company_website": "कंपनी की वेबसाइट",
+        "settings_sec_appearance": "थीम रंग योजना",
+        "settings_theme_label": "थीम पैलेट",
+        "settings_theme_crimson": "क्रिमसन रेड (डिफ़ॉल्ट)",
+        "settings_theme_emerald": "पन्ना हरा (Emerald Green)",
+        "settings_theme_midnight": "आधी रात का नीला (Midnight Blue)",
+        "settings_btn_save": "सेटिंग्स सहेजें",
+        "export_pdf": "पीडीएफ निर्यात",
+        "details_btn": "विवरण"
     }
 };
 
@@ -2421,6 +2605,12 @@ async function loadFinanceData(filterType = "All", page) {
             const pStatus = evt.payment_status || "Unpaid";
             const badgeClass = pStatus === "Fully Paid" ? "badge-completed" :
                                pStatus === "Partially Paid" ? "badge-confirmed" : "badge-draft";
+            
+            const showRemind = (evt.remaining_balance > 0 && evt.status !== "Cancelled" && evt.status !== "Completed");
+            const remindBtn = showRemind ? `
+                <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem; color: var(--maroon); border-color: var(--maroon);" onclick="sendPaymentReminder('${evt.id}')">✉ Remind</button>
+            ` : '';
+
             tr.innerHTML = `
                 <td>
                     <strong>${evt.client_name}</strong><br>
@@ -2434,6 +2624,7 @@ async function loadFinanceData(filterType = "All", page) {
                 <td>
                     <div style="display: flex; gap: 0.4rem;">
                         <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem;" onclick="openInvoiceModal('${evt.id}')">Receipt/Payout</button>
+                        ${remindBtn}
                         <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem;" onclick="fetchAndCopyPortalLink('${evt.id}')">🔗 Portal</button>
                     </div>
                 </td>
@@ -2513,6 +2704,11 @@ async function loadInvoicesData(filterType = "All", page) {
                 badgeClass = "badge-confirmed";
             }
             
+            const showRemind = (balance > 0 && evt.status !== "Cancelled" && evt.status !== "Completed");
+            const remindBtn = showRemind ? `
+                <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem; color: var(--maroon); border-color: var(--maroon);" onclick="sendPaymentReminder('${evt.id}')">✉ Remind</button>
+            ` : '';
+
             const tr = document.createElement("tr");
             tr.innerHTML = `
                 <td>
@@ -2528,6 +2724,7 @@ async function loadInvoicesData(filterType = "All", page) {
                     <div style="display: flex; gap: 0.4rem;">
                         <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem;" onclick="exportInvoiceToPDF('${evt.id}')">Export PDF</button>
                         <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem;" onclick="openInvoiceModal('${evt.id}')">Receipt/Payout</button>
+                        ${remindBtn}
                         <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem;" onclick="fetchAndCopyPortalLink('${evt.id}')">🔗 Portal</button>
                     </div>
                 </td>
@@ -4941,6 +5138,36 @@ async function deleteBookingEventPhoto(photoId, eventId) {
 }
 window.deleteBookingEventPhoto = deleteBookingEventPhoto;
 
+
+async function sendPaymentReminder(eventId) {
+    if (!confirm("Send a payment reminder email to the client for this booking?")) return;
+    try {
+        showToast("Sending reminder email...");
+        const res = await apiFetch(`/api/events/${eventId}/send-reminder`, {
+            method: "POST"
+        });
+        showToast(res.message || "Payment reminder sent successfully.");
+    } catch (err) {
+        showToast("Error: " + err.message, "error");
+    }
+}
+window.sendPaymentReminder = sendPaymentReminder;
+
+async function sendAllPaymentReminders() {
+    if (!confirm("Are you sure you want to send payment reminder emails to ALL clients with an outstanding balance?")) return;
+    try {
+        showToast("Sending reminders in bulk...");
+        const res = await apiFetch("/api/finance/send-bulk-reminders", {
+            method: "POST"
+        });
+        showToast(`Reminders sent successfully! Sent: ${res.sent_count}, Skipped: ${res.skipped_count}`);
+        loadFinanceData();
+        loadInvoicesData();
+    } catch (err) {
+        showToast("Error: " + err.message, "error");
+    }
+}
+window.sendAllPaymentReminders = sendAllPaymentReminders;
 
 // Nav hooks for the 3 new admin sections
 document.addEventListener("DOMContentLoaded", () => {

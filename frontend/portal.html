@@ -546,6 +546,137 @@
             }
         }
 
+        /* ── Quote Banner Styling ── */
+        .quote-approval-card {
+            background: linear-gradient(135deg, #FFFBF0 0%, #FFF3D6 100%);
+            border: 1px solid rgba(201, 148, 31, 0.3);
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(201, 148, 31, 0.1);
+            padding: 1.75rem;
+            margin-bottom: 1.5rem;
+            display: none; /* Controlled via JS */
+            animation: slideDown 0.4s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .quote-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: #8C620D;
+            font-family: 'Marcellus', serif;
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .quote-desc {
+            font-size: 0.9rem;
+            color: #5D4924;
+            line-height: 1.6;
+            margin-bottom: 1.25rem;
+        }
+
+        .quote-actions-row {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-quote-approve {
+            background: var(--gold);
+            color: #fff;
+            border: none;
+            padding: 0.65rem 1.25rem;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.88rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(201, 148, 31, 0.25);
+        }
+
+        .btn-quote-approve:hover {
+            background: var(--gold-light);
+            transform: translateY(-1px);
+        }
+
+        .btn-quote-reject {
+            background: transparent;
+            color: var(--maroon);
+            border: 1.5px solid var(--maroon);
+            padding: 0.6rem 1.25rem;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.88rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-quote-reject:hover {
+            background: rgba(107, 22, 35, 0.05);
+            transform: translateY(-1px);
+        }
+
+        .feedback-form-container {
+            margin-top: 1.25rem;
+            padding-top: 1.25rem;
+            border-top: 1px dashed rgba(201, 148, 31, 0.2);
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .feedback-textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 0.75rem;
+            border-radius: 6px;
+            border: 1px solid rgba(201, 148, 31, 0.3);
+            font-family: inherit;
+            font-size: 0.88rem;
+            outline: none;
+            resize: vertical;
+            margin-bottom: 0.75rem;
+            background: #fff;
+            color: var(--ink);
+        }
+
+        .feedback-textarea:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(201, 148, 31, 0.15);
+        }
+
+        .btn-feedback-submit {
+            background: var(--maroon);
+            color: #fff;
+            border: none;
+            padding: 0.55rem 1.1rem;
+            border-radius: 5px;
+            font-weight: 600;
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-feedback-submit:hover {
+            background: var(--maroon-deep);
+        }
+
         /* ── Hidden PDF Template ── */
         #portal-invoice-pdf-template {
             display: none;
@@ -593,6 +724,33 @@
 
             <!-- Content -->
             <div class="portal-content">
+
+                <!-- Quotation Approval Card -->
+                <div class="quote-approval-card" id="portal-quote-card">
+                    <div class="quote-header">
+                        <span>📋</span> Quotation Approval Required / ક્વોટેશન મંજૂરી જરૂરી
+                    </div>
+                    <div class="quote-desc">
+                        Please review the decoration items and rental charges below. You can approve this quotation to confirm your event booking, or submit a request for changes if updates are needed.<br>
+                        મહેરબાनी કરીને નીચે દર્શાવેલ વસ્તુઓ અને કિંમત તપાસો. બુકિંગ કન્ફર્મ કરવા માટે તમે આ ક્વોટેશન મંજૂર કરી શકો છો, અથવા ફेरફાર માટે વિનંતી મોકલી શકો છો.
+                    </div>
+                    <div class="quote-actions-row">
+                        <button class="btn-quote-approve" id="btn-portal-approve-quote" onclick="handleQuotePortalAction('approve')">
+                            ✓ Approve Quote & Confirm Booking
+                        </button>
+                        <button class="btn-quote-reject" id="btn-portal-show-reject" onclick="toggleQuoteFeedbackForm()">
+                            ✎ Request Changes / Feedback
+                        </button>
+                    </div>
+                    <div class="feedback-form-container" id="quote-feedback-container">
+                        <label style="display:block; font-size:0.82rem; font-weight:600; color:#5D4924; margin-bottom:0.4rem; font-family:'Poppins', sans-serif;">Describe your requested modifications / તમારા ફેરફારો જણાવो:</label>
+                        <textarea class="feedback-textarea" id="quote-feedback-text" placeholder="e.g., Please change the marigold color to yellow, or add 10 more floor lights..."></textarea>
+                        <div style="display:flex; gap:0.5rem;">
+                            <button class="btn-feedback-submit" onclick="handleQuotePortalAction('reject')">Submit Changes Request</button>
+                            <button class="btn-secondary" style="padding:0.4rem 0.8rem; font-size:0.8rem;" onclick="toggleQuoteFeedbackForm(false)">Cancel</button>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Balance Card -->
                 <div class="balance-card">
@@ -1060,6 +1218,16 @@
         });
 
         function populatePortal(event) {
+            // Toggle Quote Approval Card based on status
+            const quoteCard = document.getElementById("portal-quote-card");
+            if (quoteCard) {
+                if (event.status === "Quote") {
+                    quoteCard.style.display = "block";
+                } else {
+                    quoteCard.style.display = "none";
+                }
+            }
+
             // Balance hero
             const remaining = event.remaining_balance || 0;
             const paid = event.amount_paid || 0;
@@ -1547,6 +1715,66 @@
                 placeholder.style.display = "block";
             }
         }
+
+        function toggleQuoteFeedbackForm(show) {
+            const container = document.getElementById("quote-feedback-container");
+            if (show === undefined) {
+                container.style.display = container.style.display === "block" ? "none" : "block";
+            } else {
+                container.style.display = show ? "block" : "none";
+            }
+        }
+        window.toggleQuoteFeedbackForm = toggleQuoteFeedbackForm;
+
+        async function handleQuotePortalAction(action) {
+            const feedbackText = document.getElementById("quote-feedback-text").value;
+            
+            if (action === "reject" && !feedbackText.trim()) {
+                alert("Please enter details about the changes you want to request.");
+                return;
+            }
+            
+            const approveBtn = document.getElementById("btn-portal-approve-quote");
+            const rejectBtn = document.getElementById("btn-portal-show-reject");
+            
+            if (approveBtn) approveBtn.disabled = true;
+            if (rejectBtn) rejectBtn.disabled = true;
+            
+            try {
+                const res = await fetch(`/api/portal/${_portalToken}/action`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        action: action,
+                        feedback: feedbackText
+                    })
+                });
+                
+                const data = await res.json();
+                
+                if (res.ok) {
+                    if (action === "approve") {
+                        alert("Thank you! Your quote has been approved, and your booking is now Confirmed. You will receive a confirmation email shortly.");
+                        window.location.reload();
+                    } else {
+                        alert("Thank you. Your change requests have been sent to the administrator. We will review them and update your quote.");
+                        document.getElementById("quote-feedback-text").value = "";
+                        toggleQuoteFeedbackForm(false);
+                    }
+                } else {
+                    alert("Error: " + (data.detail || "Failed to process quote action."));
+                }
+            } catch (err) {
+                console.error("Quote action error:", err);
+                alert("An error occurred: " + err.message);
+            } finally {
+                if (approveBtn) approveBtn.disabled = false;
+                if (rejectBtn) rejectBtn.disabled = false;
+            }
+        }
+        window.handleQuotePortalAction = handleQuotePortalAction;
 
         // Attach to portal load
         const _origPortalInit = window.__portalInitDone;

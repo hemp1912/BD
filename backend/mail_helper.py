@@ -64,6 +64,10 @@ async def send_system_email(to_email: str, email_type: str, context: dict):
     elif email_type == "completed":
         subject_tpl = settings.get("completed_email_subject") or "Thank You from Bhoomi Decoration!"
         body_tpl = settings.get("completed_email_body") or "Dear {client_name},\n\nWe want to say a big thank you for choosing Bhoomi Decoration for your recent event.\n\nIt was our pleasure assisting you. You can review your final invoice and download a PDF copy from your portal: {portal_url}\n\nBest regards,\nBhoomi Decoration Team"
+    elif email_type == "reminder":
+        subject_tpl = settings.get("reminder_email_subject") or "Payment Reminder — Outstanding Balance for Event at {venue_address}"
+        body_tpl = settings.get("reminder_email_body") or "Dear {client_name},\n\nThis is a friendly reminder that there is an outstanding balance of ₹{remaining} due for your upcoming event booking with Bhoomi Decoration.\n\nEvent Details:\n- Event ID: {event_id}\n- Venue: {venue_address}\n- Dates: {start_date} to {end_date}\n\nYou can review your invoice and make payments through your portal link here:\n{portal_url}\n\nThank you,\nBhoomi Decoration Team"
+        
         
     # Replace placeholders
     subject = subject_tpl

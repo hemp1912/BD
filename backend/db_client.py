@@ -10,6 +10,7 @@ class BaseDB:
 
     # Clients
     async def get_clients(self, page=None, limit=10, search=None): raise NotImplementedError
+    async def get_client(self, client_id: str): raise NotImplementedError
     async def create_client(self, client: dict): raise NotImplementedError
     async def update_client(self, client_id: str, client: dict): raise NotImplementedError
     async def delete_client(self, client_id: str): raise NotImplementedError
