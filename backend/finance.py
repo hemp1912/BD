@@ -82,6 +82,9 @@ class PaymentRequest(BaseModel):
     amount: float
     payment_method: str = "Cash"
 
+class ReminderRequest(BaseModel):
+    to_email: Optional[str] = None
+
 class TaskSchema(BaseModel):
     event_id: str
     description: str
@@ -321,8 +324,19 @@ async def get_event_portal_link(request: Request, event_id: str):
     return {"portal_token": token, "portal_link": f"/portal/{token}"}
 
 @router.post("/events/{event_id}/send-reminder")
-async def send_event_payment_reminder(request: Request, event_id: str, background_tasks: BackgroundTasks):
+async def send_event_payment_reminder(request: Request, event_id: str, body: Optional[ReminderRequest] = None):
     await require_admin(request)
+    
+    # Check SMTP configuration
+    import os
+    if not (os.getenv("TESTING") == "true" or os.getenv("DISABLE_EMAIL") == "true"):
+        settings = await db_client.get_settings()
+        smtp_host = settings.get("smtp_host")
+        smtp_user = settings.get("smtp_user")
+        smtp_pass = settings.get("smtp_pass")
+        if not smtp_host or not smtp_user or not smtp_pass:
+            raise HTTPException(status_code=400, detail="SMTP Configuration (host, user, pass) is incomplete. Please configure it in System Settings.")
+
     event_data = await db_client.get_event(event_id)
     if not event_data:
         raise HTTPException(status_code=404, detail="Event not found")
@@ -331,25 +345,46 @@ async def send_event_payment_reminder(request: Request, event_id: str, backgroun
     event_data = add_payment_status(event_data)
     
     from backend.mail_helper import get_event_email_context, send_system_email
-    client_email, email_context = await get_event_email_context(event_data, request)
+    db_email, email_context = await get_event_email_context(event_data, request)
+    
+    # Prefer email passed from frontend (which already fetched client), fall back to DB-resolved email
+    supplied_email = (body.to_email or "").strip() if body else ""
+    client_email = supplied_email or db_email
+    
     if not client_email:
-        raise HTTPException(status_code=400, detail="Client email address is missing or invalid for this booking.")
+        raise HTTPException(status_code=400, detail="Client email address is missing or invalid for this booking. Please add an email address to the client record.")
         
     if (event_data.get("remaining_balance") or 0.0) <= 0:
         raise HTTPException(status_code=400, detail="This booking has no outstanding remaining balance due.")
         
-    background_tasks.add_task(send_system_email, client_email, "reminder", email_context)
-    return {"status": "success", "message": f"Payment reminder scheduled for client {event_data.get('client_name')}."}
+    success = await send_system_email(client_email, "reminder", email_context)
+    if not success:
+        raise HTTPException(status_code=500, detail="Failed to send payment reminder email via SMTP. Please check your SMTP settings or server logs.")
+        
+    return {"status": "success", "message": f"Payment reminder email successfully sent to {client_email} for client {event_data.get('client_name')}."}
 
 @router.post("/finance/send-bulk-reminders")
-async def send_bulk_payment_reminders(request: Request, background_tasks: BackgroundTasks):
+async def send_bulk_payment_reminders(request: Request):
     await require_admin(request)
+    
+    # Check SMTP configuration
+    import os
+    if not (os.getenv("TESTING") == "true" or os.getenv("DISABLE_EMAIL") == "true"):
+        settings = await db_client.get_settings()
+        smtp_host = settings.get("smtp_host")
+        smtp_user = settings.get("smtp_user")
+        smtp_pass = settings.get("smtp_pass")
+        if not smtp_host or not smtp_user or not smtp_pass:
+            raise HTTPException(status_code=400, detail="SMTP Configuration (host, user, pass) is incomplete. Please configure it in System Settings.")
+
     events = await db_client.get_events()
     
     from backend.mail_helper import get_event_email_context, send_system_email
+    import asyncio
     
-    sent_count = 0
+    email_tasks = []
     skipped_count = 0
+    
     for evt in events:
         evt_status = evt.get("status", "")
         if evt_status in ["Cancelled", "Completed"]:
@@ -362,11 +397,19 @@ async def send_bulk_payment_reminders(request: Request, background_tasks: Backgr
         evt = await ensure_portal_token(evt)
         client_email, email_context = await get_event_email_context(evt, request)
         if client_email:
-            background_tasks.add_task(send_system_email, client_email, "reminder", email_context)
-            sent_count += 1
+            email_tasks.append(send_system_email(client_email, "reminder", email_context))
         else:
             skipped_count += 1
             
+    sent_count = 0
+    if email_tasks:
+        results = await asyncio.gather(*email_tasks, return_exceptions=True)
+        for r in results:
+            if r is True:
+                sent_count += 1
+            else:
+                skipped_count += 1
+                
     return {"status": "success", "sent_count": sent_count, "skipped_count": skipped_count}
 
 @router.get("/events/{event_id}")

@@ -12,9 +12,9 @@ async def get_event_email_context(event: dict, request: Optional[Request] = None
     client_name = event.get("client_name") or "Valued Client"
     try:
         client_data = await db_client.get_client(event.get("client_id"))
-        client_email = client_data.get("email") if client_data else ""
+        client_email = client_data.get("email") if client_data else (event.get("client_email") or "")
     except Exception:
-        client_email = ""
+        client_email = event.get("client_email") or ""
         
     portal_token = event.get("portal_token") or ""
     origin = "http://localhost:8000"
@@ -26,9 +26,9 @@ async def get_event_email_context(event: dict, request: Optional[Request] = None
     return client_email, {
         "client_name": client_name,
         "portal_url": portal_url,
-        "total": f"{event.get('total_invoice_amount', 0.0):.2f}",
-        "paid": f"{event.get('amount_paid', 0.0):.2f}",
-        "remaining": f"{event.get('remaining_balance', 0.0):.2f}",
+        "total": f"{float(event.get('total_invoice_amount') or 0.0):.2f}",
+        "paid": f"{float(event.get('amount_paid') or 0.0):.2f}",
+        "remaining": f"{float(event.get('remaining_balance') or 0.0):.2f}",
         "event_id": event.get("id") or "",
         "venue_address": event.get("venue_address") or "",
         "start_date": event.get("start_date") or "",

@@ -63,6 +63,14 @@ async def get_clients(
     await require_admin(request)
     return await db_client.get_clients(page=page, limit=limit, search=search)
 
+@router.get("/clients/{client_id}")
+async def get_client(request: Request, client_id: str):
+    await require_admin(request)
+    res = await db_client.get_client(client_id)
+    if not res:
+        raise HTTPException(status_code=404, detail="Client not found")
+    return res
+
 @router.post("/clients")
 async def create_client(request: Request, client: ClientSchema):
     await require_admin(request)

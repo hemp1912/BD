@@ -1214,6 +1214,11 @@ function renderDashboardTable(tbody, alertsBox) {
             ? `<strong class="${balance > 0 ? 'text-danger' : 'text-success'}" style="font-size:0.9rem;">₹${balance.toFixed(2)}</strong>`
             : `<span>—</span>`;
 
+        const showRemind = (evt.remaining_balance > 0 && evt.status !== "Cancelled" && evt.status !== "Completed");
+        const remindBtn = showRemind ? `
+            <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem; color: var(--maroon); border-color: var(--maroon);" onclick="sendPaymentReminder('${evt.id}')">✉ Remind</button>
+        ` : '';
+
         tr.innerHTML = `
             <td>
                 <strong>${evt.client_name}</strong><br>
@@ -1234,6 +1239,7 @@ function renderDashboardTable(tbody, alertsBox) {
                     <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem;" onclick="openInvoiceModal('${evt.id}')">Invoice/Receipt</button>
                     <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem;" onclick="openLayoutUploadModal('${evt.id}')">Upload Layout</button>
                     <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem;" onclick="editEventBooking('${evt.id}')">Edit</button>
+                    ${remindBtn}
                     <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem;" onclick="fetchAndCopyPortalLink('${evt.id}')">🔗 Portal</button>
                     <button class="btn-danger" style="padding: 0.35rem 0.5rem; font-size: 0.75rem; border-radius: 8px;" onclick="deleteEventBooking('${evt.id}')">✕</button>
                 </div>
@@ -1600,37 +1606,27 @@ async function openInvoiceModal(eventId) {
     const evt = await apiFetch(`/api/events/${eventId}`);
     const detailsDiv = document.getElementById("invoice-details-box");
     
-    // Parse items booked
-    let bookedItems = {};
-    try {
-        bookedItems = JSON.parse(evt.items_booked || "{}");
-    } catch (e) {}
-    
     // Resolve item names and rates
     let itemsHtml = "";
-    const fullInv = await getFullInventoryList();
     
     // Calculate rental span
     const sDate = new Date(evt.start_date);
     const eDate = new Date(evt.end_date);
-    const days = Math.max(1, Math.round((eDate - sDate) / (1000 * 60 * 60 * 24)) + 1);
+    const days = evt.rental_days || Math.max(1, Math.round((eDate - sDate) / (1000 * 60 * 60 * 24)) + 1);
     
     let itemsListTextForPrint = "";
     let subtotal = 0.0;
-    Object.keys(bookedItems).forEach(itemId => {
-        const item = fullInv.find(i => i.id === itemId);
-        if (item) {
-            const qty = bookedItems[itemId];
-            const cost = item.rental_price_per_day * qty * days;
-            subtotal += cost;
-            itemsHtml += `
-                <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border-glass); padding: 0.25rem 0;">
-                    <span>${item.name} (${t('pdf_qty')}: ${qty})</span>
-                    <span>₹${cost.toFixed(2)}</span>
-                </div>
-            `;
-            itemsListTextForPrint += `<tr><td style="border: 1px solid #e5e7eb; padding: 8px;">${item.name}</td><td style="border: 1px solid #e5e7eb; padding: 8px;">${qty}</td><td style="border: 1px solid #e5e7eb; padding: 8px;">₹${item.rental_price_per_day.toFixed(2)}</td><td style="border: 1px solid #e5e7eb; padding: 8px;">₹${cost.toFixed(2)}</td></tr>`;
-        }
+    const resolvedItems = evt.resolved_items || [];
+    resolvedItems.forEach(item => {
+        const cost = item.cost;
+        subtotal += cost;
+        itemsHtml += `
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border-glass); padding: 0.25rem 0;">
+                <span>${item.name} (${t('pdf_qty')}: ${item.quantity})</span>
+                <span>₹${cost.toFixed(2)}</span>
+            </div>
+        `;
+        itemsListTextForPrint += `<tr><td style="border: 1px solid #e5e7eb; padding: 8px;">${item.name}</td><td style="border: 1px solid #e5e7eb; padding: 8px;">${item.quantity}</td><td style="border: 1px solid #e5e7eb; padding: 8px;">₹${item.rate.toFixed(2)}</td><td style="border: 1px solid #e5e7eb; padding: 8px;">₹${cost.toFixed(2)}</td></tr>`;
     });
 
     // Parse worker wages layout
@@ -1947,6 +1943,12 @@ async function loadEventsData(page) {
             const badgeClass = evt.status === "Completed" ? "badge-completed" :
                                evt.status === "Confirmed" ? "badge-confirmed" :
                                evt.status === "Quote" ? "badge-confirmed" : "badge-draft";
+            
+            const showRemind = (evt.remaining_balance > 0 && evt.status !== "Cancelled" && evt.status !== "Completed");
+            const remindBtn = showRemind ? `
+                <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem; color: var(--maroon); border-color: var(--maroon);" onclick="sendPaymentReminder('${evt.id}')">✉ Remind</button>
+            ` : '';
+
             tr.innerHTML = `
                 <td>
                     <strong>${evt.client_name}</strong><br>
@@ -1970,6 +1972,7 @@ async function loadEventsData(page) {
                             <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem;" onclick="openInvoiceModal('${evt.id}')">Receipt/Pay</button>
                         `}
                         <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem;" onclick="editEventBooking('${evt.id}')">${t('edit')}</button>
+                        ${remindBtn}
                         <button class="btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem;" onclick="fetchAndCopyPortalLink('${evt.id}')">🔗 Portal</button>
                         <button class="btn-danger" style="padding: 0.35rem 0.5rem; font-size: 0.75rem; border-radius: 8px;" onclick="deleteEventBooking('${evt.id}')">✕</button>
                     </div>
@@ -3990,41 +3993,35 @@ async function openEventDetailsViewModal(eventId) {
             return;
         }
 
-        if (clientsList.length === 0) {
-            clientsList = await apiFetch("/api/clients") || [];
+        let client = {};
+        if (evt.client_id) {
+            try {
+                client = await apiFetch(`/api/clients/${evt.client_id}`) || {};
+            } catch (err) {
+                console.error("Failed to fetch client details:", err);
+            }
         }
-        const fullInv = await getFullInventoryList();
-
-        const client = clientsList.find(c => c.id === evt.client_id) || {};
-        
-        let booked = {};
-        try {
-            booked = JSON.parse(evt.items_booked || "{}");
-        } catch (e) {}
 
         const sDate = new Date(evt.start_date);
         const eDate = new Date(evt.end_date);
-        const days = Math.max(1, Math.round((eDate - sDate) / (1000 * 60 * 60 * 24)) + 1);
+        const days = evt.rental_days || Math.max(1, Math.round((eDate - sDate) / (1000 * 60 * 60 * 24)) + 1);
 
         let itemsHtml = "";
         let itemsCount = 0;
         let subtotal = 0;
-        Object.keys(booked).forEach(itemId => {
-            const item = fullInv.find(i => i.id === itemId);
-            if (item) {
-                const qty = booked[itemId];
-                const total = item.rental_price_per_day * qty * days;
-                subtotal += total;
-                itemsCount += qty;
-                itemsHtml += `
-                    <tr>
-                        <td><strong>${item.name}</strong><br><small style="color:var(--text-muted);">${item.category}</small></td>
-                        <td>${qty}</td>
-                        <td>₹${item.rental_price_per_day.toFixed(2)}</td>
-                        <td style="text-align:right;">₹${total.toFixed(2)}</td>
-                    </tr>
-                `;
-            }
+        const resolvedItems = evt.resolved_items || [];
+        resolvedItems.forEach(item => {
+            const total = item.cost;
+            subtotal += total;
+            itemsCount += item.quantity;
+            itemsHtml += `
+                <tr>
+                    <td><strong>${item.name}</strong><br><small style="color:var(--text-muted);">${item.category}</small></td>
+                    <td>${item.quantity}</td>
+                    <td>₹${item.rate.toFixed(2)}</td>
+                    <td style="text-align:right;">₹${total.toFixed(2)}</td>
+                </tr>
+            `;
         });
 
         if (itemsHtml === "") {
@@ -4045,6 +4042,11 @@ async function openEventDetailsViewModal(eventId) {
                 </div>
             `;
         }
+
+        const showRemindInModal = (evt.remaining_balance > 0 && evt.status !== "Cancelled" && evt.status !== "Completed");
+        const remindBtnInModal = showRemindInModal ? `
+            <button class="btn btn-secondary" style="padding:0.4rem 0.8rem;font-size:0.8rem;border-color:var(--maroon);color:var(--maroon);background:transparent;cursor:pointer;" onclick="sendPaymentReminder('${evt.id}')">✉️ Send Payment Reminder</button>
+        ` : '';
 
         const detailsContent = document.getElementById("event-details-content");
         if (detailsContent) {
@@ -4110,10 +4112,11 @@ async function openEventDetailsViewModal(eventId) {
                     </div>
                 </div>
 
-                <div class="glass-panel" style="padding:1rem;margin-top:1rem;display:flex;gap:1rem;justify-content:center;align-items:center;background:rgba(16,185,129,0.05);border:1px solid rgba(16,185,129,0.2);">
+                <div class="glass-panel" style="padding:1rem;margin-top:1rem;display:flex;gap:1rem;justify-content:center;align-items:center;background:rgba(16,185,129,0.05);border:1px solid rgba(16,185,129,0.2);flex-wrap:wrap;">
                     <h5 style="margin:0;font-family:'Marcellus',serif;color:var(--maroon);font-size:0.9rem;">Dispatch Invoice:</h5>
                     <button class="btn btn-secondary" style="padding:0.4rem 0.8rem;font-size:0.8rem;border-color:#25d366;color:#25d366;background:transparent;cursor:pointer;" onclick="dispatchWhatsAppInvoice('${evt.client_name || ''}', '${evt.start_date || ''}', '${evt.remaining_balance || 0}', '${evt.portal_token || ''}', '${client.phone || ''}')">💬 Send to WhatsApp</button>
                     <button class="btn btn-secondary" style="padding:0.4rem 0.8rem;font-size:0.8rem;border-color:var(--maroon);color:var(--maroon);background:transparent;cursor:pointer;" onclick="dispatchEmailInvoice('${evt.client_name || ''}', '${evt.portal_token || ''}', '${evt.total_invoice_amount || 0}', '${evt.amount_paid || 0}', '${evt.remaining_balance || 0}', '${client.email || ''}')">✉️ Send to Email</button>
+                    ${remindBtnInModal}
                 </div>
 
                 <div class="glass-panel" style="padding:1rem;margin-top:1rem;">
@@ -4143,14 +4146,23 @@ function dispatchWhatsAppInvoice(clientName, startDate, remainingBalance, portal
 window.dispatchWhatsAppInvoice = dispatchWhatsAppInvoice;
 
 async function dispatchEmailInvoice(clientName, portalToken, total, paid, remaining, email) {
-    const smtpHost = localStorage.getItem("settings_smtp_host") || "smtp.gmail.com";
-    const smtpPort = parseInt(localStorage.getItem("settings_smtp_port") || "587");
-    const smtpUser = localStorage.getItem("settings_smtp_user") || "";
-    const smtpPass = localStorage.getItem("settings_smtp_pass") || "";
+    let settings;
+    try {
+        settings = await apiFetch("/api/admin/settings") || {};
+    } catch (err) {
+        console.error("Error fetching settings:", err);
+        showToast("Error retrieving settings from server.", "error");
+        return;
+    }
+
+    const smtpHost = settings.smtp_host || "smtp.gmail.com";
+    const smtpPort = parseInt(settings.smtp_port || "587");
+    const smtpUser = settings.smtp_user || "";
+    const smtpPass = settings.smtp_pass || "";
 
     const portalUrl = `${window.location.origin}/portal/${portalToken}`;
-    const subjectTemplate = localStorage.getItem("settings_email_subject") || "Bhoomi Decoration Event Portal & Invoice — {client_name}";
-    const bodyTemplate = localStorage.getItem("settings_email_body") || "Hi {client_name},\n\nThank you for choosing Bhoomi Decoration.\n\nHere is your Bhoomi Decoration Event Portal link to track payments, designs and invoices:\n{portal_url}\n\nInvoice Details:\n- Invoice Total: ₹{total}\n- Amount Paid: ₹{paid}\n- Remaining Balance: ₹{remaining}\n\nBest regards,\nBhoomi Decoration Team";
+    const subjectTemplate = settings.email_subject || "Bhoomi Decoration Event Portal & Invoice — {client_name}";
+    const bodyTemplate = settings.email_body || "Hi {client_name},\n\nThank you for choosing Bhoomi Decoration.\n\nHere is your Bhoomi Decoration Event Portal link to track payments, designs and invoices:\n{portal_url}\n\nInvoice Details:\n- Invoice Total: ₹{total}\n- Amount Paid: ₹{paid}\n- Remaining Balance: ₹{remaining}\n\nBest regards,\nBhoomi Decoration Team";
 
     function fillTemplate(text) {
         return text
@@ -4181,11 +4193,7 @@ async function dispatchEmailInvoice(clientName, portalToken, total, paid, remain
             body: JSON.stringify({
                 to_email: email,
                 subject: subject,
-                body: body,
-                smtp_host: smtpHost,
-                smtp_port: smtpPort,
-                smtp_user: smtpUser,
-                smtp_pass: smtpPass
+                body: body
             })
         });
         showToast("Invoice email successfully dispatched via SMTP!", "success");
@@ -5147,16 +5155,94 @@ window.deleteBookingEventPhoto = deleteBookingEventPhoto;
 async function sendPaymentReminder(eventId) {
     if (!confirm("Send a payment reminder email to the client for this booking?")) return;
     try {
-        showToast("Sending reminder email...");
-        const res = await apiFetch(`/api/events/${eventId}/send-reminder`, {
-            method: "POST"
-        });
-        showToast(res.message || "Payment reminder sent successfully.");
+        showToast("Fetching booking details...", "info");
+        const evt = await apiFetch(`/api/events/${eventId}`);
+        if (!evt) {
+            showToast("Failed to fetch event details.", "error");
+            return;
+        }
+
+        let client = {};
+        if (evt.client_id) {
+            try {
+                client = await apiFetch(`/api/clients/${evt.client_id}`) || {};
+            } catch (err) {
+                console.error("Failed to fetch client details:", err);
+            }
+        }
+
+        const email = client.email || evt.client_email || "";
+        if (!email) {
+            showToast("Client email address is missing. Please add an email to the client record first.", "error");
+            return;
+        }
+
+        let settings = {};
+        try {
+            settings = await apiFetch("/api/admin/settings") || {};
+        } catch (err) {
+            console.error("Error fetching settings:", err);
+        }
+
+        const smtpUser = settings.smtp_user || "";
+        const smtpPass = settings.smtp_pass || "";
+
+        const portalUrl = `${window.location.origin}/portal/${evt.portal_token || ''}`;
+        const subjectTemplate = settings.reminder_email_subject || "Payment Reminder — Outstanding Balance for Event at {venue_address}";
+        const bodyTemplate = settings.reminder_email_body || "Dear {client_name},\n\nThis is a friendly reminder that there is an outstanding balance of ₹{remaining} due for your upcoming event booking with Bhoomi Decoration.\n\nEvent Details:\n- Event ID: {event_id}\n- Venue: {venue_address}\n- Dates: {start_date} to {end_date}\n\nYou can review your invoice and make payments through your portal link here:\n{portal_url}\n\nThank you,\nBhoomi Decoration Team";
+
+        const clientName = client.name || evt.client_name || "Valued Client";
+        const remainingStr = (evt.remaining_balance || 0.0).toFixed(2);
+        const venueAddress = evt.venue_address || "N/A";
+        const eventIdStr = evt.id || "";
+        const startDate = evt.start_date || "";
+        const endDate = evt.end_date || "";
+
+        function fillTemplate(text) {
+            return text
+                .replaceAll("{client_name}", clientName)
+                .replaceAll("{portal_url}", portalUrl)
+                .replaceAll("{remaining}", remainingStr)
+                .replaceAll("{venue_address}", venueAddress)
+                .replaceAll("{event_id}", eventIdStr)
+                .replaceAll("{start_date}", startDate)
+                .replaceAll("{end_date}", endDate);
+        }
+
+        const subject = fillTemplate(subjectTemplate);
+        const body = fillTemplate(bodyTemplate);
+
+        const openMailtoFallback = () => {
+            showToast("Falling back to local mail client...", "warning");
+            const mailtoUrl = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.location.href = mailtoUrl;
+        };
+
+        if (!smtpUser || !smtpPass) {
+            showToast("SMTP credentials not configured in settings.", "warning");
+            openMailtoFallback();
+            return;
+        }
+
+        showToast("Sending reminder email via SMTP server...", "info");
+        try {
+            const res = await apiFetch(`/api/events/${eventId}/send-reminder`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ to_email: email })
+            });
+            showToast(res.message || "Payment reminder sent successfully.");
+        } catch (err) {
+            console.error("SMTP sending failed, opening mailto fallback:", err);
+            openMailtoFallback();
+        }
     } catch (err) {
-        showToast("Error: " + err.message, "error");
+        console.error("sendPaymentReminder error:", err);
+        showToast("Error preparing reminder email: " + err.message, "error");
     }
 }
 window.sendPaymentReminder = sendPaymentReminder;
+
 
 async function sendAllPaymentReminders() {
     if (!confirm("Are you sure you want to send payment reminder emails to ALL clients with an outstanding balance?")) return;
