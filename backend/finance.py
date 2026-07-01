@@ -331,7 +331,7 @@ async def send_event_payment_reminder(request: Request, event_id: str, body: Opt
     import os
     if not (os.getenv("TESTING") == "true" or os.getenv("DISABLE_EMAIL") == "true"):
         settings = await db_client.get_settings()
-        smtp_host = settings.get("smtp_host")
+        smtp_host = settings.get("smtp_host") or "smtp.gmail.com"
         smtp_user = settings.get("smtp_user")
         smtp_pass = settings.get("smtp_pass")
         if not smtp_host or not smtp_user or not smtp_pass:
@@ -371,7 +371,7 @@ async def send_bulk_payment_reminders(request: Request):
     import os
     if not (os.getenv("TESTING") == "true" or os.getenv("DISABLE_EMAIL") == "true"):
         settings = await db_client.get_settings()
-        smtp_host = settings.get("smtp_host")
+        smtp_host = settings.get("smtp_host") or "smtp.gmail.com"
         smtp_user = settings.get("smtp_user")
         smtp_pass = settings.get("smtp_pass")
         if not smtp_host or not smtp_user or not smtp_pass:

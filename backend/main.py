@@ -588,7 +588,7 @@ async def send_email_api(payload: EmailRequestSchema, request: Request):
     from backend.db_client import db_client
     settings = await db_client.get_settings()
     
-    smtp_host = settings.get("smtp_host")
+    smtp_host = settings.get("smtp_host") or "smtp.gmail.com"
     smtp_port = settings.get("smtp_port") or 587
     smtp_user = settings.get("smtp_user")
     smtp_pass = settings.get("smtp_pass")

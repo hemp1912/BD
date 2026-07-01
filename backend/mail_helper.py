@@ -55,7 +55,7 @@ async def send_system_email(to_email: str, email_type: str, context: dict):
         print(f"[TESTING] Mock SMTP: Simulated sending {email_type} email to {to_email}.")
         return True
         
-    smtp_host = settings.get("smtp_host")
+    smtp_host = settings.get("smtp_host") or "smtp.gmail.com"
     smtp_port = settings.get("smtp_port") or 587
     smtp_user = settings.get("smtp_user")
     smtp_pass = settings.get("smtp_pass")
