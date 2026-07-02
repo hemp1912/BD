@@ -869,5 +869,23 @@
         "token": "6a44ec0dd16853b91dfd",
         "expire": "2027-07-01T09:29:33.857+00:00",
         "verified_at": 1782901779.5803947
+    },
+    "test_admin_token_123": {
+        "email": "hello@bhoomidecoration.com",
+        "role": "admin",
+        "name": "Admin Manager",
+        "id": "usr_admin",
+        "token": "test_admin_token_123",
+        "expire": "",
+        "verified_at": 1782914332.1086016
+    },
+    "6a451de0cd50acae8af9": {
+        "email": "hello@bhoomidecoration.com",
+        "role": "admin",
+        "name": "Admin Manager",
+        "id": "usr_admin",
+        "token": "6a451de0cd50acae8af9",
+        "expire": "2027-07-01T13:02:08.840+00:00",
+        "verified_at": 1782914533.5192237
     }
 }
