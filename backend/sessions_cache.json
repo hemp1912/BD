@@ -887,5 +887,14 @@
         "token": "6a451de0cd50acae8af9",
         "expire": "2027-07-01T13:02:08.840+00:00",
         "verified_at": 1782914533.5192237
+    },
+    "6a45e65c232bbb4803b8": {
+        "email": "hello@bhoomidecoration.com",
+        "role": "admin",
+        "name": "Admin Manager",
+        "id": "usr_admin",
+        "token": "6a45e65c232bbb4803b8",
+        "expire": "2027-07-02T03:17:32.144+00:00",
+        "verified_at": 1782965858.0808048
     }
 }

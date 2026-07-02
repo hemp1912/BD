@@ -50,18 +50,23 @@ async def create_gallery_item(
 ):
     await require_admin(request)
     
+    import anyio
+    import asyncio
+
     if config.DB_TYPE == "APPWRITE":
         try:
             temp_path = os.path.join(UPLOAD_DIR, f"temp_{file.filename}")
-            with open(temp_path, "wb") as f:
-                f.write(await file.read())
+            async with await anyio.open_file(temp_path, "wb") as f:
+                await f.write(await file.read())
             
-            res = db_client.storage.create_file(
+            res = await asyncio.to_thread(
+                db_client.storage.create_file,
                 config.APPWRITE_STORAGE_BUCKET_ID,
                 "unique()",
                 InputFile.from_path(temp_path)
             )
-            os.remove(temp_path)
+            # Remove file asynchronously or in a worker thread
+            await asyncio.to_thread(os.remove, temp_path)
             
             file_id = res.id if hasattr(res, "id") else res["$id"]
             image_url = f"{config.APPWRITE_ENDPOINT}/storage/buckets/{config.APPWRITE_STORAGE_BUCKET_ID}/files/{file_id}/view?project={config.APPWRITE_PROJECT_ID}"
@@ -70,8 +75,8 @@ async def create_gallery_item(
     else:
         filename = f"gal_{int(datetime.now().timestamp())}_{file.filename}"
         dest_path = os.path.join(UPLOAD_DIR, filename)
-        with open(dest_path, "wb") as f:
-            f.write(await file.read())
+        async with await anyio.open_file(dest_path, "wb") as f:
+            await f.write(await file.read())
         image_url = f"/static/uploads/{filename}"
         
     item_data = {

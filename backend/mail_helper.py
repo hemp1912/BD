@@ -155,8 +155,9 @@ async def send_system_email(to_email: str, email_type: str, context: dict):
         subject = subject.replace(placeholder, str(v))
         body = body.replace(placeholder, str(v))
         
+    import asyncio
     try:
-        send_email_base(to_email, subject, body, settings)
+        await asyncio.to_thread(send_email_base, to_email, subject, body, settings)
         print(f"Successfully dispatched {email_type} email to {to_email}.")
         return True
     except Exception as e:

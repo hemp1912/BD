@@ -826,6 +826,20 @@ class AppwriteDB(BaseDB):
         except Exception:
             return None
 
+    async def get_event_by_portal_token(self, token: str):
+        try:
+            res = await asyncio.to_thread(
+                self.databases.list_documents,
+                self.db_id,
+                config.APPWRITE_EVENTS_COLLECTION_ID,
+                queries=[Query.equal("portal_token", token), Query.limit(1)]
+            )
+            docs = self._get_documents_list(res)
+            return self._clean_doc(docs[0]) if docs else None
+        except Exception as e:
+            print(f"[!] Error in get_event_by_portal_token: {e}")
+            return None
+
     async def create_event(self, event: dict):
         doc_id = "evt_" + str(uuid.uuid4())[:8]
         event_data = dict(event)
@@ -982,12 +996,18 @@ class AppwriteDB(BaseDB):
         )
         return self._clean_doc(doc)
 
-    async def get_gallery(self, page=None, limit=10, search=None):
+    async def get_gallery(self, page=None, limit=10, search=None, event_id=None):
+        queries = []
+        if event_id:
+            queries.append(Query.equal("event_id", event_id))
+        
+        queries.append(Query.limit(1000))
+        
         res = await asyncio.to_thread(
             self.databases.list_documents,
             self.db_id, 
             config.APPWRITE_GALLERY_COLLECTION_ID,
-            queries=[Query.limit(1000)]
+            queries=queries
         )
         all_items = [self._clean_doc(d) for d in self._get_documents_list(res)]
         

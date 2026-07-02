@@ -188,14 +188,10 @@ async def get_portal_data(token: str):
     from datetime import datetime, timedelta
     from backend.db_client import db_client
     import json
+    import asyncio
     
-    # 1. Fetch all events and find the matching portal_token
-    events = await db_client.get_events()
-    target_event = None
-    for e in events:
-        if e.get("portal_token") == token:
-            target_event = e
-            break
+    # 1. Fetch the specific event directly by token
+    target_event = await db_client.get_event_by_portal_token(token)
             
     if not target_event:
         raise HTTPException(status_code=404, detail="Portal link not found or invalid.")
@@ -210,14 +206,24 @@ async def get_portal_data(token: str):
         print(f"[!] Error parsing event end_date for expiration: {parse_err}")
         
     # 3. Resolve booked items names, rates, and costs
-    inventory = await db_client.get_inventory()
-    inv_map = {item.get("id"): item for item in inventory if item.get("id")}
-    
     try:
         items_booked = json.loads(target_event.get("items_booked", "{}"))
     except Exception:
         items_booked = {}
         
+    inv_map = {}
+    if items_booked:
+        try:
+            item_ids = list(items_booked.keys())
+            # Fetch inventory details concurrently
+            tasks = [db_client.get_inventory_item(item_id) for item_id in item_ids]
+            inventory_items = await asyncio.gather(*tasks)
+            for item in inventory_items:
+                if item and item.get("id"):
+                    inv_map[item.get("id")] = item
+        except Exception as inv_err:
+            print(f"[!] Error resolving inventory items for portal: {inv_err}")
+            
     resolved_items = []
     try:
         s_date = datetime.strptime(target_event.get("start_date", ""), "%Y-%m-%d").date()
@@ -260,14 +266,14 @@ async def get_portal_data(token: str):
         except Exception:
             pass
             
-    # Fetch tagged gallery photos for the event
+    # Fetch tagged gallery photos for the event (using optimized database filter)
     event_photos = []
     try:
-        gallery_items = await db_client.get_gallery()
+        gallery_items = await db_client.get_gallery(event_id=target_event.get("id"))
         event_photos = [
             item.get("image_url")
             for item in gallery_items
-            if item.get("event_id") == target_event.get("id")
+            if item.get("image_url")
         ]
     except Exception as g_err:
         print(f"[!] Error fetching gallery items for portal: {g_err}")

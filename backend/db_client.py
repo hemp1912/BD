@@ -16,7 +16,7 @@ class BaseDB:
     async def delete_client(self, client_id: str): raise NotImplementedError
 
     # Gallery
-    async def get_gallery(self, page=None, limit=10, search=None): raise NotImplementedError
+    async def get_gallery(self, page=None, limit=10, search=None, event_id=None): raise NotImplementedError
     async def get_gallery_item(self, photo_id: str): raise NotImplementedError
     async def create_gallery_item(self, item: dict): raise NotImplementedError
     async def update_gallery_item(self, photo_id: str, item: dict): raise NotImplementedError
@@ -31,6 +31,7 @@ class BaseDB:
     # Events
     async def get_events(self, page=None, limit=10, search=None, status=None): raise NotImplementedError
     async def get_event(self, event_id: str): raise NotImplementedError
+    async def get_event_by_portal_token(self, token: str): raise NotImplementedError
     async def create_event(self, event: dict): raise NotImplementedError
     async def update_event(self, event_id: str, event: dict): raise NotImplementedError
     async def delete_event(self, event_id: str): raise NotImplementedError
