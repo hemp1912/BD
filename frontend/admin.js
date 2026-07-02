@@ -4001,6 +4001,8 @@ async function openEventDetailsViewModal(eventId) {
                 console.error("Failed to fetch client details:", err);
             }
         }
+        const resolvedEmail = client.email || evt.client_email || "";
+        const resolvedPhone = client.phone || evt.client_phone || "";
 
         const sDate = new Date(evt.start_date);
         const eDate = new Date(evt.end_date);
@@ -4074,8 +4076,8 @@ async function openEventDetailsViewModal(eventId) {
                     <div class="glass-panel" style="padding:1rem;">
                         <h4 style="font-family:'Marcellus',serif;color:var(--maroon);margin:0 0 0.5rem 0;">Client Profile</h4>
                         <p style="margin:0 0 0.25rem 0;font-weight:600;">${client.name || evt.client_name || 'N/A'}</p>
-                        <p style="margin:0 0 0.25rem 0;font-size:0.85rem;color:var(--text-secondary);">${client.email || 'N/A'}</p>
-                        <p style="margin:0 0 0.25rem 0;font-size:0.85rem;color:var(--text-secondary);">${client.phone || 'N/A'}</p>
+                        <p style="margin:0 0 0.25rem 0;font-size:0.85rem;color:var(--text-secondary);">${resolvedEmail || 'N/A'}</p>
+                        <p style="margin:0 0 0.25rem 0;font-size:0.85rem;color:var(--text-secondary);">${resolvedPhone || 'N/A'}</p>
                         <p style="margin:0;font-size:0.85rem;color:var(--text-secondary);">${client.address || 'N/A'}</p>
                     </div>
                     <div class="glass-panel" style="padding:1rem;">
@@ -4114,8 +4116,8 @@ async function openEventDetailsViewModal(eventId) {
 
                 <div class="glass-panel" style="padding:1rem;margin-top:1rem;display:flex;gap:1rem;justify-content:center;align-items:center;background:rgba(16,185,129,0.05);border:1px solid rgba(16,185,129,0.2);flex-wrap:wrap;">
                     <h5 style="margin:0;font-family:'Marcellus',serif;color:var(--maroon);font-size:0.9rem;">Dispatch Invoice:</h5>
-                    <button class="btn btn-secondary" style="padding:0.4rem 0.8rem;font-size:0.8rem;border-color:#25d366;color:#25d366;background:transparent;cursor:pointer;" onclick="dispatchWhatsAppInvoice('${evt.client_name || ''}', '${evt.start_date || ''}', '${evt.remaining_balance || 0}', '${evt.portal_token || ''}', '${client.phone || ''}')">💬 Send to WhatsApp</button>
-                    <button class="btn btn-secondary" style="padding:0.4rem 0.8rem;font-size:0.8rem;border-color:var(--maroon);color:var(--maroon);background:transparent;cursor:pointer;" onclick="dispatchEmailInvoice('${evt.client_name || ''}', '${evt.portal_token || ''}', '${evt.total_invoice_amount || 0}', '${evt.amount_paid || 0}', '${evt.remaining_balance || 0}', '${client.email || ''}')">✉️ Send to Email</button>
+                    <button class="btn btn-secondary" style="padding:0.4rem 0.8rem;font-size:0.8rem;border-color:#25d366;color:#25d366;background:transparent;cursor:pointer;" onclick="dispatchWhatsAppInvoice('${evt.client_name || ''}', '${evt.start_date || ''}', '${evt.remaining_balance || 0}', '${evt.portal_token || ''}', '${resolvedPhone}')">💬 Send to WhatsApp</button>
+                    <button class="btn btn-secondary" style="padding:0.4rem 0.8rem;font-size:0.8rem;border-color:var(--maroon);color:var(--maroon);background:transparent;cursor:pointer;" onclick="dispatchEmailInvoice('${evt.client_name || ''}', '${evt.portal_token || ''}', '${evt.total_invoice_amount || 0}', '${evt.amount_paid || 0}', '${evt.remaining_balance || 0}', '${resolvedEmail}')">✉️ Send to Email</button>
                     ${remindBtnInModal}
                 </div>
 
@@ -4146,6 +4148,10 @@ function dispatchWhatsAppInvoice(clientName, startDate, remainingBalance, portal
 window.dispatchWhatsAppInvoice = dispatchWhatsAppInvoice;
 
 async function dispatchEmailInvoice(clientName, portalToken, total, paid, remaining, email) {
+    if (!email || !email.trim()) {
+        showToast("Client email address is missing. Please add an email to the client record first.", "error");
+        return;
+    }
     let settings;
     try {
         settings = await apiFetch("/api/admin/settings") || {};

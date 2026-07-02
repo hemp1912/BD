@@ -35,6 +35,68 @@ async def get_event_email_context(event: dict, request: Optional[Request] = None
         "end_date": event.get("end_date") or ""
     }
 
+def send_email_base(to_email: str, subject: str, body: str, settings: dict) -> bool:
+    import smtplib
+    from email.mime.text import MIMEText
+    from email.mime.multipart import MIMEMultipart
+    from email.header import Header
+
+    smtp_host = (settings.get("smtp_host") or "smtp.gmail.com").strip()
+    smtp_port_raw = settings.get("smtp_port")
+    smtp_user = (settings.get("smtp_user") or "").strip()
+    smtp_pass = settings.get("smtp_pass") or ""
+    
+    try:
+        smtp_port = int(smtp_port_raw) if smtp_port_raw is not None else 587
+    except ValueError:
+        smtp_port = 587
+        
+    if not smtp_host or not smtp_user or not smtp_pass:
+        raise ValueError("SMTP Server not fully configured in settings database.")
+        
+    to_email_clean = to_email.strip() if to_email else ""
+    if not to_email_clean or "@" not in to_email_clean:
+        raise ValueError("Recipient email address is missing or invalid.")
+        
+    # Create message container with UTF-8 support
+    msg = MIMEMultipart()
+    msg['From'] = smtp_user
+    msg['To'] = to_email_clean
+    msg['Subject'] = Header(subject, 'utf-8').encode()
+    
+    # Attach message body with utf-8
+    msg.attach(MIMEText(body, 'plain', 'utf-8'))
+    
+    # Connect to SMTP server based on port
+    if smtp_port == 465:
+        print(f"Connecting to SMTP SSL server at {smtp_host}:{smtp_port} with timeout=10...")
+        server = smtplib.SMTP_SSL(smtp_host, smtp_port, timeout=10)
+    else:
+        print(f"Connecting to SMTP server at {smtp_host}:{smtp_port} with timeout=10...")
+        server = smtplib.SMTP(smtp_host, smtp_port, timeout=10)
+        try:
+            server.ehlo()
+            if server.has_extn('STARTTLS'):
+                print("STARTTLS supported. Initiating TLS connection...")
+                server.starttls()
+                server.ehlo()
+        except Exception as tls_err:
+            print(f"Warning: STARTTLS not supported or failed: {tls_err}")
+            
+    try:
+        print("Logging in to SMTP server...")
+        server.login(smtp_user, smtp_pass)
+        print("Sending email...")
+        server.sendmail(smtp_user, to_email_clean, msg.as_string())
+        server.quit()
+        return True
+    except Exception as e:
+        try:
+            server.close()
+        except Exception:
+            pass
+        raise e
+
 async def send_system_email(to_email: str, email_type: str, context: dict):
     from backend.db_client import db_client
     try:
@@ -56,7 +118,6 @@ async def send_system_email(to_email: str, email_type: str, context: dict):
         return True
         
     smtp_host = settings.get("smtp_host") or "smtp.gmail.com"
-    smtp_port = settings.get("smtp_port") or 587
     smtp_user = settings.get("smtp_user")
     smtp_pass = settings.get("smtp_pass")
     
@@ -80,7 +141,6 @@ async def send_system_email(to_email: str, email_type: str, context: dict):
         subject_tpl = settings.get("reminder_email_subject") or "Payment Reminder — Outstanding Balance for Event at {venue_address}"
         body_tpl = settings.get("reminder_email_body") or "Dear {client_name},\n\nThis is a friendly reminder that there is an outstanding balance of ₹{remaining} due for your upcoming event booking with Bhoomi Decoration.\n\nEvent Details:\n- Event ID: {event_id}\n- Venue: {venue_address}\n- Dates: {start_date} to {end_date}\n\nYou can review your invoice and make payments through your portal link here:\n{portal_url}\n\nThank you,\nBhoomi Decoration Team"
         
-        
     # Replace placeholders
     subject = subject_tpl
     body = body_tpl
@@ -90,20 +150,10 @@ async def send_system_email(to_email: str, email_type: str, context: dict):
         body = body.replace(placeholder, str(v))
         
     try:
-        msg = MIMEMultipart()
-        msg['From'] = smtp_user
-        msg['To'] = to_email
-        msg['Subject'] = subject
-        
-        msg.attach(MIMEText(body, 'plain'))
-        
-        server = smtplib.SMTP(smtp_host, int(smtp_port))
-        server.starttls()
-        server.login(smtp_user, smtp_pass)
-        server.sendmail(smtp_user, to_email, msg.as_string())
-        server.quit()
+        send_email_base(to_email, subject, body, settings)
         print(f"Successfully dispatched {email_type} email to {to_email}.")
         return True
     except Exception as e:
         print(f"Failed to send {email_type} email: {e}")
         return False
+

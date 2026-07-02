@@ -588,37 +588,9 @@ async def send_email_api(payload: EmailRequestSchema, request: Request):
     from backend.db_client import db_client
     settings = await db_client.get_settings()
     
-    smtp_host = settings.get("smtp_host") or "smtp.gmail.com"
-    smtp_port = settings.get("smtp_port") or 587
-    smtp_user = settings.get("smtp_user")
-    smtp_pass = settings.get("smtp_pass")
-    
-    if not smtp_host or not smtp_user or not smtp_pass:
-        raise HTTPException(status_code=400, detail="SMTP Configuration (host, user, pass) is incomplete. Please configure it in System Settings.")
-        
+    from backend.mail_helper import send_email_base
     try:
-        import smtplib
-        from email.mime.text import MIMEText
-        from email.mime.multipart import MIMEMultipart
-        
-        # Create message container
-        msg = MIMEMultipart()
-        msg['From'] = smtp_user
-        msg['To'] = payload.to_email
-        msg['Subject'] = payload.subject
-        
-        # Attach message body
-        msg.attach(MIMEText(payload.body, 'plain'))
-        
-        # Connect to SMTP server
-        server = smtplib.SMTP(smtp_host, int(smtp_port))
-        server.starttls()
-        server.login(smtp_user, smtp_pass)
-        
-        # Send mail
-        server.sendmail(smtp_user, payload.to_email, msg.as_string())
-        server.quit()
-        
+        send_email_base(payload.to_email, payload.subject, payload.body, settings)
         return {"status": "success", "message": f"Email successfully sent to {payload.to_email}!"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to send email: {str(e)}")
