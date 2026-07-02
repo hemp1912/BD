@@ -1,10 +1,12 @@
 import smtplib
 import json
+import traceback
 from typing import Optional
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from fastapi import Request
 from backend import config
+
 
 async def get_event_email_context(event: dict, request: Optional[Request] = None):
     from backend.db_client import db_client
@@ -67,23 +69,24 @@ def send_email_base(to_email: str, subject: str, body: str, settings: dict) -> b
     # Attach message body with utf-8
     msg.attach(MIMEText(body, 'plain', 'utf-8'))
     
-    # Connect to SMTP server based on port
-    if smtp_port == 465:
-        print(f"Connecting to SMTP SSL server at {smtp_host}:{smtp_port} with timeout=10...")
-        server = smtplib.SMTP_SSL(smtp_host, smtp_port, timeout=10)
-    else:
-        print(f"Connecting to SMTP server at {smtp_host}:{smtp_port} with timeout=10...")
-        server = smtplib.SMTP(smtp_host, smtp_port, timeout=10)
-        try:
-            server.ehlo()
-            if server.has_extn('STARTTLS'):
-                print("STARTTLS supported. Initiating TLS connection...")
-                server.starttls()
-                server.ehlo()
-        except Exception as tls_err:
-            print(f"Warning: STARTTLS not supported or failed: {tls_err}")
-            
+    server = None
     try:
+        # Connect to SMTP server based on port
+        if smtp_port == 465:
+            print(f"Connecting to SMTP SSL server at {smtp_host}:{smtp_port} with timeout=10...")
+            server = smtplib.SMTP_SSL(smtp_host, smtp_port, timeout=10)
+        else:
+            print(f"Connecting to SMTP server at {smtp_host}:{smtp_port} with timeout=10...")
+            server = smtplib.SMTP(smtp_host, smtp_port, timeout=10)
+            try:
+                server.ehlo()
+                if server.has_extn('STARTTLS'):
+                    print("STARTTLS supported. Initiating TLS connection...")
+                    server.starttls()
+                    server.ehlo()
+            except Exception as tls_err:
+                print(f"Warning: STARTTLS not supported or failed: {tls_err}")
+                
         print("Logging in to SMTP server...")
         server.login(smtp_user, smtp_pass)
         print("Sending email...")
@@ -91,10 +94,13 @@ def send_email_base(to_email: str, subject: str, body: str, settings: dict) -> b
         server.quit()
         return True
     except Exception as e:
-        try:
-            server.close()
-        except Exception:
-            pass
+        print(f"Error in send_email_base: {e}")
+        traceback.print_exc()
+        if server:
+            try:
+                server.close()
+            except Exception:
+                pass
         raise e
 
 async def send_system_email(to_email: str, email_type: str, context: dict):
